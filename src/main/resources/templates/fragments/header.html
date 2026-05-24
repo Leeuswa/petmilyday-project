@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<nav class="gnb" th:fragment="header">
+  <div class="logo">petmily<span>day</span></div>
+  <a th:href="@{/}" class="nav-link active">홈</a>
+  <a th:href="@{/hospital}" class="nav-link">동물병원 예약</a>
+  <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a>
+  <a th:href="@{/shop}" class="nav-link">동물용품샵</a>
+  <a th:href="@{/used}" class="nav-link">중고거래</a>
+  <a th:href="@{/community}" class="nav-link">커뮤니티</a>
+  <div style="flex:1"></div>
+  <div class="fxa g12">
+    <th:block th:if="${loggedInUser == null}">
+      <a th:href="@{/member/login}" class="btn btn-outline btn-sm">로그인</a>
+      <a th:href="@{/member/register}" class="btn btn-accent btn-sm">회원가입</a>
+    </th:block>
+
+    <th:block th:if="${loggedInUser != null}">
+      <span style="font-size: 14px; font-weight: 600; color: #111111; margin-right: 10px;">
+        👤 <span th:text="${loggedInUser}">사용자</span>님 환영합니다!
+      </span>
+
+      <form th:action="@{/member/logout}" method="post" style="display: inline;">
+        <button type="submit" class="btn btn-outline btn-sm">로그아웃</button>
+      </form>
+    </th:block>
+  </div>
+</nav>
+</html>

@@ -1,0 +1,333 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+:root {
+    --primary: #2546f0;
+    --primary-hover: #1b35c0;
+    --bg-color: #f0f3f8;
+    --card-bg: #ffffff;
+    --text-main: #111111;
+    --text-sub: #666666;
+    --border: #e2e8f0;
+    --input-bg: #f4f6fa;
+    --kakao: #fee500;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Pretendard', sans-serif;
+    background-color: var(--bg-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 20px;
+}
+
+.register-wrapper {
+    max-width: 500px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.logo-icon {
+    background-color: var(--primary);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-text {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.auth-header h1 {
+    font-size: 24px;
+    margin: 0 0 8px 0;
+    color: var(--text-main);
+}
+
+.auth-header p {
+    font-size: 14px;
+    color: var(--text-sub);
+    margin: 0;
+}
+
+.social-login {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-kakao {
+    background-color: var(--kakao);
+    color: #000;
+}
+
+.btn-google {
+    background-color: #fff;
+    border: 1px solid var(--border);
+    color: var(--text-main);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 24px;
+    color: var(--text-sub);
+    font-size: 13px;
+}
+
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+}
+
+.divider span {
+    padding: 0 16px;
+}
+
+.auth-card {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+    border: 1px solid var(--border);
+}
+
+.input-group {
+    margin-bottom: 16px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+
+.required { color: #e53e3e; }
+.optional { color: var(--text-sub); font-weight: normal; }
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    color: #a0aec0;
+    font-size: 14px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--input-bg);
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.input-wrapper input {
+    padding-left: 40px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: #fff;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    font-size: 13px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-sub);
+}
+
+.link-text {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--text-sub);
+}
+
+.link-primary {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+/* Progress Bar (회원가입 용) */
+.progress-container {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.progress-bar {
+    position: absolute;
+    top: 12px;
+    left: 15%;
+    width: 70%;
+    height: 2px;
+    background-color: var(--border);
+    z-index: 1;
+}
+
+.progress-container::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 15%;
+    width: 35%;
+    height: 2px;
+    background-color: var(--primary);
+    z-index: 2;
+}
+
+.step {
+    width: 24px;
+    height: 24px;
+    background-color: var(--border);
+    color: #fff;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    position: relative;
+    z-index: 3;
+}
+
+.step:nth-child(2) { float: left; margin-left: 15%; }
+.step:nth-child(3) { float: right; margin-right: 15%; }
+
+.step.active {
+    background-color: var(--primary);
+}
+
+.step-labels {
+    clear: both;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10% 0;
+    font-size: 12px;
+    color: var(--text-sub);
+}
+
+.active-label {
+    color: var(--primary);
+    font-weight: bold;
+}
+
+/* Terms Container (회원가입 용) */
+.terms-container {
+    background-color: var(--input-bg);
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.terms-container hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 12px 0;
+}
+
+.term-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.term-item:last-child {
+    margin-bottom: 0;
+}
+
+.term-link {
+    font-size: 12px;
+    color: #a0aec0;
+    text-decoration: underline;
+}

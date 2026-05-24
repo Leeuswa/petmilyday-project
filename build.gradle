@@ -4,7 +4,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'com.petmilyday'
+group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 description = 'petmilyday'
 
@@ -19,17 +19,39 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    // 1. Core & Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     compileOnly 'org.projectlombok:lombok'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testCompileOnly 'org.projectlombok:lombok'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // 2. Database (JPA & MariaDB)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+    // 3. Security, OAuth2, JWT
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5' // JWT
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // 4. WebSocket (Chat)
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // 5. Spring Batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
+
+    // 6. External API & Cloud
+    implementation 'org.springframework.boot:spring-boot-starter-webflux' // WebClient용
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE' // S3
+    implementation 'com.google.firebase:firebase-admin:9.2.0' // FCM
+
+    // 7. Template Engine (Thymeleaf)
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    // 시큐리티 유틸리티 라이브러리 (나중에 로그인 정보 표시용)
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 }
 
 tasks.named('test') {
