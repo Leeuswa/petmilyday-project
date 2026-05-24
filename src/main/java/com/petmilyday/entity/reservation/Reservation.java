@@ -59,4 +59,9 @@ public class Reservation {
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public void cancel(String cancelReason){
+        this.status = "CANCEL";
+        this.cancelReason = cancelReason;
+    }
 }
