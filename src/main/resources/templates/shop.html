@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>petmilyday — Design B</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f2f7;--bg2:#e6e9f2;--bg3:#d8dced;
+  --surface:#ffffff;--border:#d0d5e8;--border2:#b8bfdc;
+  --text:#0d1433;--text2:#3d4670;--text3:#8890b8;
+  --accent:#2b44cc;--accent-light:#eaedfa;--accent-mid:#3d58e0;
+  --indigo:#4a2bcc;--indigo-light:#eeebfa;
+  --sky:#0e88cc;--sky-light:#e7f4fb;
+  --amber:#b56a0a;--amber-light:#fdf2e3;
+  --rose:#b52844;--rose-light:#fceef1;
+  --green:#1a7a48;--green-light:#e6f4ec;
+  --r:8px;--rl:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+
+.gnb{position:sticky;top:0;z-index:100;background:var(--text);display:flex;align-items:center;height:56px;padding:0 28px}
+.logo{font-size:15px;font-weight:700;color:#fff;margin-right:36px;letter-spacing:.5px}
+.logo span{color:var(--accent-light);opacity:.7;font-weight:300}
+.nav-links{display:flex;gap:2px;flex:1}
+.nav-link{padding:6px 14px;border-radius:var(--r);font-size:12px;color:rgba(255,255,255,.5);cursor:pointer;border:none;background:none;font-family:'Sora',sans-serif;font-weight:400;transition:all .15s;letter-spacing:.2px}
+.nav-link:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.08)}
+.nav-link.active{color:#fff;background:var(--accent);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-btn{padding:6px 16px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;font-weight:500}
+.nav-btn-ghost{border:1px solid rgba(255,255,255,.25);background:none;color:rgba(255,255,255,.7)}
+.nav-btn-fill{border:none;background:var(--accent);color:#fff}
+.nav-icon{width:32px;height:32px;border-radius:var(--r);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+
+.page{display:none}.page.active{display:block}
+.wrap{max-width:1100px;margin:0 auto;padding:0 28px 80px}
+
+.hero{background:var(--text);padding:56px 28px 48px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;right:-80px;top:-80px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(43,68,204,.5) 0%,transparent 70%)}
+.hero::after{content:'';position:absolute;left:40%;bottom:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(74,43,204,.3) 0%,transparent 70%)}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 360px;gap:56px;align-items:center;position:relative;z-index:1}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:14px}
+.hero-title{font-size:40px;font-weight:700;line-height:1.2;letter-spacing:-.5px;color:#fff}
+.hero-title strong{color:rgba(160,180,255,1)}
+.hero-sub{font-size:14px;color:rgba(255,255,255,.5);margin-top:14px;line-height:1.9;font-weight:300}
+.hero-actions{display:flex;gap:10px;margin-top:28px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 20px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'Sora',sans-serif;border:none;transition:all .15s}
+.btn-lg{height:48px;padding:0 28px;font-size:14px;font-weight:600}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{background:var(--accent-mid)}
+.btn-outline{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff}
+.btn-outline:hover{background:rgba(255,255,255,.14)}
+.btn-surface{background:var(--surface);border:1px solid var(--border);color:var(--text)}
+.btn-surface:hover{background:var(--bg)}
+.btn-sm{height:32px;padding:0 14px;font-size:12px}
+
+.sec{margin-top:44px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.sec-title{font-size:15px;font-weight:700;color:var(--text)}
+.sec-link{font-size:12px;color:var(--text3);cursor:pointer;font-weight:500}
+.sec-link:hover{color:var(--accent)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:20px}
+.card-sm{background:var(--bg2);border-radius:var(--r);padding:14px}
+.divider{height:1px;background:var(--border);margin:14px 0}
+
+.badge{display:inline-flex;align-items:center;font-size:11px;padding:3px 9px;border-radius:4px;font-weight:600;letter-spacing:.3px}
+.b-accent{background:var(--accent-light);color:var(--accent)}
+.b-green{background:var(--green-light);color:var(--green)}
+.b-amber{background:var(--amber-light);color:var(--amber)}
+.b-rose{background:var(--rose-light);color:var(--rose)}
+.b-sky{background:var(--sky-light);color:var(--sky)}
+.b-dim{background:var(--bg3);color:var(--text3)}
+
+.chip{display:inline-flex;align-items:center;font-size:12px;padding:5px 14px;border-radius:4px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-weight:500}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.sl{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:start}
+.fxa{display:flex;align-items:center}.fxb{display:flex;align-items:center;justify-content:space-between}
+.g4{gap:4px}.g8{gap:8px}.g10{gap:10px}.g12{gap:12px}.g16{gap:16px}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}
+.t2{color:var(--text2)}.t3{color:var(--text3)}
+.xs{font-size:11px}.sm{font-size:12px}.md{font-size:15px}
+.w5{font-weight:500}.w6{font-weight:600}.w7{font-weight:700}
+.ph{background:var(--bg2);border:1px dashed var(--border2);border-radius:var(--r);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;font-weight:500}
+.input{height:40px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:0 14px;display:flex;align-items:center;gap:8px;color:var(--text3);font-size:13px}
+.stars{color:#d4920a;font-size:12px;letter-spacing:1px}
+
+.sidenav{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:10px;position:sticky;top:72px}
+.snav-item{padding:9px 14px;border-radius:var(--r);font-size:13px;color:var(--text2);cursor:pointer;font-weight:500}
+.snav-item:hover{color:var(--text);background:var(--bg)}
+.snav-item.on{background:var(--accent-light);color:var(--accent);font-weight:600}
+.snav-div{height:1px;background:var(--border);margin:6px 8px}
+
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:600;color:var(--text3);text-align:left;padding:9px 14px;border-bottom:1px solid var(--border);letter-spacing:.8px;text-transform:uppercase;background:var(--bg)}
+td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:400;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+
+.map{width:100%;height:260px;background:var(--bg2);border-radius:var(--rl);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.map::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 36px,rgba(43,68,204,.06) 36px,rgba(43,68,204,.06) 37px),repeating-linear-gradient(90deg,transparent,transparent 36px,rgba(43,68,204,.06) 36px,rgba(43,68,204,.06) 37px)}
+.map-label{background:rgba(255,255,255,.95);border:1px solid var(--border2);padding:7px 16px;border-radius:var(--r);font-size:12px;color:var(--text2);font-weight:600}
+.pin{position:absolute;width:12px;height:12px;background:var(--accent);border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(43,68,204,.4)}
+
+.prod{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;cursor:pointer;transition:all .15s}
+.prod:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(43,68,204,.1)}
+.prod-img{height:128px;background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;font-weight:500}
+.prod-body{padding:14px}
+.prod-name{font-size:13px;font-weight:600;color:var(--text)}
+.prod-price{font-size:16px;font-weight:700;color:var(--accent);margin-top:6px}
+
+#p-shop .prod {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+#p-shop .prod-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+#p-shop .prod-name {
+  flex-grow: 1;
+}
+
+.used{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);display:flex;overflow:hidden;transition:border-color .15s}
+.used:hover{border-color:var(--border2)}
+.used-img{width:96px;flex-shrink:0;background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;font-weight:500}
+.used-body{padding:14px 18px;flex:1}
+
+.bubble-me{background:var(--accent);color:#fff;border-radius:12px 12px 3px 12px;padding:8px 13px;font-size:12px;max-width:65%;font-weight:500}
+.bubble-them{background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:12px 12px 12px 3px;padding:8px 13px;font-size:12px;max-width:65%;font-weight:500}
+
+.quick-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:22px 16px;text-align:center;cursor:pointer;transition:all .15s}
+.quick-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(43,68,204,.08)}
+.quick-icon{width:48px;height:48px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin:0 auto 12px;letter-spacing:.8px;text-transform:uppercase;color:#fff}
+
+.hero-info{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--rl);padding:20px}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.stat-box{background:rgba(255,255,255,.06);border-radius:var(--r);padding:14px}
+.stat-num{font-size:22px;font-weight:700;color:#fff}
+.stat-label{font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;font-weight:400;letter-spacing:.3px}
+
+.sev-bar{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.sev-fill{height:100%;background:var(--amber);border-radius:3px}
+.tag{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;background:var(--bg3);color:var(--text3);padding:2px 7px;border-radius:4px}
+</style>
+</head>
+<body>
+
+<nav class="gnb">
+  <div class="logo">petmilyday</div>
+  <div class="nav-links">
+    <button class="nav-link"
+            th:classappend="${activeTab == 'main' || activeTab == null} ? 'active' : ''"
+            onclick="go('main', this)">홈</button>
+    <button class="nav-link" onclick="go('hospital',this)">동물병원 예약</button>
+    <button class="nav-link" onclick="go('ai',this)">AI 자가진단</button>
+    <button class="nav-link"
+            th:classappend="${activeTab == 'shop'} ? 'active' : ''"
+            onclick="location.href='/shop?category=ALL'">동물용품샵</button>
+    <button class="nav-link" onclick="go('used',this)">중고거래</button>
+    <button class="nav-link" onclick="go('community',this)">커뮤니티</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-icon">&#128276;</div>
+    <button class="nav-btn nav-btn-ghost">로그인</button>
+    <button class="nav-btn nav-btn-fill">회원가입</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="p-main" class="page" th:classappend="${activeTab == null || activeTab == 'main'} ? 'active' : ''">
+  <div class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-label">Pet Health Platform</div>
+        <div class="hero-title">우리 아이의 건강,<br><strong>petmilyday</strong>와 함께</div>
+        <div class="hero-sub">병원 예약부터 AI 진단, 용품 구매까지<br>반려동물 모든 것을 한 곳에서</div>
+        <div class="hero-actions">
+          <button class="btn btn-accent btn-lg">병원 예약하기</button>
+          <button class="btn btn-outline btn-lg">AI 자가진단</button>
+        </div>
+      </div>
+      <div>
+        <div class="hero-info">
+          <div class="fxb" style="margin-bottom:14px">
+            <div style="color:rgba(255,255,255,.8);font-weight:600;font-size:14px">내 반려동물</div>
+            <button class="btn-sm btn-accent btn" style="font-size:11px;border-radius:6px">+ 추가</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="fxa g12" style="background:rgba(255,255,255,.06);padding:12px;border-radius:var(--r);border:1px solid rgba(255,255,255,.08)">
+              <div class="ph" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.3)">사진</div>
+              <div style="flex:1">
+                <div class="fxb"><div style="color:#fff;font-weight:600;font-size:13px">초코</div><span class="badge b-amber">D-7 접종</span></div>
+                <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px">말티즈 · 수컷 · 3살 · 4.2kg</div>
+              </div>
+            </div>
+            <div class="fxa g12" style="background:rgba(255,255,255,.06);padding:12px;border-radius:var(--r);border:1px solid rgba(255,255,255,.08)">
+              <div class="ph" style="width:40px;height:40px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.3)">사진</div>
+              <div style="flex:1">
+                <div class="fxb"><div style="color:#fff;font-weight:600;font-size:13px">두부</div><span class="badge b-green">접종 완료</span></div>
+                <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px">페르시안 · 암컷 · 5살 · 3.8kg</div>
+              </div>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-box"><div class="stat-num">3</div><div class="stat-label">총 예약 건</div></div>
+            <div class="stat-box"><div class="stat-num">5</div><div class="stat-label">AI 진단 이력</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="sec">
+      <div class="sec-head"><div class="sec-title">빠른 메뉴</div></div>
+      <div class="grid4">
+        <div class="quick-card" onclick="go('hospital',document.querySelectorAll('.nav-link')[1])"><div class="quick-icon" style="background:var(--sky)">병원</div><div class="w6 sm">동물병원 예약</div><div class="xs t3 mt4">Kakao Map</div></div>
+        <div class="quick-card" onclick="go('ai',document.querySelectorAll('.nav-link')[2])"><div class="quick-icon" style="background:var(--accent)">AI</div><div class="w6 sm">AI 자가진단</div><div class="xs t3 mt4">OpenAI Vision</div></div>
+        <div class="quick-card" onclick="go('shop',document.querySelectorAll('.nav-link')[3])"><div class="quick-icon" style="background:var(--green)">샵</div><div class="w6 sm">동물용품샵</div><div class="xs t3 mt4">맞춤 추천</div></div>
+        <div class="quick-card" onclick="go('used',document.querySelectorAll('.nav-link')[4])"><div class="quick-icon" style="background:var(--amber)">중고</div><div class="w6 sm">중고거래</div><div class="xs t3 mt4">안전결제</div></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="grid2">
+        <div><div class="sec-head"><div class="sec-title">최근 예약</div><span class="sec-link">전체보기</span></div><div class="card" style="padding:0;overflow:hidden"><table><thead><tr><th>병원</th><th>일정</th><th>상태</th></tr></thead><tbody><tr><td><div class="w6">서울동물병원</div><div class="xs t3">내과 · 초코</div></td><td><div class="w5">05.22</div><div class="xs t3">10:00</div></td><td><span class="badge b-sky">대기중</span></td></tr><tr><td><div class="w6">한강펫클리닉</div><div class="xs t3">피부과 · 두부</div></td><td><div class="w5">05.10</div><div class="xs t3">14:30</div></td><td><span class="badge b-green">완료</span></td></tr></tbody></table></div></div>
+        <div><div class="sec-head"><div class="sec-title">AI 진단 이력</div><span class="sec-link">전체보기</span></div><div class="card" style="padding:0;overflow:hidden"><table><thead><tr><th>대상</th><th>진단</th><th>심각도</th></tr></thead><tbody><tr><td><div class="w6">초코</div><div class="xs t3">05.15</div></td><td class="xs t2">알레르기성 피부염</td><td><span class="badge b-amber">MEDIUM</span></td></tr><tr><td><div class="w6">두부</div><div class="xs t3">05.02</div></td><td class="xs t2">결막염 의심</td><td><span class="badge b-green">LOW</span></td></tr></tbody></table></div></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="grid2">
+        <div><div class="sec-head"><div class="sec-title">커뮤니티 인기글</div><span class="sec-link" onclick="go('community',document.querySelectorAll('.nav-link')[5])">더보기</span></div><div class="card" style="padding:0;overflow:hidden"><div style="padding:14px 18px;border-bottom:1px solid var(--border)"><div class="w6 sm">말티즈 피부병 경험 있으신 분!</div><div class="xs t3 mt4">자유게시판 · 댓글 12 · 조회 234</div></div><div style="padding:14px 18px;border-bottom:1px solid var(--border)"><div class="w6 sm">고양이 사료 추천 부탁드려요</div><div class="xs t3 mt4">정보공유 · 댓글 8 · 조회 189</div></div><div style="padding:14px 18px"><div class="w6 sm">펫 동반 카페 서울 추천</div><div class="xs t3 mt4">자유게시판 · 댓글 5 · 조회 142</div></div></div></div>
+        <div><div class="sec-head"><div class="sec-title">실종신고</div><button class="btn btn-sm btn-surface" style="border-color:var(--rose);color:var(--rose)">신고 등록</button></div><div class="card" style="padding:0;overflow:hidden"><div class="fxa g12" style="padding:14px 18px;border-bottom:1px solid var(--border)"><div class="ph" style="width:50px;height:50px;border-radius:var(--r);flex-shrink:0">사진</div><div><div class="w6 sm">흰색 말티즈 · 수컷</div><div class="xs t3 mt4">마포구 상암동 · 05.18</div><div class="mt8"><span class="badge b-rose">MISSING</span></div></div></div><div class="fxa g12" style="padding:14px 18px"><div class="ph" style="width:50px;height:50px;border-radius:var(--r);flex-shrink:0">사진</div><div><div class="w6 sm">회색 고양이 · 암컷</div><div class="xs t3 mt4">강남구 역삼동 · 05.16</div><div class="mt8"><span class="badge b-rose">MISSING</span></div></div></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOSPITAL -->
+<div id="p-hospital" class="page">
+  <div class="wrap"><div class="sec">
+    <div class="fxb mb16"><div><div class="md w7" style="margin-bottom:4px">동물병원 예약</div><div class="sm t2">현재 위치 · 서울 마포구 상암동</div></div><div class="fxa g8"><button class="btn btn-surface btn-sm">위치 변경</button><button class="btn btn-accent btn-sm">지도 보기</button></div></div>
+    <div class="map mb16"><div class="pin" style="top:72px;left:210px"></div><div class="pin" style="top:112px;left:288px;width:9px;height:9px;background:var(--text3)"></div><div class="pin" style="top:58px;left:338px;width:9px;height:9px;background:var(--text3)"></div><div class="map-label">Kakao Map — 위치 기반 병원 표시</div></div>
+    <div class="chips mb16"><span class="chip on">전체</span><span class="chip">24시 응급</span><span class="chip">내과</span><span class="chip">외과</span><span class="chip">피부과</span><span class="chip">오늘 영업</span><span class="chip">평점순</span></div>
+    <div class="grid3">
+      <div class="card"><div class="ph mb12" style="height:90px">병원 사진</div><div class="fxb mb8"><div class="w7">서울동물병원</div><span class="badge b-rose">24시</span></div><div class="xs t2 mb8">내과 · 외과 · 피부과</div><div class="fxa g8 mb8"><div class="stars">★★★★☆</div><div class="xs t3">4.0 (28)</div></div><div class="xs t3 mb12">0.3km · 마포구 상암로 23</div><button class="btn btn-accent" style="width:100%;height:36px">예약하기</button></div>
+      <div class="card"><div class="ph mb12" style="height:90px">병원 사진</div><div class="fxb mb8"><div class="w7">한강펫클리닉</div><span class="badge b-dim">일반</span></div><div class="xs t2 mb8">내과 · 치과</div><div class="fxa g8 mb8"><div class="stars">★★★★★</div><div class="xs t3">4.8 (52)</div></div><div class="xs t3 mb12">0.7km · 마포구 월드컵로 15</div><button class="btn btn-accent" style="width:100%;height:36px">예약하기</button></div>
+      <div class="card"><div class="ph mb12" style="height:90px">병원 사진</div><div class="fxb mb8"><div class="w7">상암24동물메디컬</div><span class="badge b-rose">24시</span></div><div class="xs t2 mb8">내과 · 외과 · 안과</div><div class="fxa g8 mb8"><div class="stars">★★★★☆</div><div class="xs t3">4.2 (17)</div></div><div class="xs t3 mb12">1.1km · 마포구 성암로 189</div><button class="btn btn-accent" style="width:100%;height:36px">예약하기</button></div>
+    </div>
+    <div class="sec"><div class="w7 md mb16">예약 신청 — 서울동물병원</div>
+      <div class="grid2" style="gap:24px">
+        <div class="card"><div class="sm w6 mb8">반려동물</div><div class="chips mb14"><span class="chip on">초코</span><span class="chip">두부</span></div><div class="sm w6 mb8">진료과</div><div class="chips mb14"><span class="chip on">내과</span><span class="chip">외과</span><span class="chip">피부과</span></div><div class="sm w6 mb8">날짜</div><div class="input mb12">2026년 5월 22일</div><div class="sm w6 mb8">시간 <span class="tag">30분 간격</span></div><div class="chips"><span class="chip on">09:00</span><span class="chip">09:30</span><span class="chip" style="opacity:.35;cursor:not-allowed">10:00 마감</span><span class="chip">10:30</span><span class="chip">11:00</span></div></div>
+        <div class="card" style="background:var(--accent-light);border-color:var(--border2)"><div class="sm w6 mb12">예약 요약</div><div class="card-sm mb12"><table><tr><td class="xs t3" style="border:none;padding:5px 0">병원</td><td style="border:none;padding:5px 0" class="sm w5">서울동물병원</td></tr><tr><td class="xs t3" style="border:none;padding:5px 0">반려동물</td><td style="border:none;padding:5px 0" class="sm">초코</td></tr><tr><td class="xs t3" style="border:none;padding:5px 0">진료과</td><td style="border:none;padding:5px 0" class="sm">내과</td></tr><tr><td class="xs t3" style="border:none;padding:5px 0">일시</td><td style="border:none;padding:5px 0" class="sm">05.22 · 09:00</td></tr></table></div><div class="xs t3 mb16">예약 완료 후 실시간 대기 번호 확인 가능 (SSE)</div><button class="btn btn-accent" style="width:100%;height:42px">예약 신청</button><button class="btn btn-surface" style="width:100%;height:36px;margin-top:8px;font-size:12px">취소</button></div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- AI -->
+<div id="p-ai" class="page">
+  <div class="wrap"><div class="sec">
+    <div class="md w7 mb8">AI 자가진단</div>
+    <div class="sm t2 mb24">증상을 입력하면 AI가 1차 분석 결과를 제공합니다</div>
+    <div class="grid2" style="gap:24px;align-items:start">
+      <div>
+        <div class="card mb12"><div class="sm w6 mb8">반려동물 선택</div><div class="chips"><span class="chip on">초코 (말티즈 · 3살)</span><span class="chip">두부 (페르시안 · 5살)</span></div></div>
+        <div class="card mb12"><div class="sm w6 mb8">증상 입력</div><div class="ph mb12" style="height:88px;justify-content:flex-start;align-items:flex-start;padding:12px;font-size:12px">피부가 빨개지고 계속 긁어요...</div><div class="sm w6 mb8">사진 업로드 <span class="tag">Vision API</span></div><div class="ph" style="height:70px;flex-direction:column;gap:6px">사진 첨부 (선택)</div></div>
+        <button class="btn btn-accent" style="width:100%;height:42px">AI 진단 요청</button>
+      </div>
+      <div>
+        <div class="card mb12" style="border-left:3px solid var(--amber)">
+          <div class="fxb mb12"><div class="sm w6">진단 결과</div><span class="badge b-amber">MEDIUM</span></div>
+          <div class="divider"></div>
+          <div class="xs t3 mb4">의심 질환</div><div class="w6 mb12">알레르기성 피부염 · 아토피</div>
+          <div class="xs t3 mb6">심각도</div><div class="sev-bar mb12"><div class="sev-fill" style="width:55%"></div></div>
+          <div class="xs t3 mb6">권고사항</div>
+          <div class="card-sm sm t2" style="line-height:1.7">피부 알레르기 증상이 의심됩니다. 자극 없는 샴푸 사용을 권장하며, 3일 이상 지속 시 동물병원 방문을 권고드립니다.</div>
+          <div class="divider"></div>
+          <div class="xs t3" style="font-style:italic">AI 진단은 참고용이며 전문 수의사 진료를 대체하지 않습니다.</div>
+        </div>
+        <button class="btn btn-accent" style="width:100%;height:40px;margin-bottom:8px">병원 바로 예약</button>
+        <div class="card-sm"><div class="xs t3 mb8">진단 이력</div><div class="fxb mb6"><span class="xs t3">05.15 · 초코</span><span class="xs t2">알레르기성 피부염</span><span class="badge b-amber" style="font-size:10px">MEDIUM</span></div><div class="fxb"><span class="xs t3">05.02 · 두부</span><span class="xs t2">결막염 의심</span><span class="badge b-green" style="font-size:10px">LOW</span></div></div>
+      </div>
+    </div>
+    <div class="sec"><div class="sec-title mb16">AI 동물 가이드</div>
+      <div class="grid3">
+        <div class="card" style="border-top:3px solid var(--sky)"><div class="sm w6 mb8">품종 가이드</div><div class="xs t3 mb12">품종 특성 · 주의 질환 · 케어 방법</div><button class="btn btn-surface btn-sm" style="width:100%">조회하기</button></div>
+        <div class="card" style="border-top:3px solid var(--green)"><div class="sm w6 mb8">맞춤 사료 추천</div><div class="xs t3 mb12">나이 · 체중 · 알러지 기반 AI 추천</div><button class="btn btn-surface btn-sm" style="width:100%">추천받기</button></div>
+        <div class="card" style="border-top:3px solid var(--accent)"><div class="sm w6 mb8">AI 챗봇</div><div class="xs t3 mb12">반려동물 관련 자유 질문 AI 답변</div><button class="btn btn-surface btn-sm" style="width:100%">챗봇 열기</button></div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- SHOP -->
+<div id="p-shop" class="page" th:classappend="${activeTab == 'shop'} ? 'active' : ''">
+  <div class="wrap"><div class="sec">
+    <div class="md w7 mb16">동물용품샵</div>
+    <div class="sl">
+      <div class="sidenav">
+        <div class="xs t3 w6" style="padding:6px 14px;letter-spacing:1px;text-transform:uppercase">카테고리</div>
+
+        <div class="snav-item" th:classappend="${param.category == null or #strings.equals(param.category, 'ALL')} ? 'on' : ''" onclick="location.href='/shop?category=ALL'">전체 상품</div>
+        <div class="snav-item" th:classappend="${#strings.equals(param.category, '사료')} ? 'on' : ''" onclick="location.href='/shop?category=사료'">사료 / 간식</div>
+        <div class="snav-item" th:classappend="${#strings.equals(param.category, '위생')} ? 'on' : ''" onclick="location.href='/shop?category=위생'">패드 / 위생</div>
+        <div class="snav-item" th:classappend="${#strings.equals(param.category, '장난감')} ? 'on' : ''" onclick="location.href='/shop?category=장난감'">장난감</div>
+        <div class="snav-item" th:classappend="${#strings.equals(param.category, '의류')} ? 'on' : ''" onclick="location.href='/shop?category=의류'">의류 / 액세서리</div>
+
+        <div class="snav-div"></div>
+        <div class="xs t3 w6" style="padding:6px 14px;letter-spacing:1px;text-transform:uppercase">맞춤 필터</div>
+        <div class="snav-item">초코 맞춤</div>
+        <div class="snav-item">두부 맞춤</div>
+      </div>
+
+      <div>
+        <div class="fxb mb16">
+          <div class="sm t2" th:text="'상품 ' + ${productList.size()} + '개'">상품 48개</div>
+          <div class="fxa g8">
+            <button class="btn btn-surface btn-sm">장바구니 (3)</button>
+            <button class="btn btn-surface btn-sm">위시리스트</button>
+
+            <select id="shopSortSelect" onchange="sortProducts()" style="height:32px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;padding:0 10px;background:var(--surface);font-family:'Sora';cursor:pointer;">
+              <option value="popular">인기순</option>
+              <option value="name">가나다순</option>
+              <option value="priceAsc">가격 낮은순</option>
+              <option value="priceDesc">가격 높은순</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid4" id="productGrid" style="margin-bottom:20px">
+          <div class="prod"
+               th:each="product : ${productList}"
+               th:onclick="|location.href='/shop/detail/' + ${product.id}|"
+               th:data-name="${product.name}"
+               th:data-price="${product.price}"
+               style="cursor: pointer;">
+
+            <div class="prod-img" style="overflow:hidden; background:var(--bg2);">
+              <img th:if="${product.imgUrl != null}"
+                   th:src="${product.imgUrl} + '?w=300&h=300&fit=crop'"
+                   alt="상품 이미지"
+                   style="width:100%; height:100%; object-fit:cover;"
+                   loading="lazy">
+              <span th:if="${product.imgUrl == null}" style="color:var(--text3); font-size:12px;">No Image</span>
+            </div>
+
+            <div class="prod-body">
+              <div class="xs t3 mb4">petmilyday</div>
+
+              <div class="prod-name" th:text="${product.name}">상품명</div>
+
+              <div class="stars mt8">★★★★★</div>
+              <div class="prod-price" th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'">가격</div>
+
+              <button class="btn btn-accent btn-sm"
+                      style="width:100%;margin-top:10px"
+                      onclick="event.stopPropagation(); alert('장바구니 기능은 구현 준비 중입니다!');">
+                담기
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="card" style="background:var(--accent-light);border-color:var(--border2)">
+          <div class="fxb mb12"><div><div class="sm w6 mb4">정기구독 배송</div><div class="xs t2">주기 설정 자동 결제 배송 · 카카오페이 빌링키</div></div><button class="btn btn-accent btn-sm">구독 관리</button></div>
+          <div class="divider"></div>
+          <div class="grid2">
+            <div class="card-sm"><div class="xs t3 mb4">구독 중</div><div class="sm w6">강아지 오리고기 사료 2kg</div><div class="xs t3 mt4">30일 주기 · 05.25 배송</div><span class="badge b-green" style="margin-top:8px;display:inline-flex">ACTIVE</span></div>
+            <div class="card-sm"><div class="xs t3 mb4">구독 중</div><div class="sm w6">배변패드 100매</div><div class="xs t3 mt4">14일 주기 · 05.22 배송</div><span class="badge b-green" style="margin-top:8px;display:inline-flex">ACTIVE</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<script>
+  function sortProducts() {
+    const grid = document.getElementById('productGrid');
+    const select = document.getElementById('shopSortSelect');
+    if(!grid || !select) return;
+
+    const products = Array.from(grid.getElementsByClassName('prod'));
+    const sortType = select.value;
+
+    products.sort((a, b) => {
+      if (sortType === 'name') {
+        return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'), 'ko');
+      } else if (sortType === 'priceAsc') {
+        return parseInt(a.getAttribute('data-price')) - parseInt(b.getAttribute('data-price'));
+      } else if (sortType === 'priceDesc') {
+        return parseInt(b.getAttribute('data-price')) - parseInt(a.getAttribute('data-price'));
+      } else {
+        return 0;
+      }
+    });
+
+    products.forEach(product => grid.appendChild(product));
+  }
+</script>
+
+
+<!-- USED -->
+<div id="p-used" class="page">
+  <div class="wrap"><div class="sec">
+    <div class="fxb mb16"><div class="md w7">중고거래</div><button class="btn btn-accent btn-sm">게시글 등록</button></div>
+    <div class="fxa g8 mb16"><div class="input" style="flex:1">상품명, 키워드 검색</div><select style="height:40px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;padding:0 12px;background:var(--surface);font-family:'Sora'"><option>카테고리</option></select><select style="height:40px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;padding:0 12px;background:var(--surface);font-family:'Sora'"><option>지역</option></select></div>
+    <div class="chips mb16"><span class="chip on">전체</span><span class="chip">새제품</span><span class="chip">거의새것</span><span class="chip">중고</span><span class="chip">가격제안 가능</span></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+      <div class="used"><div class="used-img">이미지</div><div class="used-body"><div class="fxb mb6"><div class="fxa g8"><div class="sm w6">강아지 노즈워크 거의 안씀</div><span class="badge b-sky">거의새것</span></div><span class="badge b-green">판매중</span></div><div style="font-size:16px;font-weight:700;color:var(--accent);margin-bottom:6px">12,000원</div><div class="xs t3">장난감 · 마포구 · 05.18</div><div class="fxa g8 mt8"><span class="xs t3">멍냥이맘 · 4.8</span><span class="xs t3">찜 3</span></div></div></div>
+      <div class="used"><div class="used-img">이미지</div><div class="used-body"><div class="fxb mb6"><div class="fxa g8"><div class="sm w6">고양이 캣타워 판매합니다</div><span class="badge b-dim">중고</span></div><span class="badge b-amber">예약중</span></div><div style="font-size:16px;font-weight:700;color:var(--accent);margin-bottom:6px">35,000원</div><div class="xs t3">용품 · 강남구 · 05.17</div><div class="fxa g8 mt8"><span class="xs t3">고양이집사 · 4.5</span><span class="xs t3">찜 8</span></div></div></div>
+    </div>
+    <div class="w7 md mb16">1:1 채팅 <span class="tag">WebSocket STOMP</span></div>
+    <div class="grid2">
+      <div class="card" style="padding:0;overflow:hidden"><div class="fxa g10" style="padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border)"><div class="ph" style="width:30px;height:30px;border-radius:50%;flex-shrink:0;font-size:10px">U</div><div><div class="sm w6">초코아빠</div><div class="xs t3">하네스 미개봉 새제품</div></div></div><div style="padding:14px;min-height:110px"><div style="display:flex;justify-content:flex-end;margin-bottom:8px"><div class="bubble-me">혹시 직거래 가능한가요?</div></div><div style="margin-bottom:8px"><div class="bubble-them">네! 상암역 근처 가능해요</div></div><div><div class="bubble-them" style="color:var(--sky)">가격 제안: 7,000원</div></div></div><div class="fxa g8" style="padding:8px 12px;border-top:1px solid var(--border)"><div class="input" style="flex:1;height:34px;font-size:12px">메시지 입력...</div><button class="btn btn-accent btn-sm">전송</button></div></div>
+      <div class="card"><div class="sm w6 mb12">안전결제 <span class="tag">에스크로 카카오페이</span></div><div class="card-sm mb12"><div class="xs t3 mb4">거래 상품</div><div class="sm w6">하네스 미개봉 새제품</div><div style="font-size:16px;font-weight:700;color:var(--accent);margin-top:4px">8,000원</div></div><div class="xs t2 mb12" style="line-height:1.7">수령 확인 후 판매자에게 정산됩니다. 에스크로 방식으로 안전하게 거래하세요.</div><button class="btn btn-accent" style="width:100%;height:38px">카카오페이로 결제</button></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- COMMUNITY -->
+<div id="p-community" class="page">
+  <div class="wrap"><div class="sec">
+    <div class="md w7 mb16">커뮤니티</div>
+    <div class="sl">
+      <div><div class="sidenav mb12"><div class="snav-item on">전체 게시글</div><div class="snav-item">자유게시판</div><div class="snav-item">정보공유</div><div class="snav-item">질문/답변</div><div class="snav-item">일상/사진</div><div class="snav-div"></div><div class="snav-item" style="color:var(--rose)">실종신고</div></div></div>
+      <div>
+        <div class="fxb mb16"><div class="chips"><span class="chip on">최신순</span><span class="chip">인기순</span></div><div class="fxa g8"><div class="input" style="width:180px;height:34px;font-size:12px">키워드 검색</div><button class="btn btn-accent btn-sm">글쓰기</button></div></div>
+        <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px">
+          <div style="padding:16px 18px;border-bottom:1px solid var(--border)"><div class="fxa g8 mb6"><span class="badge b-dim">자유게시판</span><div class="sm w6">말티즈 피부병 경험 있으신 분 계세요?</div></div><div class="xs t3 mb6">초코맘 · 2시간 전</div><div class="fxa g12 xs t3"><span>좋아요 14</span><span>댓글 12</span><span>조회 234</span></div></div>
+          <div style="padding:16px 18px;border-bottom:1px solid var(--border)"><div class="fxa g8 mb6"><span class="badge b-green">정보공유</span><div class="sm w6">고양이 사료 성분 분석 후기</div></div><div class="xs t3 mb6">두부집사 · 5시간 전</div><div class="fxa g12 xs t3"><span>좋아요 28</span><span>댓글 8</span><span>조회 412</span></div></div>
+          <div style="padding:16px 18px"><div class="fxa g8 mb6"><span class="badge b-sky">질문</span><div class="sm w6">소형견 예방접종 주기 궁금해요</div></div><div class="xs t3 mb6">멍멍이러버 · 어제</div><div class="fxa g12 xs t3"><span>좋아요 5</span><span>댓글 3</span><span>조회 98</span></div></div>
+        </div>
+        <div class="w7 md mb12">댓글 / 대댓글 <span class="tag">parent_id 자기참조</span></div>
+        <div class="card">
+          <div class="fxa g10 mb12"><div class="ph" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;font-size:10px">U</div><div style="flex:1"><div class="fxa g8 mb4"><span class="sm w6">두부집사</span><span class="xs t3">3시간 전</span></div><div class="sm t2">비슷한 경험 있었어요! 알레르기성이었어요</div><div class="fxa g8 mt6 xs t3"><span>좋아요 3</span><span style="cursor:pointer;color:var(--accent)">답글 달기</span></div></div></div>
+          <div style="padding-left:42px;margin-bottom:12px"><div class="fxa g10"><div class="ph" style="width:28px;height:28px;border-radius:50%;flex-shrink:0;font-size:9px">U</div><div><div class="fxa g8 mb4"><span class="xs w6">초코맘</span><span class="xs t3">2시간 전</span></div><div class="xs t2">감사합니다! 예약해볼게요</div></div></div></div>
+          <div class="divider"></div>
+          <div class="fxa g8"><div class="input" style="flex:1;height:34px;font-size:12px">댓글 입력...</div><button class="btn btn-accent btn-sm">등록</button></div>
+        </div>
+        <div class="mt16">
+          <div class="fxb mb12"><div class="w7 md">실종신고 <span class="tag">FCM 반경 알림</span></div><button class="btn btn-surface btn-sm" style="border-color:var(--rose);color:var(--rose)">신고 등록</button></div>
+          <div class="map" style="height:160px;margin-bottom:12px"><div class="pin" style="top:55px;left:200px"></div><div class="map-label">실종 위치 마커 · 반경 FCM 알림 발송</div></div>
+          <div class="grid2"><div class="card fxa g12"><div class="ph" style="width:60px;height:60px;border-radius:var(--r);flex-shrink:0">사진</div><div><div class="sm w6 mb4">흰색 말티즈 · 수컷</div><div class="xs t3 mb8">마포구 상암동 · 05.18</div><span class="badge b-rose">MISSING</span></div></div><div class="card fxa g12"><div class="ph" style="width:60px;height:60px;border-radius:var(--r);flex-shrink:0">사진</div><div><div class="sm w6 mb4">회색 코숏 · 암컷</div><div class="xs t3 mb8">강남구 역삼동 · 05.16</div><span class="badge b-rose">MISSING</span></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<script>
+function go(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));document.getElementById('p-'+id).classList.add('active');if(el)el.classList.add('active');window.scrollTo(0,0)}
+</script>
+</body>
+</html>
