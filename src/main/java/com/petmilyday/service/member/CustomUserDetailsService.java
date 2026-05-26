@@ -1,7 +1,7 @@
-package com.petmilyday.service;
+package com.petmilyday.service.member;
 
-import com.petmilyday.entity.Member;
-import com.petmilyday.repository.MemberRepository;
+import com.petmilyday.entity.member.Member;
+import com.petmilyday.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

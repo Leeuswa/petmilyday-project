@@ -1,6 +1,6 @@
 package com.petmilyday.config;
 
-import com.petmilyday.service.CustomOAuth2UserService;
+import com.petmilyday.service.member.CustomOAuth2UserService;
 import org.springframework.security.core.userdetails.UserDetailsService; // ⭐ 추가
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

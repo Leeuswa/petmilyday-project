@@ -1,10 +1,10 @@
-package com.petmilyday.service;
+package com.petmilyday.service.member;
 
-import com.petmilyday.dto.MemberDTO;
-import com.petmilyday.entity.AccountStatus;
-import com.petmilyday.entity.Member;
-import com.petmilyday.entity.Role;
-import com.petmilyday.repository.MemberRepository;
+import com.petmilyday.dto.member.MemberDTO;
+import com.petmilyday.entity.member.AccountStatus;
+import com.petmilyday.entity.member.Member;
+import com.petmilyday.entity.member.Role;
+import com.petmilyday.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
