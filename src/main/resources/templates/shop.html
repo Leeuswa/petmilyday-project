@@ -325,26 +325,52 @@ tr:hover td{background:var(--bg)}
 
       <div>
         <div class="fxb mb16">
-          <div class="sm t2">상품 48개</div>
+          <div class="sm t2" th:text="'상품 ' + ${productList.size()} + '개'">상품 48개</div>
           <div class="fxa g8">
             <button class="btn btn-surface btn-sm">장바구니 (3)</button>
             <button class="btn btn-surface btn-sm">위시리스트</button>
-            <select style="height:32px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;padding:0 10px;background:var(--surface);font-family:'Sora'">
-              <option>인기순</option>
+
+            <select id="shopSortSelect" onchange="sortProducts()" style="height:32px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;padding:0 10px;background:var(--surface);font-family:'Sora';cursor:pointer;">
+              <option value="popular">인기순</option>
+              <option value="name">가나다순</option>
+              <option value="priceAsc">가격 낮은순</option>
+              <option value="priceDesc">가격 높은순</option>
             </select>
           </div>
         </div>
 
-        <div class="grid4" style="margin-bottom:20px">
-          <div class="prod" th:each="product : ${productList}">
-            <div class="prod-img">이미지</div>
+        <div class="grid4" id="productGrid" style="margin-bottom:20px">
+          <div class="prod"
+               th:each="product : ${productList}"
+               th:onclick="|location.href='/shop/detail/' + ${product.id}|"
+               th:data-name="${product.name}"
+               th:data-price="${product.price}"
+               style="cursor: pointer;">
+
+            <div class="prod-img" style="overflow:hidden; background:var(--bg2);">
+              <img th:if="${product.imgUrl != null}"
+                   th:src="${product.imgUrl} + '?w=300&h=300&fit=crop'"
+                   alt="상품 이미지"
+                   style="width:100%; height:100%; object-fit:cover;"
+                   loading="lazy">
+              <span th:if="${product.imgUrl == null}" style="color:var(--text3); font-size:12px;">No Image</span>
+            </div>
+
             <div class="prod-body">
               <div class="xs t3 mb4">petmilyday</div>
+
               <div class="prod-name" th:text="${product.name}">상품명</div>
+
               <div class="stars mt8">★★★★★</div>
               <div class="prod-price" th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'">가격</div>
-              <button class="btn btn-accent btn-sm" style="width:100%;margin-top:10px">담기</button>
+
+              <button class="btn btn-accent btn-sm"
+                      style="width:100%;margin-top:10px"
+                      onclick="event.stopPropagation(); alert('장바구니 기능은 구현 준비 중입니다!');">
+                담기
+              </button>
             </div>
+
           </div>
         </div>
 
@@ -360,6 +386,31 @@ tr:hover td{background:var(--bg)}
     </div>
   </div></div>
 </div>
+
+<script>
+  function sortProducts() {
+    const grid = document.getElementById('productGrid');
+    const select = document.getElementById('shopSortSelect');
+    if(!grid || !select) return;
+
+    const products = Array.from(grid.getElementsByClassName('prod'));
+    const sortType = select.value;
+
+    products.sort((a, b) => {
+      if (sortType === 'name') {
+        return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'), 'ko');
+      } else if (sortType === 'priceAsc') {
+        return parseInt(a.getAttribute('data-price')) - parseInt(b.getAttribute('data-price'));
+      } else if (sortType === 'priceDesc') {
+        return parseInt(b.getAttribute('data-price')) - parseInt(a.getAttribute('data-price'));
+      } else {
+        return 0;
+      }
+    });
+
+    products.forEach(product => grid.appendChild(product));
+  }
+</script>
 
 
 <!-- USED -->
