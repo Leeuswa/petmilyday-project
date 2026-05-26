@@ -43,6 +43,7 @@ public class HospitalReview {
     private String content;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isReported = false;
 
     @CreatedDate
