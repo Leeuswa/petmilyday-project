@@ -24,16 +24,10 @@
             width: 80px;
             color: #636e72;
         }
-        .emergency-badge {
-            background-color: #ff4757;
-        }
-        .rating-badge {
-            background-color: #ffa502;
-        }
-        .info-label {
-            color: #636e72;
-            font-size: 0.85rem;
-        }
+        .emergency-badge { background-color: #ff4757; }
+        .rating-badge { background-color: #ffa502; }
+        .info-label { color: #636e72; font-size: 0.85rem; }
+        .star-rating { color: #ffa502; }
     </style>
 </head>
 <body>
@@ -106,37 +100,87 @@
             </div>
 
             <!-- 운영시간 -->
-            <div class="card detail-card p-4">
+            <div class="card detail-card p-4 mb-4">
                 <h5 class="fw-bold mb-3"><i class="bi bi-calendar-week"></i> 운영시간</h5>
                 <table class="table hours-table">
                     <tbody>
                     <tr th:each="hour : ${hospital.hours}">
                         <th>
-                                <span th:switch="${hour.dayOfWeek}">
-                                    <span th:case="0">월요일</span>
-                                    <span th:case="1">화요일</span>
-                                    <span th:case="2">수요일</span>
-                                    <span th:case="3">목요일</span>
-                                    <span th:case="4">금요일</span>
-                                    <span th:case="5">토요일</span>
-                                    <span th:case="6">일요일</span>
-                                </span>
+                            <span th:switch="${hour.dayOfWeek}">
+                                <span th:case="0">월요일</span>
+                                <span th:case="1">화요일</span>
+                                <span th:case="2">수요일</span>
+                                <span th:case="3">목요일</span>
+                                <span th:case="4">금요일</span>
+                                <span th:case="5">토요일</span>
+                                <span th:case="6">일요일</span>
+                            </span>
                         </th>
                         <td>
                             <span th:if="${hour.isClosed}" class="text-danger fw-bold">휴무</span>
                             <span th:unless="${hour.isClosed}">
-                                    <span th:text="${hour.openTime}"></span>
-                                    ~
-                                    <span th:text="${hour.closeTime}"></span>
-                                </span>
+                                <span th:text="${hour.openTime}"></span>
+                                ~
+                                <span th:text="${hour.closeTime}"></span>
+                            </span>
                         </td>
                     </tr>
-                    <!-- 운영시간 데이터 없을 때 -->
                     <tr th:if="${#lists.isEmpty(hospital.hours)}">
                         <td colspan="2" class="text-muted">운영시간 정보가 없습니다.</td>
                     </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- 리뷰 목록 -->
+            <div class="card detail-card p-4 mb-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-star"></i> 리뷰</h5>
+                <div th:if="${#lists.isEmpty(reviewList)}" class="text-muted">
+                    아직 리뷰가 없습니다.
+                </div>
+                <div th:each="review : ${reviewList}" class="mb-3 border-bottom pb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="fw-bold" th:text="${review.memberNickname}"></span>
+                        <span class="text-muted small"
+                              th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd')}"></span>
+                    </div>
+                    <div class="star-rating mb-1">
+                        <span th:each="i : ${#numbers.sequence(1, review.rating)}">
+                            <i class="bi bi-star-fill"></i>
+                        </span>
+                        <span th:each="i : ${#numbers.sequence(review.rating + 1, 5)}">
+                            <i class="bi bi-star"></i>
+                        </span>
+                    </div>
+                    <p class="mb-0" th:text="${review.content}"></p>
+                </div>
+            </div>
+
+            <!-- 리뷰 작성 폼 -->
+            <div class="card detail-card p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-pencil"></i> 리뷰 작성</h5>
+                <form th:action="@{/review/register}" method="post">
+                    <input type="hidden" name="hospitalId" th:value="${hospital.id}"/>
+                    <input type="hidden" name="reservationId" value="2"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">별점</label>
+                        <select class="form-select" name="rating">
+                            <option value="5">⭐⭐⭐⭐⭐ 5점</option>
+                            <option value="4">⭐⭐⭐⭐ 4점</option>
+                            <option value="3">⭐⭐⭐ 3점</option>
+                            <option value="2">⭐⭐ 2점</option>
+                            <option value="1">⭐ 1점</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">리뷰 내용</label>
+                        <textarea class="form-control" name="content" rows="3"
+                                  placeholder="진료 경험을 공유해주세요" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-send"></i> 리뷰 등록
+                    </button>
+                </form>
             </div>
         </div>
 

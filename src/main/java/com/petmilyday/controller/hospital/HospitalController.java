@@ -2,6 +2,8 @@ package com.petmilyday.controller.hospital;
 
 import com.petmilyday.dto.hospital.HospitalRequestDTO;
 import com.petmilyday.dto.hospital.HospitalResponseDTO;
+import com.petmilyday.dto.review.HospitalReviewResponseDTO;
+import com.petmilyday.service.hospital.HospitalReviewService;
 import com.petmilyday.service.hospital.HospitalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,6 +22,7 @@ import java.util.List;
 public class HospitalController {
 
     private final HospitalService hospitalService;
+    private final HospitalReviewService hospitalReviewService;
 
     @GetMapping("/list")
     public String hospitalList(HospitalRequestDTO dto ,Model model){
@@ -32,11 +35,12 @@ public class HospitalController {
     }
 
     @GetMapping("/{hospitalId}")
-    public String hospitalDetail(@PathVariable Long hospitalId, Model model){
+    public String hospitalDetail(@PathVariable Long hospitalId, Model model) {
         log.info("병원 상세 조회 요청 - hospitalId: {}", hospitalId);
         HospitalResponseDTO dto = hospitalService.hospitalReadOne(hospitalId);
-        log.info("병원 상세 조회 완료 - 병원명: {}", dto.getName());
-        model.addAttribute("hospital",dto);
+        List<HospitalReviewResponseDTO> reviewList = hospitalReviewService.reviewList(hospitalId);
+        model.addAttribute("hospital", dto);
+        model.addAttribute("reviewList", reviewList);
         return "hospital/hospital_detail";
     }
 }
