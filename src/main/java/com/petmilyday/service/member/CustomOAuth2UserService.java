@@ -1,9 +1,9 @@
-package com.petmilyday.service;
+package com.petmilyday.service.member;
 
-import com.petmilyday.entity.AccountStatus;
-import com.petmilyday.entity.Member;
-import com.petmilyday.entity.Role;
-import com.petmilyday.repository.MemberRepository;
+import com.petmilyday.entity.member.AccountStatus;
+import com.petmilyday.entity.member.Member;
+import com.petmilyday.entity.member.Role;
+import com.petmilyday.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

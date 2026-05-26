@@ -1,4 +1,4 @@
-package com.petmilyday.dto;
+package com.petmilyday.dto.member;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

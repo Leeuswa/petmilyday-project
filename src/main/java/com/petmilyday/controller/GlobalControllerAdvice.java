@@ -1,7 +1,7 @@
 package com.petmilyday.controller;
 
-import com.petmilyday.entity.Member;
-import com.petmilyday.repository.MemberRepository;
+import com.petmilyday.entity.member.Member;
+import com.petmilyday.repository.member.MemberRepository;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;

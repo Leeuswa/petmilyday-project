@@ -1,7 +1,7 @@
-package com.petmilyday.controller;
+package com.petmilyday.controller.member;
 
-import com.petmilyday.dto.MemberDTO;
-import com.petmilyday.service.MemberService;
+import com.petmilyday.dto.member.MemberDTO;
+import com.petmilyday.service.member.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
