@@ -1,6 +1,7 @@
 package com.petmilyday.service.product;
 
 import com.petmilyday.dto.product.ProductResponseDto;
+import com.petmilyday.entity.product.Product;
 import com.petmilyday.repository.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,5 +25,11 @@ public class ProductService {
         return productRepository.findByCategory(category).stream()
                 .map(ProductResponseDto::new)
                 .collect(Collectors.toList());
+    }
+    public ProductResponseDto getProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 상품이 없습니다. id=" + id));
+
+        return new ProductResponseDto(product);
     }
 }
