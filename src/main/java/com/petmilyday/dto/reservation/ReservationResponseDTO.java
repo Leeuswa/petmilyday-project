@@ -17,6 +17,7 @@ import java.time.LocalTime;
 public class ReservationResponseDTO {
 
     private Long id;
+    private Long hospitalId;
     private String hospitalName;
     private String petName;
     private LocalDate reserveDate;

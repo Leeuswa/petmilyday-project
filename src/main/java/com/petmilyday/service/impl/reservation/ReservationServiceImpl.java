@@ -85,6 +85,7 @@ public class ReservationServiceImpl implements ReservationService {
                     ReservationResponseDTO dto = modelMapper.map(reservation,ReservationResponseDTO.class);
                     dto.setHospitalName(reservation.getHospital().getName());
                     dto.setPetName(reservation.getPet().getName());
+                    dto.setHospitalId(reservation.getHospital().getId());
                     return dto;
                 })
                 .collect(Collectors.toList());
