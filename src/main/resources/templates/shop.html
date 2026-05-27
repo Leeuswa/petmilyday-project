@@ -327,7 +327,7 @@ tr:hover td{background:var(--bg)}
         <div class="fxb mb16">
           <div class="sm t2" th:text="'상품 ' + ${productList.size()} + '개'">상품 48개</div>
           <div class="fxa g8">
-            <button class="btn btn-surface btn-sm">장바구니 (3)</button>
+            <button id="cartNavBtn" class="btn btn-surface btn-sm" onclick="location.href='/cart'">장바구니 (0)</button>
             <button class="btn btn-surface btn-sm">위시리스트</button>
 
             <select id="shopSortSelect" onchange="sortProducts()" style="height:32px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;padding:0 10px;background:var(--surface);font-family:'Sora';cursor:pointer;">
@@ -364,11 +364,7 @@ tr:hover td{background:var(--bg)}
               <div class="stars mt8">★★★★★</div>
               <div class="prod-price" th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'">가격</div>
 
-              <button class="btn btn-accent btn-sm"
-                      style="width:100%;margin-top:10px"
-                      onclick="event.stopPropagation(); alert('장바구니 기능은 구현 준비 중입니다!');">
-                담기
-              </button>
+              <button class="btn btn-accent" style="width: 100%;" th:onclick="addToCart(event, [[${product.id}]])">담기</button>
             </div>
 
           </div>
@@ -463,6 +459,55 @@ tr:hover td{background:var(--bg)}
 
 <script>
 function go(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));document.getElementById('p-'+id).classList.add('active');if(el)el.classList.add('active');window.scrollTo(0,0)}
+// 페이지 열리자마자 현재 장바구니 개수 불러오기
+document.addEventListener('DOMContentLoaded', () => {
+  updateCartCount();
+});
+
+// 상단 장바구니 숫자 갱신 API 호출
+function updateCartCount() {
+  fetch('/api/cart/count')
+          .then(res => res.json())
+          .then(count => {
+            const btn = document.getElementById('cartNavBtn');
+            if (btn) btn.innerText = `장바구니 (${count})`;
+          })
+          .catch(err => console.error('카운트 갱신 실패:', err));
+}
+
+// 장바구니 담기 (메인 화면은 무조건 1개씩 추가)
+function addToCart(event, productId) {
+
+  // [★추가] 이벤트 버블링(부모 태그로 클릭이 번지는 현상) 완벽 차단!
+  event.stopPropagation();
+  event.preventDefault(); // 혹시 a 태그로 감싸져 있다면 기본 이동 동작도 방어
+
+  fetch('/api/cart/add', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      productId: productId,
+      quantity: 1
+    })
+  })
+          .then(response => {
+            if (response.ok) {
+              updateCartCount();
+              if (confirm('장바구니에 성공적으로 담겼습니다! 장바구니 페이지로 이동할까요?')) {
+                location.href = '/cart';
+              }
+              // 취소(Cancel)를 누르면 아무 일도 안 일어나고 메인 화면에 예쁘게 남음!
+            } else {
+              response.text().then(msg => alert('담기 실패: ' + msg));
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('서버와 통신 중 오류가 발생했습니다.');
+          });
+}
 </script>
 </body>
 </html>

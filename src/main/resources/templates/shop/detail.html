@@ -139,7 +139,7 @@
                         <span id="totalPriceDisplay" th:text="${product.price != null ? #numbers.formatInteger(product.price, 3, 'COMMA') + '원' : '0원'}" style="font-size:22px; font-weight:700; color:var(--accent);">Total</span>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto;">
-                        <button class="btn btn-outline" onclick="alert('준비 중!')" style="height:44px; font-weight:600;">장바구니 담기</button>
+                        <button class="btn btn-outline" th:onclick="addToCart([[${product.id}]])" style="height:44px; font-weight:600;">장바구니 담기</button>
                         <button class="btn btn-accent" onclick="alert('준비 중!')" style="height:44px; font-weight:600;">바로 구매하기</button>
                     </div>
                 </div>
@@ -314,6 +314,36 @@
         const currentCount = parseInt(qnaTab.innerText.match(/\d+/)[0]);
         qnaTab.innerText = `문의/Q&A (${currentCount + 1})`;
         alert('문의가 성공적으로 등록되었습니다!');
+    }
+    // 장바구니 담기 비동기 통신 함수
+    function addToCart(productId) {
+        const qtyInput = document.getElementById('productQty');
+        const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
+
+        fetch('/api/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                productId: productId,
+                quantity: quantity
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 성공하면 확인창 띄우고 장바구니로 갈지 묻기
+                    if (confirm('장바구니에 성공적으로 담겼습니다! 장바구니 페이지로 이동할까요?')) {
+                        location.href = '/cart';
+                    }
+                } else {
+                    response.text().then(msg => alert('담기 실패: ' + msg));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('서버와 통신 중 오류가 발생했습니다.');
+            });
     }
 </script>
 </body>
