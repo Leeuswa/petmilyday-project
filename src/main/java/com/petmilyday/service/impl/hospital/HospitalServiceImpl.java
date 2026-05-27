@@ -24,7 +24,7 @@ public class HospitalServiceImpl implements HospitalService {
     @Override
     public List<HospitalResponseDTO> hospitalList(HospitalRequestDTO requestDTO) {
         // 병원 데이터 가져오기
-        List<Hospital> hospitals = hospitalRepository.findAll();
+        List<Hospital> hospitals = hospitalRepository.searchHospitals(requestDTO);
         //Entity -> DTO 변경
         return hospitals.stream()
                 .map(hospital -> modelMapper.map(hospital, HospitalResponseDTO.class))
