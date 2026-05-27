@@ -27,6 +27,7 @@ public class HospitalResponseDTO {
     private Integer slotIntervalMin;
     private Integer maxPerSlot;
 
+
     //운영시간, 이미지는 상세페이지에서만 적용
     private List<HospitalHoursDTO> hours;
     private List<String> imageUrls;
