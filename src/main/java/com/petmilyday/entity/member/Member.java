@@ -32,37 +32,53 @@ public class Member {
     private String email; // 이메일
 
     @Column(name = "social_type", length = 20)
-    private String socialType; // 소셜 로그인 타입 (일반 가입은 NULL) [cite: 16]
+    private String socialType; // 소셜 로그인 타입 (일반 가입은 NULL)
 
     @Column(name = "social_id", length = 100)
-    private String socialId; // 소셜 로그인 ID (일반 가입은 NULL) [cite: 16]
+    private String socialId; // 소셜 로그인 ID (일반 가입은 NULL)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private Role role; // 권한 (USER/ADMIN) [cite: 16]
+    private Role role; // 권한 (USER/ADMIN)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private AccountStatus status; // 계정 상태 (ACTIVE/BANNED/WITHDRAWN) [cite: 17]
+    private AccountStatus status; // 계정 상태 (ACTIVE/BANNED/WITHDRAWN)
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt; // 가입일시 [cite: 17]
+    private LocalDateTime createdAt; // 가입일시
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt; // 수정일시 [cite: 17]
+    private LocalDateTime updatedAt; // 수정일시
 
     @Column(name = "deleted_at")
-    private LocalDateTime deletedAt; // 탈퇴일시 [cite: 17]
+    private LocalDateTime deletedAt; // 탈퇴일시
 
     @Column(name = "refresh_token", length = 500)
-    private String refreshToken; // 리프레시 토큰 [cite: 18]
+    private String refreshToken; // 리프레시 토큰
 
     @Column(name = "fcm_token")
-    private String fcmToken; // FCM 토큰 [cite: 19]
+    private String fcmToken; // FCM 토큰
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+    }
+
+    // 회원 정보 수정 (닉네임, 이메일)
+    public void updateProfile(String nickname, String email) {
+        this.nickname = nickname;
+        this.email = email;
+    }
+
+    // 비밀번호 변경
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    // 회원 탈퇴 (Soft Delete)
+    public void withdraw() {
+        this.status = AccountStatus.WITHDRAWN;
     }
 }

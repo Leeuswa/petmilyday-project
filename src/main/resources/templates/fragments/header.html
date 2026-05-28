@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" lang="ko">
 <head>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -71,18 +71,17 @@
   <a th:href="@{/community}" class="nav-link">커뮤니티</a>
   <div style="flex:1"></div>
   <div class="fxa g12">
-    <th:block th:if="${loggedInUser == null}">
+    <th:block sec:authorize="isAnonymous()">
       <a th:href="@{/member/login}" class="btn btn-outline btn-sm">로그인</a>
       <a th:href="@{/member/register}" class="btn btn-accent btn-sm">회원가입</a>
     </th:block>
 
-    <th:block th:if="${loggedInUser != null}">
-            <span style="font-size: 14px; font-weight: 600; color: #111111; margin-right: 10px;">
-                👤 <span th:text="${loggedInUser}">사용자</span>님 환영합니다!
-            </span>
-      <form th:action="@{/member/logout}" method="post" style="display: inline;">
-        <button type="submit" class="btn btn-outline btn-sm">로그아웃</button>
-      </form>
+    <th:block sec:authorize="isAuthenticated()">
+      <span style="font-size: 14px; color: var(--text2); margin-right: 8px;">
+        <span sec:authentication="name" style="font-weight: 600;">사용자</span>님
+      </span>
+      <a th:href="@{/member/mypage}" class="btn btn-outline btn-sm">마이페이지</a>
+      <a th:href="@{/member/logout}" class="btn btn-outline btn-sm" style="color: #b52844; border-color: #b52844;">로그아웃</a>
     </th:block>
   </div>
 </nav>

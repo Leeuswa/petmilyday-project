@@ -7,6 +7,7 @@ import com.petmilyday.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -108,6 +109,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // [분기 2] DB에 이미 이메일이 존재하는 경우 -> 기존 회원 로그인 처리
         if (isAlreadyRegistered) {
+
+            // 탈퇴한 회원이 다시 로그인하는 것 방지
+            if (member.getStatus() == AccountStatus.WITHDRAWN) {
+                throw new UsernameNotFoundException("탈퇴한 회원입니다.");
+            }
+
             log.info("🎉 [STATUS: EXISTING] 우리 서비스에 이미 가입된 기존 회원입니다.");
             log.info("   • 매핑된 기존 회원 닉네임: " + member.getNickname());
             log.info("   • 계정 상태              : " + member.getStatus());
