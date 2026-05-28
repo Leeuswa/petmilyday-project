@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>petmilyday - 정기구독 관리</title>
+    <!-- 팀원들이 쓰는 공통 CSS 파일들이 있다면 여기에 임포트 확인해줘! -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+
+<!-- 팀원의 소중한 공통 헤더 조립 -->
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="page" style="padding: 40px 0; background: var(--bg);">
+    <div class="wrap" style="max-width: 1000px; margin: 0 auto; padding: 0 20px; box-sizing: border-box;">
+
+        <div style="margin-bottom: 30px;">
+            <a th:href="@{/shop}" style="text-decoration: none; color: var(--accent); font-size: 14px; font-weight: 600;">← 동물용품샵으로 돌아가기</a>
+            <h1 style="font-size: 26px; font-weight: 700; margin-top: 12px; color: var(--text);">💳 나의 정기구독 관리</h1>
+            <p style="font-size: 13px; color: var(--text3); margin-top: 4px;">정기 결제 주기 변경 및 구독 해지를 관리할 수 있습니다.</p>
+        </div>
+
+        <!--구독중인 아이템이 있을 때 리스트 출력 -->
+        <div style="display: flex; flex-direction: column; gap: 20px;" th:if="${subscriptionList != null and !subscriptionList.isEmpty()}">
+            <div th:each="sub : ${subscriptionList}"
+                 style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+
+                <!-- 상품 정보 -->
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div style="width: 80px; height: 80px; background: var(--bg2); border-radius: 8px; overflow: hidden; flex-shrink: 0;">
+                        <img th:if="${sub.imgUrl != null}" th:src="${sub.imgUrl} + '?w=150&h=150&fit=crop'" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div>
+                        <span style="font-size: 11px; font-weight: 600; color: #10b981; background: #e6fbf4; padding: 2px 8px; border-radius: 20px;" th:text="${sub.status}">ACTIVE</span>
+                        <h3 style="font-size: 18px; font-weight: 600; margin: 6px 0 4px 0; color: var(--text);" th:text="${sub.productName}">강아지 사료</h3>
+                        <p style="font-size: 13px; color: var(--text2);">
+                            결제 금액: <span style="font-weight: 600;" th:text="${#numbers.formatInteger(sub.productPrice, 3, 'COMMA')} + '원'">0원</span> (수량: [[${sub.quantity}]]개)
+                        </p>
+                        <p style="font-size: 12px; color: var(--text3); margin-top: 4px;">
+                            🔄 배송 주기: <span style="color: var(--text);" th:text="${sub.cycleDays} + '일 마다 자동 결제'">30일</span> |
+                            📅 다음 배송(결제)일: <span style="color: var(--accent); font-weight: 600;"
+                                                th:if="${sub.nextDeliveryDate != null}"
+                                                th:text="${sub.nextDeliveryDate}">2026-05-25</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 관리 액션 버튼들 -->
+                <div style="display: flex; gap: 8px; flex-shrink: 0;">
+                    <button class="btn btn-outline btn-sm" th:onclick="'changeCycle(' + ${sub.id} + ')'" style="padding: 8px 14px; font-size: 12px;">주기 변경</button>
+                    <button class="btn btn-sm" th:onclick="'cancelSubscription(' + ${sub.id} + ')'" style="background: #fff1f1; color: #ff4d4d; border: 1px solid #ffd6d6; padding: 8px 14px; font-size: 12px; border-radius: var(--r); cursor: pointer;">구독 해지</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 구독중인 아이템이 없을 때 안내 멘트 -->
+        <div style="text-align: center; padding: 60px 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r);"
+             th:if="${subscriptionList == null or subscriptionList.isEmpty()}">
+            <p style="font-size: 16px; font-weight: 600; color: var(--text2);">현재 이용 중인 정기구독 서비스가 없습니다.</p>
+            <p style="font-size: 13px; color: var(--text3); margin-top: 6px;">댕댕이와 야옹이를 위한 맞춤 상품을 정기구독해 보세요!</p>
+            <button class="btn btn-accent" th:onclick="|location.href='/shop'|" style="margin-top: 16px; padding: 10px 20px;">용품 보러가기</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // 1. 배송 주기 변경 함수
+    function changeCycle(subId) {
+        const newCycle = prompt("변경할 주기를 입력하세요 (예: 14, 30, 60):", "30");
+        if (!newCycle) return;
+
+        if (newCycle !== "14" && newCycle !== "30" && newCycle !== "60") {
+            alert("주기는 14, 30, 60일 중에서만 선택 가능합니다!");
+            return;
+        }
+
+        fetch(`/api/subscription/${subId}/change-cycle?cycleDays=${newCycle}`, {
+            method: 'PUT'
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert(`🔄 배송 주기가 ${newCycle}일로 성공적으로 변경되었습니다!`);
+                    location.reload();
+                } else {
+                    response.text().then(msg => alert('변경 실패: ' + msg));
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // 2. 정기구독 해지 함수
+    function cancelSubscription(subId) {
+        if (confirm("진짜로 이 소중한 정기구독을 해지하시겠습니까? 😢\n해지하시면 다음 달부터 자동 결제가 진행되지 않습니다.")) {
+
+            fetch(`/api/subscription/${subId}/cancel`, {
+                method: 'PUT'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('정기구독이 안전하게 해지되었습니다. 이용해 주셔서 감사합니다.');
+                        location.reload();
+                    } else {
+                        response.text().then(msg => alert('해지 실패: ' + msg));
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    }
+</script>
+
+</body>
+</html>
