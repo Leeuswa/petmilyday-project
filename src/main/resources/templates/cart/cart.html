@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -79,24 +79,7 @@
 </head>
 <body>
 
-<nav class="gnb">
-  <div class="logo">petmilyday</div>
-  <div class="nav-links">
-    <button class="nav-link">홈</button>
-    <button class="nav-link">동물병원 예약</button>
-    <button class="nav-link">AI 자가진단</button>
-    <button class="nav-link active" onclick="location.href='/shop?category=ALL'">동물용품샵</button>
-    <button class="nav-link">중고거래</button>
-    <button class="nav-link">커뮤니티</button>
-  </div>
-
-  <!-- 네 원본에는 없었지만, 우측 로그인 버튼 유지하려면 이 부분 추가 -->
-  <div class="nav-right">
-    <div class="nav-icon">&#128276;</div>
-    <button class="nav-btn nav-btn-ghost">로그인</button>
-    <button class="nav-btn nav-btn-fill">회원가입</button>
-  </div>
-</nav>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <div class="wrap">
   <div class="fxb">
