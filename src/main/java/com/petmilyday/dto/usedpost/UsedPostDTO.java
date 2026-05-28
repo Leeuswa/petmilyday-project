@@ -1,6 +1,9 @@
 package com.petmilyday.dto.usedpost;
 
-import com.petmilyday.domain.used.*;
+import com.petmilyday.entity.used.*;
+import com.petmilyday.entity.used.ItemCondition;
+import com.petmilyday.entity.used.UsedPost;
+import com.petmilyday.entity.used.UsedPostStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;

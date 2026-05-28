@@ -1,6 +1,6 @@
 package com.petmilyday.service.wishlist;
 
-import com.petmilyday.domain.used.UsedPost;
+import com.petmilyday.entity.used.UsedPost;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

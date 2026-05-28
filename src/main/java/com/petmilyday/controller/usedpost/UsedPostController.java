@@ -1,8 +1,8 @@
 package com.petmilyday.controller.usedpost;
 
-import com.petmilyday.domain.used.ItemCondition;
-import com.petmilyday.domain.used.UsedPost;
-import com.petmilyday.domain.used.UsedPostStatus;
+import com.petmilyday.entity.used.ItemCondition;
+import com.petmilyday.entity.used.UsedPost;
+import com.petmilyday.entity.used.UsedPostStatus;
 import com.petmilyday.dto.usedpost.UsedPostDTO;
 import com.petmilyday.service.usedpost.UsedPostService;
 import com.petmilyday.service.wishlist.WishlistService;

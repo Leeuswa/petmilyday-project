@@ -1,7 +1,7 @@
 package com.petmilyday.service.usedpost;
 
-import com.petmilyday.domain.chat.ChatMessage;
-import com.petmilyday.domain.chat.ChatRoom;
+import com.petmilyday.entity.chat.ChatMessage;
+import com.petmilyday.entity.chat.ChatRoom;
 import com.petmilyday.dto.usedpost.ChatMessageDTO;
 
 import java.util.List;

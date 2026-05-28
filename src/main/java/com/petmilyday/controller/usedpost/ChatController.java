@@ -1,6 +1,6 @@
 package com.petmilyday.controller.usedpost;
 
-import com.petmilyday.domain.chat.ChatRoom;
+import com.petmilyday.entity.chat.ChatRoom;
 import com.petmilyday.service.usedpost.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
