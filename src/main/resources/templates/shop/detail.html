@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -80,22 +80,7 @@
 </head>
 <body th:data-base-price="${product?.price != null ? product.price : 0}">
 
-<nav class="gnb">
-    <div class="logo">petmilyday</div>
-    <div class="nav-links">
-        <button class="nav-link">홈</button>
-        <button class="nav-link">동물병원 예약</button>
-        <button class="nav-link">AI 자가진단</button>
-        <button class="nav-link active" onclick="location.href='/shop?category=ALL'">동물용품샵</button>
-        <button class="nav-link">중고거래</button>
-        <button class="nav-link">커뮤니티</button>
-    </div>
-    <div class="nav-right">
-        <div class="nav-icon">&#128276;</div>
-        <button class="nav-btn nav-btn-ghost">로그인</button>
-        <button class="nav-btn nav-btn-fill">회원가입</button>
-    </div>
-</nav>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <div class="wrap" style="padding-top: 40px;">
     <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">

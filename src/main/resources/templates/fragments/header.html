@@ -63,7 +63,7 @@
   </style>
 
   <div class="logo">petmily<span>day</span></div>
-  <a th:href="@{/}" class="nav-link active">홈</a>
+  <a th:href="@{/}" class="nav-link" th:classappend="${activeTab == 'main' || activeTab == null} ? 'active' : ''" style="background: none !important; color: #3d4670;">홈</a>
   <a th:href="@{/hospital/list}" class="nav-link">동물병원 예약</a>
   <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a>
   <a th:href="@{/shop}" class="nav-link">동물용품샵</a>
