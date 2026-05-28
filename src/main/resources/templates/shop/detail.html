@@ -16,7 +16,6 @@
         *{box-sizing:border-box;margin:0;padding:0}
         body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
 
-        /* [★완벽 복구] 정민이의 shop.html 원본 CSS 100% 동일 적용 */
         .gnb{position:sticky;top:0;z-index:100;background:var(--text);display:flex;align-items:center;height:56px;padding:0 28px}
         .logo{font-size:15px;font-weight:700;color:#fff;margin-right:36px;letter-spacing:.5px}
         .logo span{color:var(--accent-light);opacity:.7;font-weight:300}
@@ -110,7 +109,8 @@
                     <div style="font-size:24px; font-weight:700; color:var(--accent); margin-top:12px;" th:text="${product.price != null ? #numbers.formatInteger(product.price, 3, 'COMMA') + '원' : '0원'}">Price</div>
                     <div class="divider"></div>
 
-                    <div class="fxb" style="margin-bottom: 20px; background: var(--bg); padding: 12px; border-radius: var(--r);">
+                    <!-- 수량 선택 박스 -->
+                    <div class="fxb" style="margin-bottom: 16px; background: var(--bg); padding: 12px; border-radius: var(--r);">
                         <span style="font-weight:600; font-size:12px;">수량 선택</span>
                         <div class="qty-box">
                             <button class="qty-btn" onclick="changeQuantity(-1)">-</button>
@@ -119,13 +119,28 @@
                         </div>
                     </div>
 
+                    <!-- [★정민 전용 추가] 정기구독 주기 셀렉트 박스 구역 -->
+                    <div class="fxb" style="margin-bottom: 20px; background: var(--bg); padding: 12px; border-radius: var(--r);">
+                        <span style="font-weight:600; font-size:12px;">정기배송 주기</span>
+                        <select id="subscriptionCycle" style="height:36px; border:1px solid var(--border); border-radius:4px; font-size:13px; font-weight:600; padding:0 10px; background:var(--surface); cursor:pointer; font-family:'Sora';">
+                            <option value="14">14일 마다 (2주)</option>
+                            <option value="30" selected>30일 마다 (4주)</option>
+                            <option value="60">60일 마다 (8주)</option>
+                        </select>
+                    </div>
+
                     <div class="fxb" style="margin-bottom: 24px;">
                         <span style="font-weight:700; font-size:12px;">총 합계 금액</span>
                         <span id="totalPriceDisplay" th:text="${product.price != null ? #numbers.formatInteger(product.price, 3, 'COMMA') + '원' : '0원'}" style="font-size:22px; font-weight:700; color:var(--accent);">Total</span>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto;">
-                        <button class="btn btn-outline" th:onclick="addToCart([[${product.id}]])" style="height:44px; font-weight:600;">장바구니 담기</button>
-                        <button class="btn btn-accent" onclick="alert('준비 중!')" style="height:44px; font-weight:600;">바로 구매하기</button>
+
+                    <!-- [★정민 전용 추가] 정기구독 신청 전용 3단 버튼 레이아웃 구조 적용 -->
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: auto;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <button class="btn btn-outline" th:onclick="addToCart([[${product.id}]])" style="height:44px; font-weight:600;">장바구니 담기</button>
+                            <button class="btn btn-surface" onclick="alert('준비 중!')" style="height:44px; font-weight:600;">바로 구매하기</button>
+                        </div>
+                        <button class="btn btn-accent" th:onclick="requestSubscription([[${product.id}]])" style="width:100%; height:46px; font-weight:700; font-size:14px; letter-spacing:0.5px;">🔄 매달 알아서 배송! 정기구독 신청</button>
                     </div>
                 </div>
             </div>
@@ -204,15 +219,10 @@
         display.innerText = (basePrice * val).toLocaleString('ko-KR') + '원';
     }
 
-    // 탭 전환 함수
     function switchTab(idx) {
         document.querySelectorAll('.detail-tab').forEach((t, i) => t.classList.toggle('on', i === idx));
         document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === idx));
     }
-
-    // ==========================================
-    // 대용량 더미 리뷰 및 Q&A 자동 렌더링
-    // ==========================================
 
     const dummyReviews = [
         { author: '펫밀리러버', rating: 5, date: '2026.05.20', text: '기호성이 너무 좋아요! 우리 애가 이것만 찾네요.' },
@@ -300,7 +310,7 @@
         qnaTab.innerText = `문의/Q&A (${currentCount + 1})`;
         alert('문의가 성공적으로 등록되었습니다!');
     }
-    // 장바구니 담기 비동기 통신 함수
+
     function addToCart(productId) {
         const qtyInput = document.getElementById('productQty');
         const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
@@ -317,7 +327,6 @@
         })
             .then(response => {
                 if (response.ok) {
-                    // 성공하면 확인창 띄우고 장바구니로 갈지 묻기
                     if (confirm('장바구니에 성공적으로 담겼습니다! 장바구니 페이지로 이동할까요?')) {
                         location.href = '/cart';
                     }
@@ -329,6 +338,42 @@
                 console.error('Error:', error);
                 alert('서버와 통신 중 오류가 발생했습니다.');
             });
+    }
+
+    // [★정민 전용 추가] 정기구독 신청 비동기 통신 함수 구현완료
+    function requestSubscription(productId) {
+        const qtyInput = document.getElementById('productQty');
+        const cycleSelect = document.getElementById('subscriptionCycle');
+
+        const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
+        const cycleDays = cycleSelect ? parseInt(cycleSelect.value) : 30;
+
+        if (confirm(`선택하신 상품을 ${cycleDays}일 주기로 정기구독 신청하시겠습니까?`)) {
+
+            fetch('/api/subscription/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    quantity: quantity,
+                    cycleDays: cycleDays
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('🎉 정기구독 신청이 성공적으로 완료되었습니다!');
+                        location.href = '/shop/subscription'; // 신청 완료 시 마이페이지 관리탭으로 폭격 이동!
+                    } else {
+                        response.text().then(msg => alert('신청 실패: ' + msg));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('서버와 통신 중 오류가 발생했습니다.');
+                });
+        }
     }
 </script>
 </body>

@@ -286,82 +286,122 @@ tr:hover td{background:var(--bg)}
 
 <!-- SHOP -->
 <div id="p-shop" class="page" th:classappend="${activeTab == 'shop'} ? 'active' : ''">
-  <div class="wrap"><div class="sec">
-    <div class="md w7 mb16">동물용품샵</div>
-    <div class="sl">
-      <div class="sidenav">
-        <div class="xs t3 w6" style="padding:6px 14px;letter-spacing:1px;text-transform:uppercase">카테고리</div>
+  <!-- [★대수정] 가로 최대 크기 제한(max-width)을 완전히 없애고(100%), 양옆 30px 여백만 줌 -->
+  <div class="wrap" style="max-width: 100%; width: 100%; margin: 0; padding: 0 35px; box-sizing: border-box;">
+    <div class="sec" style="width: 100%; padding-top: 24px;">
 
-        <div class="snav-item" th:classappend="${param.category == null or #strings.equals(param.category, 'ALL')} ? 'on' : ''" onclick="location.href='/shop?category=ALL'">전체 상품</div>
-        <div class="snav-item" th:classappend="${#strings.equals(param.category, '사료')} ? 'on' : ''" onclick="location.href='/shop?category=사료'">사료 / 간식</div>
-        <div class="snav-item" th:classappend="${#strings.equals(param.category, '위생')} ? 'on' : ''" onclick="location.href='/shop?category=위생'">패드 / 위생</div>
-        <div class="snav-item" th:classappend="${#strings.equals(param.category, '장난감')} ? 'on' : ''" onclick="location.href='/shop?category=장난감'">장난감</div>
-        <div class="snav-item" th:classappend="${#strings.equals(param.category, '의류')} ? 'on' : ''" onclick="location.href='/shop?category=의류'">의류 / 액세서리</div>
+      <div class="md w7 mb16" style="font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 24px;">동물용품샵</div>
 
-        <div class="snav-div"></div>
-        <div class="xs t3 w6" style="padding:6px 14px;letter-spacing:1px;text-transform:uppercase">맞춤 필터</div>
-        <div class="snav-item">초코 맞춤</div>
-        <div class="snav-item">두부 맞춤</div>
-      </div>
+      <!-- [★대수정] 좌측 기둥 / 가운데 컨텐츠 / 우측 기둥이 화면 100%를 나눠 갖는 구조 -->
+      <div class="sl" style="display: flex; gap: 32px; align-items: flex-start; width: 100%; position: relative;">
 
-      <div>
-        <div class="fxb mb16">
-          <div class="sm t2" th:text="'상품 ' + ${productList.size()} + '개'">상품 48개</div>
-          <div class="fxa g8">
-            <button id="cartNavBtn" class="btn btn-surface btn-sm" onclick="location.href='/cart'">장바구니 (0)</button>
-            <button class="btn btn-surface btn-sm">위시리스트</button>
-
-            <select id="shopSortSelect" onchange="sortProducts()" style="height:32px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;padding:0 10px;background:var(--surface);font-family:'Sora';cursor:pointer;">
-              <option value="popular">인기순</option>
-              <option value="name">가나다순</option>
-              <option value="priceAsc">가격 낮은순</option>
-              <option value="priceDesc">가격 높은순</option>
-            </select>
-          </div>
+        <!-- [좌측 끝] 무신사 스타일 왼쪽 고정 카테고리창 -->
+        <div class="sidenav" style="width: 200px; flex-shrink: 0; position: -webkit-sticky; position: sticky; top: 80px; z-index: 10; background: var(--surface); padding: 16px; border-radius: var(--r); border: 1px solid var(--border);">
+          <div class="xs t3 w6" style="padding:4px 10px; letter-spacing:1px; text-transform:uppercase; color: var(--text2); font-size: 11px;">카테고리</div>
+          <div class="snav-item" th:classappend="${param.category == null or #strings.equals(param.category, 'ALL')} ? 'on' : ''" onclick="location.href='/shop?category=ALL'">전체 상품</div>
+          <div class="snav-item" th:classappend="${#strings.equals(param.category, '사료')} ? 'on' : ''" onclick="location.href='/shop?category=사료'">사료 / 간식</div>
+          <div class="snav-item" th:classappend="${#strings.equals(param.category, '위생')} ? 'on' : ''" onclick="location.href='/shop?category=위생'">패드 / 위생</div>
+          <div class="snav-item" th:classappend="${#strings.equals(param.category, '장난감')} ? 'on' : ''" onclick="location.href='/shop?category=장난감'">장난감</div>
+          <div class="snav-item" th:classappend="${#strings.equals(param.category, '의류')} ? 'on' : ''" onclick="location.href='/shop?category=의류'">의류 / 액세서리</div>
+          <div class="snav-div" style="margin: 12px 0; border-top: 1px solid var(--border);"></div>
+          <div class="xs t3 w6" style="padding:4px 10px; letter-spacing:1px; text-transform:uppercase; color: var(--text2); font-size: 11px;">맞춤 필터</div>
+          <div class="snav-item">초코 맞춤</div>
+          <div class="snav-item">두부 맞춤</div>
         </div>
 
-        <div class="grid4" id="productGrid" style="margin-bottom:20px">
-          <div class="prod"
-               th:each="product : ${productList}"
-               th:onclick="|location.href='/shop/detail/' + ${product.id}|"
-               th:data-name="${product.name}"
-               th:data-price="${product.price}"
-               style="cursor: pointer;">
+        <!-- [가운데] 상품 메인 영역 (★쓸데없는 패딩/마진 전부 삭제해서 공간 100% 확보!) -->
+        <div style="flex: 1; min-width: 0;">
 
-            <div class="prod-img" style="overflow:hidden; background:var(--bg2);">
-              <img th:if="${product.imgUrl != null}"
-                   th:src="${product.imgUrl} + '?w=300&h=300&fit=crop'"
-                   alt="상품 이미지"
-                   style="width:100%; height:100%; object-fit:cover;"
-                   loading="lazy">
-              <span th:if="${product.imgUrl == null}" style="color:var(--text3); font-size:12px;">No Image</span>
+          <!-- 필터 툴바 구역 -->
+          <div class="fxb mb16" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div class="sm t2" style="font-weight: 500; font-size: 14px;" th:text="'상품 ' + ${productList.size()} + '개'">상품 48개</div>
+            <div class="fxa g8" style="display: flex; gap: 8px; align-items: center;">
+              <button id="cartNavBtn" class="btn btn-surface btn-sm" onclick="location.href='/cart'">장바구니 (0)</button>
+              <button class="btn btn-surface btn-sm">위시리스트</button>
+              <select id="shopSortSelect" onchange="sortProducts()" style="height:32px;border:1px solid var(--border);border-radius:var(--r);font-size:12px;padding:0 10px;background:var(--surface);font-family:'Sora';cursor:pointer;">
+                <option value="popular">인기순</option>
+                <option value="name">가나다순</option>
+                <option value="priceAsc">가격 낮은순</option>
+                <option value="priceDesc">가격 높은순</option>
+              </select>
             </div>
+          </div>
 
-            <div class="prod-body">
-              <div class="xs t3 mb4">petmilyday</div>
+          <!-- [★대수정] 마진 족쇄 풀고 남는 가로폭 다 쓰며 카드를 큼직하게 키운 시원시원한 5열 그리드 -->
+          <div id="productGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px 20px; margin-bottom: 40px; width: 100%;">
+            <div class="prod"
+                 th:each="product : ${productList}"
+                 th:onclick="|location.href='/shop/detail/' + ${product.id}|"
+                 th:data-name="${product.name}"
+                 th:data-price="${product.price}"
+                 style="cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 16px; box-sizing: border-box; height: 100%;">
 
-              <div class="prod-name" th:text="${product.name}">상품명</div>
+              <div>
+                <!-- 카드 크기가 커짐에 따라 이미지도 무신사처럼 큼직하게 꽉 차게 빌드업 -->
+                <div class="prod-img" style="overflow:hidden; background:var(--bg2); border-radius: calc(var(--r) - 2px); aspect-ratio: 1/1; width: 100%;">
+                  <img th:if="${product.imgUrl != null}"
+                       th:src="${product.imgUrl} + '?w=500&h=500&fit=crop'"
+                       alt="상품 이미지"
+                       style="width:100%; height:100%; object-fit:cover;"
+                       loading="lazy">
+                  <span th:if="${product.imgUrl == null}" style="color:var(--text3); font-size:13px; display:flex; align-items:center; justify-content:center; height:100%;">No Image</span>
+                </div>
 
-              <div class="stars mt8">★★★★★</div>
-              <div class="prod-price" th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'">가격</div>
+                <div class="prod-body" style="padding: 14px 0 8px 0;">
+                  <div class="xs t3 mb4" style="color: var(--text3); font-size: 11px; letter-spacing: 0.5px;">PETMILYDAY</div>
+                  <div class="prod-name" th:text="${product.name}" style="font-size: 15px; font-weight: 500; color: var(--text); height: 44px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.45;">상품명</div>
+                  <div class="stars mt6" style="color: #ffb800; font-size: 12px;">★★★★★</div>
+                </div>
+              </div>
 
-              <button class="btn btn-accent" style="width: 100%;" th:onclick="addToCart(event, [[${product.id}]])">담기</button>
+              <div>
+                <div class="prod-price" th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'" style="font-weight: 700; font-size: 17px; color: var(--text); margin-bottom: 10px; margin-top: 4px;">가격</div>
+                <button class="btn btn-accent" style="width: 100%; padding: 10px 0; font-size: 13px; font-weight: 500; border-radius: var(--r); box-sizing: border-box;" th:onclick="addToCart(event, [[${product.id}]])">담기</button>
+              </div>
             </div>
-
           </div>
-        </div>
+        </div> <!-- 가운데 영역 끝 -->
 
-        <div class="card" style="background:var(--accent-light);border-color:var(--border2)">
-          <div class="fxb mb12"><div><div class="sm w6 mb4">정기구독 배송</div><div class="xs t2">주기 설정 자동 결제 배송 · 카카오페이 빌링키</div></div><button class="btn btn-accent btn-sm">구독 관리</button></div>
-          <div class="divider"></div>
-          <div class="grid2">
-            <div class="card-sm"><div class="xs t3 mb4">구독 중</div><div class="sm w6">강아지 오리고기 사료 2kg</div><div class="xs t3 mt4">30일 주기 · 05.25 배송</div><span class="badge b-green" style="margin-top:8px;display:inline-flex">ACTIVE</span></div>
-            <div class="card-sm"><div class="xs t3 mb4">구독 중</div><div class="sm w6">배변패드 100매</div><div class="xs t3 mt4">14일 주기 · 05.22 배송</div><span class="badge b-green" style="margin-top:8px;display:inline-flex">ACTIVE</span></div>
+        <!-- [우측 끝] 화면 오른쪽 벽면에 딱 붙어서 끈질기게 따라오는 고정식 구독관리 패널 -->
+        <div class="subscription-floating-panel"
+             th:if="${loggedInUser != null}"
+             style="position: -webkit-sticky; position: sticky; top: 80px; width: 260px; flex-shrink: 0; background: #f4f6fb; border: 1px solid var(--border2); border-radius: var(--r); padding: 16px; box-sizing: border-box; z-index: 10;">
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div>
+              <div style="font-size: 14px; font-weight: 700; color: var(--text);">📅 정기구독 현황</div>
+              <div style="font-size: 11px; color: var(--text2); margin-top: 2px;">자동 결제 배송 관리</div>
+            </div>
+            <button class="btn btn-accent btn-sm"
+                    th:onclick="|location.href='/shop/subscription'|"
+                    style="padding: 4px 10px; font-size: 11px; border-radius: 6px; cursor: pointer;">관리</button>
           </div>
-        </div>
-      </div>
-    </div>
-  </div></div>
+
+          <div style="border-top: 1px solid var(--border); margin-bottom: 12px;"></div>
+
+          <div style="max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"
+               th:if="${subscriptionList != null and !subscriptionList.isEmpty()}">
+            <div class="card-sm" th:each="sub : ${subscriptionList}" style="background: var(--surface); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+              <div style="font-size: 11px; color: var(--accent); font-weight: 600;">● 구독 중</div>
+              <div style="font-size: 13px; font-weight: 600; color: var(--text); margin: 3px 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" th:text="${sub.productName}">상품명</div>
+
+              <div style="font-size: 11px; color: var(--text3);"
+                   th:if="${sub.nextDeliveryDate != null}"
+                   th:text="${sub.cycleDays} + '일 주기 · ' + ${sub.nextDeliveryDate.getMonthValue()} + '.' + ${sub.nextDeliveryDate.getDayOfMonth()} + ' 배송'">
+                주기
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align: center; padding: 20px 0;" th:if="${subscriptionList == null or subscriptionList.isEmpty()}">
+            <div style="font-size: 13px; font-weight: 600; color: var(--text2);">구독 중인 상품이 없습니다.</div>
+            <div style="font-size: 11px; color: var(--text3); margin-top: 4px;">상세페이지에서 신청 가능해요!</div>
+          </div>
+        </div> <!-- 우측 구독 패널 끝 -->
+
+      </div> <!-- sl 끝 -->
+    </div> <!-- sec 끝 -->
+  </div> <!-- wrap 끝 -->
 </div>
 
 <script>
