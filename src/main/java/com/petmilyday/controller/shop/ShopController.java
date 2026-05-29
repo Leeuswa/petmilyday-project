@@ -81,4 +81,26 @@ public class ShopController {
 
         return "shop/subscription_manage";
     }
+
+    @GetMapping("/order/subscription-checkout")
+    public String subscriptionCheckoutPage(@RequestParam("productId") Long productId,
+                                           @RequestParam("quantity") int quantity,
+                                           @RequestParam("cycleDays") int cycleDays,
+                                           @RequestParam("name") String name,
+                                           @RequestParam("price") int price,
+                                           Model model) {
+        // 상품 단가랑 수량 곱해서 회당 진짜 결제 금액 연산 완료
+        int totalPrice = price * quantity;
+
+        // 뷰단(HTML)에서 0원이나 null 안 뜨게 확실하게 바인딩
+        model.addAttribute("productId", productId);
+        model.addAttribute("quantity", quantity);
+        model.addAttribute("cycleDays", cycleDays);
+        model.addAttribute("name", name);
+        model.addAttribute("price", price);
+        model.addAttribute("totalPrice", totalPrice);
+
+        // templates/shop/subscription_checkout.html 화면 렌더링 리턴!
+        return "shop/subscription_checkout";
+    }
 }

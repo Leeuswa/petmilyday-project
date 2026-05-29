@@ -91,19 +91,22 @@
     <!-- 왼쪽: 장바구니 상품 리스트 -->
     <div class="card">
       <div class="cart-header">
-        <!-- [★수정] 괄호 안 숫자 여백 제거 및 구조 개선 -->
         <label style="display:flex; align-items:center; gap:8px; font-weight:600; cursor:pointer;">
           <input type="checkbox" id="checkAll" checked onchange="toggleAll()">
           전체 선택 (<span id="checkedCount">2</span>/<span id="totalCount">2</span>)
         </label>
-        <!-- [★수정] 선택 삭제 클릭 이벤트 추가 -->
         <button class="btn btn-surface btn-sm" style="height:28px;" onclick="deleteSelected()">선택 삭제</button>
       </div>
 
       <div id="cartItemList">
+        <!-- 개별 장바구니 아이템 Row (부모 클래스로 스크립트 추적 원활하게 세팅) -->
         <div class="cart-item" th:each="item : ${cartItems}">
+          <!-- [★수정] 자바스크립트 매칭을 위해 th:data-id 외에 진짜 상품 ID인 th:data-product-id와 상품명 th:data-name을 태그에 직접 박아둠 -->
           <input type="checkbox" class="item-check" checked onchange="updateSummary()"
-                 th:data-price="${item.price}" th:data-id="${item.cartItemId}">
+                 th:data-price="${item.price}"
+                 th:data-id="${item.cartItemId}"
+                 th:data-product-id="${item.productId}"
+                 th:data-name="${item.name}">
 
           <div class="cart-item-img">
             <img th:if="${item.imgUrl != null}" th:src="${item.imgUrl}" alt="상품 이미지">
@@ -133,6 +136,7 @@
       </div>
     </div>
 
+    <!-- 오른쪽: 영수증 패널 구역 -->
     <div class="card summary-box">
       <h3 style="margin-bottom: 24px; font-size: 16px;">결제 정보</h3>
 
@@ -153,7 +157,10 @@
         <span id="finalTotalPrice" style="color: var(--accent);">0원</span>
       </div>
 
-      <button class="btn btn-accent" style="width: 100%; height: 48px; font-size: 15px; margin-top: 24px;" onclick="alert('결제 모듈 준비 중!')">
+      <!-- [★디자인 완전 복구] 네 기존 프로젝트의 오리지널 버튼 스타일 클래스 적용 완료! -->
+      <button onclick="proceedToCheckout()"
+              class="btn btn-accent"
+              style="display: block !important; width: 100% !important; height: 56px; font-size: 16px; font-weight: 700; border-radius: 12px; margin-top: 24px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
         <span id="orderBtnText">0원</span> 주문하기
       </button>
     </div>
@@ -176,7 +183,6 @@
     let val = parseInt(input.value) + amount;
     if (val < 1) return;
 
-    // 백엔드로 수량 업데이트 API 쏘기
     fetch('/api/cart/update/' + cartItemId, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -281,12 +287,53 @@
     document.getElementById('sumProductPrice').innerText = totalProductPrice.toLocaleString('ko-KR') + '원';
     document.getElementById('sumShippingPrice').innerText = shippingPrice === 0 ? (totalProductPrice === 0 ? '0원' : '무료') : shippingPrice.toLocaleString('ko-KR') + '원';
     document.getElementById('finalTotalPrice').innerText = finalPrice.toLocaleString('ko-KR') + '원';
-    document.getElementById('orderBtnText').innerText = finalPrice.toLocaleString('ko-KR') + '원';
+
+    const orderBtnText = document.getElementById('orderBtnText');
+    if(orderBtnText) orderBtnText.innerText = finalPrice.toLocaleString('ko-KR') + '원';
 
     const checkAll = document.getElementById('checkAll');
     if (checkAll && items.length > 0) {
       checkAll.checked = (checkedCount === items.length);
     }
+  }
+
+  // [★정밀 교정 완료] 중복 다 걷어내고 진짜 네 HTML 구조에 완벽 피팅된 결제 토스 함수
+  function proceedToCheckout() {
+    const checkedItems = [];
+
+    // 1. 네 체크박스 클래스명인 .item-check 중에서 켜진 것만 정확하게 매칭!
+    const checkedBoxes = document.querySelectorAll('.item-check:checked');
+
+    checkedBoxes.forEach(checkbox => {
+      const row = checkbox.closest('.cart-item');
+
+      // 태그에 동적으로 숨겨둔 진짜 데이터들 완벽하게 가로채기
+      const productId = checkbox.getAttribute('data-product-id');
+      const productName = checkbox.getAttribute('data-name');
+      const productPrice = parseInt(checkbox.getAttribute('data-price')) || 0;
+
+      // 해당 Row의 수량 인풋 정확히 저격
+      const qtyInput = row.querySelector('.qty-input');
+      const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
+
+      checkedItems.push({
+        productId: productId,
+        name: productName,
+        price: productPrice,
+        quantity: quantity
+      });
+    });
+
+    if (checkedItems.length === 0) {
+      alert("주문할 상품을 선택해 주세요!");
+      return;
+    }
+
+    // 2. 가방 싸서 세션스토리지에 주입 (checkout.html 연동대기 완료!)
+    sessionStorage.setItem("checkoutItems", JSON.stringify(checkedItems));
+
+    // 3. 결제 페이지로 리다이렉트
+    location.href = "/order/checkout";
   }
 </script>
 </body>
