@@ -2,17 +2,19 @@ package com.petmilyday.controller.hospital;
 
 import com.petmilyday.dto.hospital.HospitalRequestDTO;
 import com.petmilyday.dto.hospital.HospitalResponseDTO;
+import com.petmilyday.dto.reservation.ReservationSlotDto;
 import com.petmilyday.dto.review.HospitalReviewResponseDTO;
 import com.petmilyday.service.hospital.HospitalReviewService;
 import com.petmilyday.service.hospital.HospitalService;
+import com.petmilyday.service.reservation.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -24,6 +26,11 @@ public class HospitalController {
     private final HospitalService hospitalService;
     private final HospitalReviewService hospitalReviewService;
 
+
+
+    @Value("${kakao.map.api-key}")
+    private String kakaoMapApiKey;
+
     @GetMapping("/list")
     public String hospitalList(HospitalRequestDTO dto ,Model model){
         log.info("병원 목록 조회 요청 - keyword: {}, isEmergency: {}, department: {}",
@@ -31,6 +38,7 @@ public class HospitalController {
         List<HospitalResponseDTO> hospitalList = hospitalService.hospitalList(dto);
         log.info("병원 목록 조회 결과 - 총 {}개", hospitalList.size());
         model.addAttribute("hospitalList",hospitalList);
+        model.addAttribute("kakaoMapApiKey", kakaoMapApiKey);
         return "hospital/hospital_list";
     }
 
@@ -43,4 +51,9 @@ public class HospitalController {
         model.addAttribute("reviewList", reviewList);
         return "hospital/hospital_detail";
     }
+
+
+
+
+
 }

@@ -2,13 +2,16 @@ package com.petmilyday.controller.reservation;
 
 import com.petmilyday.dto.reservation.ReservationRequestDTO;
 import com.petmilyday.dto.reservation.ReservationResponseDTO;
+import com.petmilyday.dto.reservation.ReservationSlotDto;
 import com.petmilyday.service.reservation.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -30,11 +33,21 @@ public class ReservationController {
 
     //예약신청
    @PostMapping("/register")
-   public String reservationRegister(ReservationRequestDTO dto){
-       log.info("예약 신청 - hospitalId: {}, petId: {}, date: {}, time: {}",
-               dto.getHospitalId(), dto.getPetId(), dto.getReserveDate(), dto.getReserveTime());
-       reservationService.reservationRegister(dto);
-       return "redirect:/reservation/list";
+   public String reservationRegister(ReservationRequestDTO dto,
+                                     RedirectAttributes redirectAttributes){
+      try {
+          reservationService.reservationRegister(dto);
+          return "redirect:/reservation/list";
+      }catch (RuntimeException e){
+          redirectAttributes
+                  .addFlashAttribute(
+                          "errorMessage",
+                          e.getMessage()
+                  );
+      }
+
+       return "redirect:/reservation/register?hospitalId=" + dto.getHospitalId();
+
    }
 
    //내 예약 목록
@@ -54,7 +67,18 @@ public class ReservationController {
         reservationService.reservationCancel(reservationId,cancelReason);
         return "redirect:/reservation/list";
     }
+    @GetMapping("/slots")
+    @ResponseBody
+    public List<ReservationSlotDto> getAvailableSlots(
+            @RequestParam Long hospitalId,
+            @RequestParam LocalDate date
+    ) {
 
+        return reservationService.getAvailableSlots(
+                hospitalId,
+                date
+        );
+    }
 
 
 }
