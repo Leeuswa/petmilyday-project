@@ -49,4 +49,9 @@ public class HospitalReview {
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public void contentChange(String content,Integer rating){
+        this.content = content;
+        this.rating = rating;
+    }
 }

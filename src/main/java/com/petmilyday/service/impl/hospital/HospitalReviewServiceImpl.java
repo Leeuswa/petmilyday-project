@@ -11,8 +11,10 @@ import com.petmilyday.service.hospital.HospitalReviewService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +31,12 @@ public class HospitalReviewServiceImpl implements HospitalReviewService {
         if(!reservation.getStatus().equals("DONE")){
             throw new RuntimeException("진료 완료 후에만 리뷰를 작성할 수 있습니다.");
         }
+        boolean exists =
+                hospitalReviewRepository.existsByReservation(reservation);
+
+        if(exists){
+            throw new RuntimeException("이미 리뷰를 작성한 예약입니다.");
+        }
 
         HospitalReview review = HospitalReview.builder()
                 .member(reservation.getMember())
@@ -37,6 +45,8 @@ public class HospitalReviewServiceImpl implements HospitalReviewService {
                 .rating(dto.getRating())
                 .content(dto.getContent())
                 .build();
+
+
 
         hospitalReviewRepository.save(review);
     }
@@ -50,8 +60,33 @@ public class HospitalReviewServiceImpl implements HospitalReviewService {
                 .map(review -> {
                     HospitalReviewResponseDTO dto = modelMapper.map(review, HospitalReviewResponseDTO.class);
                     dto.setMemberNickname(review.getMember().getNickname());
+                    dto.setMemberId(review.getMember().getId());
+                    dto.setHospitalId(review.getHospital().getId());
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    //리뷰 수정
+    @Transactional
+    @Override
+    public void reviewModify(Long reviewId, HospitalReviewRequestDTO dto) {
+        HospitalReview review = hospitalReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("작성된 리뷰가 없습니다."));
+
+        review.contentChange(dto.getContent(), dto.getRating());
+
+//        hospitalReviewRepository.save(review);
+
+    }
+
+    //리뷰삭제
+    @Transactional
+    @Override
+    public void reviewRemove(Long reviewId) {
+        HospitalReview review = hospitalReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("작성된 리뷰가 없습니다."));
+        hospitalReviewRepository.deleteById(reviewId);
+
     }
 }

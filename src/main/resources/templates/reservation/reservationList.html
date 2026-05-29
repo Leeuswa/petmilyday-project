@@ -1,147 +1,365 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>내 예약 목록</title>
+
     <link th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+          rel="stylesheet">
+
     <style>
-        body { background-color: #f8f9fa; }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
         .reservation-card {
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             transition: transform 0.2s;
         }
-        .reservation-card:hover { transform: translateY(-2px); }
-        .status-waiting  { background-color: #ffeaa7; color: #d35400; }
-        .status-confirmed { background-color: #d5f5e3; color: #1e8449; }
-        .status-done     { background-color: #d6eaf8; color: #1a5276; }
-        .status-cancel   { background-color: #f2f3f4; color: #7f8c8d; }
+
+        .reservation-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .status-waiting {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-confirmed {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-done {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancel {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
     </style>
 </head>
 <body>
+
 <div th:replace="~{fragments/header :: header}"></div>
 
 <div class="container py-5">
 
+    <!-- 상단 -->
     <div class="d-flex justify-content-between align-items-center mb-4">
+
         <h4 class="fw-bold mb-0">
-            <i class="bi bi-calendar2-check"></i> 내 예약 목록
+
+            <i class="bi bi-calendar2-check"></i>
+
+            내 예약 목록
+
         </h4>
-        <a th:href="@{/hospital/list}" class="btn btn-outline-primary btn-sm">
-            <i class="bi bi-plus"></i> 병원 찾기
+
+        <a th:href="@{/hospital/list}"
+           class="btn btn-outline-primary btn-sm">
+
+            <i class="bi bi-plus"></i>
+
+            병원 찾기
+
         </a>
+
     </div>
 
     <!-- 예약 없을 때 -->
-    <div class="text-center py-5" th:if="${#lists.isEmpty(reservationList)}">
-        <i class="bi bi-calendar-x" style="font-size: 3rem; color: #b2bec3;"></i>
-        <p class="mt-3 text-muted">예약 내역이 없습니다.</p>
-        <a th:href="@{/hospital/list}" class="btn btn-primary mt-2">병원 찾기</a>
+    <div class="text-center py-5"
+         th:if="${#lists.isEmpty(reservationList)}">
+
+        <i class="bi bi-calendar-x"
+           style="font-size: 3rem; color: #b2bec3;">
+        </i>
+
+        <p class="mt-3 text-muted">
+
+            예약 내역이 없습니다.
+
+        </p>
+
+        <a th:href="@{/hospital/list}"
+           class="btn btn-primary mt-2">
+
+            병원 찾기
+
+        </a>
+
     </div>
 
     <!-- 예약 목록 -->
     <div class="row g-3">
-        <div class="col-12" th:each="reservation : ${reservationList}">
+
+        <div class="col-12"
+             th:each="reservation : ${reservationList}">
+
             <div class="card reservation-card p-4">
+
                 <div class="row align-items-center">
 
-                    <!-- 왼쪽: 예약 정보 -->
+                    <!-- 왼쪽 -->
                     <div class="col-md-8">
+
+                        <!-- 병원명 + 상태 -->
                         <div class="d-flex align-items-center mb-2">
+
                             <h5 class="fw-bold mb-0 me-3"
-                                th:text="${reservation.hospitalName}"></h5>
+                                th:text="${reservation.hospitalName}">
+                            </h5>
+
                             <span class="badge rounded-pill px-3 py-2"
+
                                   th:classappend="${reservation.status == 'WAITING'} ? 'status-waiting' :
-                                                  (${reservation.status == 'CONFIRMED'} ? 'status-confirmed' :
+                                                  (${reservation.status == 'APPROVED'} ? 'status-confirmed' :
                                                   (${reservation.status == 'DONE'} ? 'status-done' : 'status-cancel'))"
-                                  th:text="${reservation.status == 'WAITING'} ? '대기중' :
-                                           (${reservation.status == 'CONFIRMED'} ? '확정' :
-                                           (${reservation.status == 'DONE'} ? '완료' : '취소'))">
+
+                                  th:text="${reservation.status == 'WAITING'} ? '승인 대기' :
+                                           (${reservation.status == 'APPROVED'} ? '예약 확정' :
+                                           (${reservation.status == 'DONE'} ? '진료 완료' : '예약 취소'))">
+
                             </span>
+
                         </div>
 
+                        <!-- 날짜 -->
                         <p class="text-muted small mb-1">
+
                             <i class="bi bi-calendar3"></i>
-                            <span th:text="${reservation.reserveDate}"></span>
-                            <span th:text="${reservation.reserveTime}"></span>
+
+                            <span th:text="${reservation.reserveDate}">
+                            </span>
+
+                            <span th:text="${reservation.reserveTime}">
+                            </span>
+
                         </p>
+
+                        <!-- 진료과 -->
                         <p class="text-muted small mb-1">
+
                             <i class="bi bi-clipboard2-pulse"></i>
-                            진료과: <span th:text="${reservation.department}"></span>
+
+                            진료과 :
+                            <span th:text="${reservation.department}">
+                            </span>
+
                         </p>
+
+                        <!-- 반려동물 -->
                         <p class="text-muted small mb-1">
+
                             <i class="bi bi-heart"></i>
-                            반려동물: <span th:text="${reservation.petName}"></span>
+
+                            반려동물 :
+                            <span th:text="${reservation.petName}">
+                            </span>
+
                         </p>
-                        <p class="text-muted small mb-0"
-                           th:if="${reservation.waitNumber != null}">
-                            <i class="bi bi-people"></i>
-                            대기번호: <span class="fw-bold"
-                                        th:text="${reservation.waitNumber}"></span>번
-                        </p>
-                        <p class="text-muted small mb-0"
+
+                        <!-- 대기번호 -->
+                        <div class="mt-3"
+
+                             th:if="${reservation.status == 'WAITING'
+                                    or reservation.status == 'APPROVED'}">
+
+                            <div class="alert alert-light border mb-0">
+
+                                <div class="d-flex align-items-center">
+
+                                    <i class="bi bi-people-fill
+                                              text-primary me-2">
+                                    </i>
+
+                                    <div>
+
+                                        <div class="small text-muted">
+
+                                            현재 대기 순번
+
+                                        </div>
+
+                                        <div class="fw-bold fs-5"
+
+                                             th:id="'wait-number-' + ${reservation.id}"
+
+                                             th:text="${reservation.waitNumber} + '번'">
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- 취소 사유 -->
+                        <p class="text-danger small mt-2 mb-0"
+
                            th:if="${reservation.cancelReason != null}">
-                            <i class="bi bi-x-circle text-danger"></i>
-                            취소 사유: <span th:text="${reservation.cancelReason}"></span>
+
+                            <i class="bi bi-x-circle"></i>
+
+                            취소 사유 :
+                            <span th:text="${reservation.cancelReason}">
+                            </span>
+
                         </p>
+
                     </div>
 
-                    <!-- 오른쪽: 버튼 -->
+                    <!-- 오른쪽 -->
                     <div class="col-md-4 text-end">
-                        <!-- 취소 버튼 -->
-                        <div th:if="${reservation.status == 'WAITING' or reservation.status == 'CONFIRMED'}">
+
+                        <!-- 예약 취소 -->
+                        <div th:if="${reservation.status == 'WAITING'
+                                     or reservation.status == 'APPROVED'}">
+
                             <button class="btn btn-outline-danger btn-sm"
+
                                     th:data-id="${reservation.id}"
+
                                     onclick="showCancelModal(this.dataset.id)">
-                                <i class="bi bi-x-circle"></i> 예약 취소
+
+                                <i class="bi bi-x-circle"></i>
+
+                                예약 취소
+
                             </button>
+
                         </div>
-                        <!-- 리뷰 작성 버튼 -->
+
+                        <!-- 리뷰 작성 -->
                         <div th:if="${reservation.status == 'DONE'}">
-                            <a th:href="@{/hospital/{id}(id=${reservation.hospitalId}, reservationId=${reservation.id})}"
+
+                            <a th:href="@{/hospital/{id}
+                            (id=${reservation.hospitalId},
+                             reservationId=${reservation.id})}"
+
                                class="btn btn-outline-warning btn-sm">
-                                <i class="bi bi-star"></i> 리뷰 작성
+
+                                <i class="bi bi-star"></i>
+
+                                리뷰 작성
+
                             </a>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
 <!-- 취소 모달 -->
-<div class="modal fade" id="cancelModal" tabindex="-1">
+<div class="modal fade"
+     id="cancelModal"
+     tabindex="-1">
+
     <div class="modal-dialog">
+
         <div class="modal-content">
+
             <div class="modal-header">
-                <h5 class="modal-title">예약 취소</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                <h5 class="modal-title">
+
+                    예약 취소
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
             </div>
-            <form id="cancelForm" method="post">
+
+            <form id="cancelForm"
+                  method="post">
+
                 <div class="modal-body">
-                    <label class="form-label fw-bold">취소 사유</label>
-                    <textarea class="form-control" name="cancelReason"
-                              rows="3" placeholder="취소 사유를 입력해주세요" required></textarea>
+
+                    <label class="form-label fw-bold">
+
+                        취소 사유
+
+                    </label>
+
+                    <textarea class="form-control"
+                              name="cancelReason"
+                              rows="3"
+                              placeholder="취소 사유를 입력해주세요"
+                              required>
+                    </textarea>
+
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary"
-                            data-bs-dismiss="modal">닫기</button>
-                    <button type="submit" class="btn btn-danger">취소 확인</button>
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        닫기
+
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-danger">
+
+                        취소 확인
+
+                    </button>
+
                 </div>
+
             </form>
+
         </div>
+
     </div>
+
 </div>
 
-<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
-<script>
-    function showCancelModal(reservationId) {
-        document.getElementById('cancelForm').action = '/reservation/' + reservationId + '/cancel';
-        new bootstrap.Modal(document.getElementById('cancelModal')).show();
-    }
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}">
 </script>
+
+<script>
+
+    function showCancelModal(reservationId) {
+
+        document.getElementById('cancelForm').action =
+            '/reservation/' + reservationId + '/cancel';
+
+        new bootstrap.Modal(
+            document.getElementById('cancelModal')
+        ).show();
+    }
+
+</script>
+
 </body>
 </html>
+

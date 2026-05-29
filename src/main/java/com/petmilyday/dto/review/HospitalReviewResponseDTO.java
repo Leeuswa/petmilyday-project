@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 public class HospitalReviewResponseDTO {
 
     private Long id;
+    private Long hospitalId;
+    private Long memberId;
     private String memberNickname;
     private Integer rating;
     private String content;

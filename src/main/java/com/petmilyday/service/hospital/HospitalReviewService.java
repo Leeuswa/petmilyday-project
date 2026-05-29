@@ -1,5 +1,6 @@
 package com.petmilyday.service.hospital;
 
+import com.petmilyday.dto.hospital.HospitalRequestDTO;
 import com.petmilyday.dto.review.HospitalReviewRequestDTO;
 import com.petmilyday.dto.review.HospitalReviewResponseDTO;
 
@@ -11,4 +12,14 @@ public interface HospitalReviewService {
     void reviewRegister(HospitalReviewRequestDTO dto);
     //리뷰 목록 조회
     List<HospitalReviewResponseDTO> reviewList(Long hospitalId);
+
+    //리뷰 수정
+    void reviewModify(Long reviewId, HospitalReviewRequestDTO dto);
+    //리뷰 삭제
+    void reviewRemove(Long reviewId);
+
+
+
+
+
 }
