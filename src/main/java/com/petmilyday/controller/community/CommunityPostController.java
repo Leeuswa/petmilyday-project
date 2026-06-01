@@ -25,6 +25,11 @@ public class CommunityPostController {
 
     private final CommunityService communityPostService;
 
+    @GetMapping({"", "/"})
+    public String communityIndex() {
+        return "redirect:/community/list";
+    }
+
     @GetMapping("/list")
     public String list(@RequestParam(required = false) String[] types,
                        @RequestParam(required = false) String keyword,
