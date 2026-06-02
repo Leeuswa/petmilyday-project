@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,13 +54,19 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentOptional.orElseThrow();
         CommentDTO dto = modelMapper.map(comment, CommentDTO.class);
         dto.setWriterName(comment.getMember().getNickname());
+        dto.setWriterUsername(comment.getMember().getUsername());
         return dto;
     }
 
     @Override
     public void modify(CommentDTO commentDTO) {
-        Optional<Comment> commentOptional = commentRepository.findById(commentDTO.getId());
-        Comment comment = commentOptional.orElseThrow();
+        Comment comment = commentRepository.findById(commentDTO.getId()).orElseThrow();
+
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!comment.getMember().getUsername().equals(currentUsername)) {
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        }
+
         comment.updateContent(commentDTO.getContent());
         commentRepository.save(comment);
     }
@@ -67,6 +74,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void remove(Long id) {
         Comment comment = commentRepository.findById(id).orElseThrow();
+
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!comment.getMember().getUsername().equals(currentUsername)) {
+            throw new IllegalArgumentException("삭제 권한이 없습니다.");
+        }
+
         commentRepository.deleteById(id);
     }
 
@@ -85,6 +98,7 @@ public class CommentServiceImpl implements CommentService {
                 .map(comment -> {
                     CommentDTO dto = modelMapper.map(comment, CommentDTO.class);
                     dto.setWriterName(comment.getMember().getDisplayName());
+                    dto.setWriterUsername(comment.getMember().getUsername());
                     return dto;
                 })
                 .collect(Collectors.toList());

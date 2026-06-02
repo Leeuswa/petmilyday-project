@@ -1,86 +1,68 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>펫밀리데이 - 커뮤니티</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* 기본 스타일 초기화 */
-    body { margin: 0; padding: 0; font-family: 'Noto Sans KR', sans-serif; background-color: #f9f9f9; }
+    /* 기본 스타일 초기화 (글로벌 디자인 톤앤매너 유지) */
+    body { margin: 0; padding: 0; font-family: 'Sora', 'Noto Sans KR', sans-serif; background-color: #f0f2f7; }
     a { text-decoration: none; color: inherit; }
     ul { list-style: none; padding: 0; margin: 0; }
 
-    /* 상단 네비게이션 (헤더) */
-    .header { background-color: #ffffff; border-bottom: 1px solid #ddd; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 24px; font-weight: bold; color: #ff8c00; }
-    .nav-menu { display: flex; gap: 30px; }
-    .nav-menu li a { font-size: 16px; font-weight: 500; color: #333; }
-    .nav-menu li a:hover { color: #ff8c00; }
-    .user-info { font-size: 14px; color: #666; }
-    .logout-btn { margin-left: 10px; padding: 5px 10px; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 4px; }
-
     /* 메인 컨테이너 */
-    .container { max-width: 1000px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .page-title { font-size: 28px; font-weight: bold; margin-bottom: 20px; color: #333; }
+    .container { max-width: 1000px; margin: 40px auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .page-title { font-size: 28px; font-weight: bold; margin-bottom: 20px; color: #0d1433; }
 
     /* 검색 영역 */
     .search-area { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-    .search-area select, .search-area input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-right: 5px; }
-    .search-btn { padding: 8px 15px; background-color: #333; color: white; border: none; border-radius: 4px; cursor: pointer; }
-    .search-btn:hover { background-color: #555; }
+    .search-area select, .search-area input { padding: 8px; border: 1px solid #d0d5e8; border-radius: 4px; margin-right: 5px; outline: none; }
+    .search-btn { padding: 8px 15px; background-color: #2b44cc; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; }
+    .search-btn:hover { background-color: #3d58e0; }
 
     /* 게시판 테이블 */
     .board-table { width: 100%; border-collapse: collapse; text-align: center; }
-    .board-table th { background-color: #f1f1f1; padding: 12px; border-top: 2px solid #333; border-bottom: 1px solid #ddd; font-weight: bold; }
-    .board-table td { padding: 12px; border-bottom: 1px solid #ddd; color: #555; }
+    .board-table th { background-color: #e6e9f2; padding: 12px; border-top: 2px solid #0d1433; border-bottom: 1px solid #d0d5e8; font-weight: 600; color: #0d1433; }
+    .board-table td { padding: 12px; border-bottom: 1px solid #d0d5e8; color: #3d4670; }
     .board-table td.title { text-align: left; }
-    .board-table td.title a { color: #333; font-weight: 500; }
-    .board-table td.title a:hover { text-decoration: underline; color: #ff8c00; }
+    .board-table td.title a { color: #0d1433; font-weight: 500; }
+    .board-table td.title a:hover { text-decoration: underline; color: #2b44cc; }
 
     /* 하단 버튼 및 페이징 */
     .bottom-area { display: flex; justify-content: space-between; align-items: center; margin-top: 30px; }
     .pagination { display: flex; gap: 5px; }
-    .pagination a, .pagination span { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; color: #333; }
-    .pagination .active { background-color: #ff8c00; color: white; border-color: #ff8c00; font-weight: bold; }
-    .pagination a:hover { background-color: #f1f1f1; }
+    .pagination a { padding: 8px 12px; border: 1px solid #d0d5e8; border-radius: 4px; color: #3d4670; }
+    .pagination .active { background-color: #2b44cc; color: white; border-color: #2b44cc; font-weight: bold; }
+    .pagination a:hover:not(.active) { background-color: #eaedfa; }
 
-    .write-btn { padding: 10px 20px; background-color: #ff8c00; color: white; font-weight: bold; border-radius: 4px; text-align: center; }
-    .write-btn:hover { background-color: #e07b00; }
+    .write-btn { padding: 10px 20px; background-color: #2b44cc; color: white; font-weight: 600; border-radius: 4px; text-align: center; }
+    .write-btn:hover { background-color: #3d58e0; }
   </style>
 </head>
 <body>
 
-<header class="header">
-  <div class="logo"><a href="/">Petmily Day</a></div>
-  <ul class="nav-menu">
-    <li><a href="/hospital/list">병원 예약</a></li>
-    <li><a href="/ai/diagnosis">AI 진단</a></li>
-    <li><a href="/shop">동물용품샵</a></li>
-    <li><a href="/community/list">커뮤니티</a></li>
-    <li><a href="/used">중고거래</a></li>
-  </ul>
-  <div class="user-info" sec:authorize="isAuthenticated()">
-    <span sec:authentication="name"></span>님 환영합니다!
-    <form th:action="@{/member/logout}" method="post" style="display:inline;">
-      <button type="submit" class="logout-btn">로그아웃</button>
-    </form>
-  </div>
-  <div class="user-info" sec:authorize="isAnonymous()">
-    <a href="/member/login" class="logout-btn">로그인</a>
-  </div>
-</header>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <div class="container">
-  <h2 class="page-title">커뮤니티</h2>
+  <h2 class="page-title">일반 게시판</h2>
 
   <div class="search-area">
-    <form th:action="@{/community/list}" method="get" id="searchForm">
-      <select name="types">
-        <option value="t" th:selected="${param.types == 't'}">제목</option>
-        <option value="c" th:selected="${param.types == 'c'}">내용</option>
-        <option value="w" th:selected="${param.types == 'w'}">작성자</option>
+    <form th:action="@{/community/list}" method="get" id="searchForm" style="display: flex; align-items: center;">
+      <label id="anonymousLabel" style="display: none; align-items: center; margin-right: 10px; cursor: pointer; font-size: 14px; font-weight: 500; color: #2b44cc;">
+        <input type="checkbox" name="anonymousSearch" id="anonymousSearch" value="true"
+               th:checked="${pageRequestDTO != null and pageRequestDTO.anonymousSearch}"
+               onchange="toggleKeywordInput()" style="margin-right: 5px;"> 익명만
+      </label>
+
+      <select name="type" id="searchType" onchange="toggleAnonymousCheckbox()">
+        <option value="t" th:selected="${pageRequestDTO != null and pageRequestDTO.type == 't'}">제목</option>
+        <option value="c" th:selected="${pageRequestDTO != null and pageRequestDTO.type == 'c'}">내용</option>
+        <option value="w" th:selected="${pageRequestDTO != null and pageRequestDTO.type == 'w'}">작성자</option>
       </select>
-      <input type="text" name="keyword" th:value="${param.keyword}" placeholder="검색어를 입력하세요">
+
+      <input type="text" name="keyword" id="searchKeyword" th:value="${pageRequestDTO != null ? pageRequestDTO.keyword : ''}" placeholder="검색어를 입력하세요">
       <button type="submit" class="search-btn">검색</button>
     </form>
   </div>
@@ -96,33 +78,76 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:if="${responseDTO == null or responseDTO.isEmpty()}">
+    <tr th:if="${responseDTO == null or responseDTO.dtoList.isEmpty()}">
       <td colspan="5">등록된 게시글이 없습니다. 첫 게시글의 주인공이 되어보세요!</td>
     </tr>
 
-    <tr th:each="post : ${responseDTO.dtoList}"> <td th:text="${post.id}"></td>
+    <tr th:each="post : ${responseDTO.dtoList}">
+      <td th:text="${post.id}">1</td>
       <td class="title">
-        <a th:href="@{/community/read(id=${post.id})}" th:text="${post.title}"></a>
+        <a th:href="@{/community/read(id=${post.id})}" th:text="${post.title}">게시글 제목</a>
       </td>
-      <td th:text="${post.writerName}"></td>
-      <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}"></td>
-      <td th:text="${post.viewCount}"></td>
-    </tr>
+      <td th:text="${post.writerName}">작성자</td>
+      <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd')}">작성일</td>
+      <td th:text="${post.viewCount}">0</td>
     </tr>
     </tbody>
   </table>
 
   <div class="bottom-area">
-    <div></div> <div class="pagination" th:if="${responseDTO != null and !responseDTO.isEmpty()}">
-    <a th:each="pageNumber : ${#numbers.sequence(0, responseDTO.totalPages - 1)}"
-       th:href="@{/community/list(page=${pageNumber}, types=${param.types}, keyword=${param.keyword})}"
-       th:text="${pageNumber + 1}"
-       th:classappend="${pageNumber == responseDTO.number} ? 'active' : ''">1</a>
+    <div></div> <div class="pagination" th:if="${responseDTO != null and !responseDTO.dtoList.isEmpty()}">
+
+    <a th:if="${responseDTO.prev}"
+       th:href="@{/community/list(page=${responseDTO.start - 1}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}">이전</a>
+
+    <a th:each="num : ${#numbers.sequence(responseDTO.start, responseDTO.end)}"
+       th:href="@{/community/list(page=${num}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}"
+       th:text="${num}"
+       th:classappend="${num == responseDTO.page} ? 'active' : ''">1</a>
+
+    <a th:if="${responseDTO.next}"
+       th:href="@{/community/list(page=${responseDTO.end + 1}, type=${pageRequestDTO.type}, keyword=${pageRequestDTO.keyword})}">다음</a>
   </div>
 
     <a href="/community/register" class="write-btn">글쓰기</a>
   </div>
 </div>
+
+<script>
+  function toggleAnonymousCheckbox() {
+    const type = document.getElementById("searchType").value;
+    const anonymousLabel = document.getElementById("anonymousLabel");
+    const anonymousCheckbox = document.getElementById("anonymousSearch");
+
+    if (type === 'w') {
+      anonymousLabel.style.display = 'inline-flex'
+    } else {
+      anonymousLabel.style.display = 'none';
+      anonymousCheckbox.checked = false;
+    }
+    toggleKeywordInput();
+  }
+
+  function toggleKeywordInput() {
+    const anonymousCheckbox = document.getElementById("anonymousSearch");
+    const keywordInput = document.getElementById("searchKeyword");
+
+    if (anonymousCheckbox.checked) {
+      keywordInput.readOnly = true;
+      keywordInput.value = "";
+      keywordInput.placeholder = "익명 게시글 모아보기";
+      keywordInput.style.backgroundColor = "#e6e9f2";
+    } else {
+      keywordInput.readOnly = false;
+      keywordInput.placeholder = "검색어를 입력하세요";
+      keywordInput.style.backgroundColor = "#ffffff";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    toggleAnonymousCheckbox();
+  });
+</script>
 
 </body>
 </html>

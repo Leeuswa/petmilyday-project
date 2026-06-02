@@ -24,6 +24,7 @@ public class PageRequestDTO {
 
     private String type; // 검색 종류 : t, c, w, tc, tw, twc
     private String keyword;
+    private boolean anonymousSearch;
 
     public String[] getTypes() {
         if (type == null || type.isEmpty()) {
@@ -32,11 +33,12 @@ public class PageRequestDTO {
         return type.split("");
     }
 
-    public Pageable getPageable(String...props) {
-        return PageRequest.of(this.page -1, this.size, Sort.by(props).descending());
+    public Pageable getPageable(String... props) {
+        return PageRequest.of(this.page - 1, this.size, Sort.by(props).descending());
     }
 
     private String link;
+
     public String getLink() {
         if (link == null) {
             StringBuilder builder = new StringBuilder();
@@ -51,7 +53,10 @@ public class PageRequestDTO {
                 } catch (UnsupportedEncodingException e) {
                 }
             }
-            link = builder().toString();
+            if (anonymousSearch) {
+                builder.append("&anonymousSearch=true");
+            }
+            link = builder.toString();
         }
         return link;
     }

@@ -20,13 +20,16 @@ public class PageResponseDTO<E> {
 
     @Builder(builderMethodName = "withAll") //메소드 호출 시 withAll로 받겠다
     public PageResponseDTO(PageRequestDTO pageRequestDTO, int total, List<E> dtoList) {
-        if(total <= 0) {
-            return;
-        }
+
         this.page = pageRequestDTO.getPage();
         this.size = pageRequestDTO.getSize();
         this.total = total;
         this.dtoList = dtoList;
+
+        if(total <= 0) {
+            return;
+        }
+
         this.end = (int)(Math.ceil(this.page / 10.0 )) * 10;
         //시작 페이지
         this.start = this.end - 9;

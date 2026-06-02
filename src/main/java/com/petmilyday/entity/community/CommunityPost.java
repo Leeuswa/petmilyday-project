@@ -38,6 +38,8 @@ public class CommunityPost {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    private boolean anonymous;
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();

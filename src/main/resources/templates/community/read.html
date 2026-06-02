@@ -55,11 +55,14 @@
 
     <div class="post-actions">
         <a th:href="@{/community/list}" class="btn btn-list">목록으로</a>
-        <a th:href="@{/community/modify(id=${dto.id})}" class="btn btn-edit">수정</a>
-        <form th:action="@{/community/remove}" method="post" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-            <input type="hidden" name="id" th:value="${dto.id}">
-            <button type="submit" class="btn btn-delete">삭제</button>
-        </form>
+
+        <th:block th:if="${#authentication.name == dto.writerUsername}">
+            <a th:href="@{/community/modify(id=${dto.id})}" class="btn btn-edit">수정</a>
+            <form th:action="@{/community/remove}" method="post" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                <input type="hidden" name="id" th:value="${dto.id}">
+                <button type="submit" class="btn btn-delete">삭제</button>
+            </form>
+        </th:block>
     </div>
 
     <div class="comment-area">
@@ -76,41 +79,47 @@
 </div>
 
 <script th:inline="javascript">
-    // [변수] 타임리프 문법을 활용해 현재 게시글 번호를 자바스크립트 변수로 가져옵니다.
     const postId = [[${dto.id}]];
 
-    // [이벤트] 페이지가 로드되면 즉시 댓글 목록을 불러옵니다.
+    const currentUser = /*[[${#authentication.name}]]*/ 'anonymousUser';
+
     document.addEventListener("DOMContentLoaded", function() {
         loadComments();
     });
 
-    // [기능] 댓글 목록 불러오기 (GET)
     function loadComments() {
-        fetch(`/community/post/${postId}/comment/list`)
+        fetch(`/comments/list/${postId}?page=1&size=100`, {
+            method: "GET",
+            credentials: "include"
+        })
             .then(response => response.json())
             .then(data => {
                 const replyList = document.getElementById("replyList");
-                replyList.innerHTML = ""; // 기존 목록 초기화
+                replyList.innerHTML = "";
 
-                data.forEach(comment => {
-                    // 각 댓글의 HTML 구조를 생성합니다.
+                const comments = data.dtoList || [];
+
+                comments.forEach(comment => {
+                    let actionButtons = '';
+                    if (currentUser === comment.writerUsername) {
+                        actionButtons = `<button class="comment-delete-btn" onclick="removeComment(${comment.id})">삭제</button>`;
+                    }
+
                     const li = document.createElement("li");
                     li.className = "comment-item";
                     li.innerHTML = `
-                            <div class="comment-writer">
-                                ${comment.writerName}
-                                <span class="comment-date">${comment.createdAt.substring(0, 16).replace('T', ' ')}</span>
-                            </div>
-                            <div class="comment-text">${comment.content}</div>
-                            <button class="comment-delete-btn" onclick="removeComment(${comment.id})">삭제</button>
-                        `;
+                        <div class="comment-writer">
+                            ${comment.writerName}
+                            <span class="comment-date">${comment.createdAt ? comment.createdAt.substring(0, 16).replace('T', ' ') : ''}</span>
+                        </div>
+                        <div class="comment-text">${comment.content}</div>
+                        ${actionButtons} `;
                     replyList.appendChild(li);
                 });
             })
             .catch(error => console.error("댓글 로딩 실패:", error));
     }
 
-    // [기능] 댓글 등록하기 (POST)
     function registerComment() {
         const contentInput = document.getElementById("replyContent");
         const content = contentInput.value.trim();
@@ -122,20 +131,22 @@
 
         const data = {
             postId: postId,
-            content: content
+            content: content,
+            writerName: "temp"
         };
 
-        fetch(`/community/post/${postId}/comment`, {
+        fetch(`/comments/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
+            credentials: "include",
             body: JSON.stringify(data)
         })
             .then(response => {
                 if(response.ok) {
                     contentInput.value = ""; // 입력창 비우기
-                    loadComments(); // 목록 새로고침
+                    loadComments();
                 } else {
                     response.text().then(text => alert("댓글 등록 실패: " + text));
                 }
@@ -143,16 +154,16 @@
             .catch(error => console.error("통신 에러:", error));
     }
 
-    // [기능] 댓글 삭제하기 (DELETE)
     function removeComment(commentId) {
         if(!confirm("댓글을 삭제하시겠습니까?")) return;
 
-        fetch(`/community/comment/${commentId}`, {
-            method: "DELETE"
+        fetch(`/comments/${commentId}`, {
+            method: "DELETE",
+            credentials: "include" // 로그인 쿠키 전송
         })
             .then(response => {
                 if(response.ok) {
-                    loadComments(); // 목록 새로고침
+                    loadComments();
                 } else {
                     alert("댓글 삭제에 실패했습니다.");
                 }

@@ -20,11 +20,15 @@ public class CommunityPostDTO {
     @NotBlank(message = "내용을 입력해 주세요.")
     private String content;
 
-    private String writerName;
+    private String writerName; // 화면 표시용
+
+    private String writerUsername; // 권한 체크용
 
     private int viewCount;
 
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    private boolean anonymous;
 }

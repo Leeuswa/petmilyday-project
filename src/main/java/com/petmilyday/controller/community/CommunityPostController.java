@@ -1,6 +1,8 @@
 package com.petmilyday.controller.community;
 
 import com.petmilyday.dto.community.CommunityPostDTO;
+import com.petmilyday.dto.community.PageRequestDTO;
+import com.petmilyday.dto.community.PageResponseDTO;
 import com.petmilyday.service.community.CommunityService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +32,13 @@ public class CommunityPostController {
         return "redirect:/community/list";
     }
 
+    // CommunityPostController.java 파일 내부
+
     @GetMapping("/list")
-    public String list(@RequestParam(required = false) String[] types,
-                       @RequestParam(required = false) String keyword,
-                       @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-                       Model model) {
-        Page<CommunityPostDTO> result = communityPostService.getList(types, keyword, pageable);
-        model.addAttribute("responseDTO", result);
+    public String list(PageRequestDTO pageRequestDTO, Model model) {
+        PageResponseDTO<CommunityPostDTO> responseDTO = communityPostService.getList(pageRequestDTO);
+        model.addAttribute("responseDTO", responseDTO);
+
         return "community/list";
     }
 

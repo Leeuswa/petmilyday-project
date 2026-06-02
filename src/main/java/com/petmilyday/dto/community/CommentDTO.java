@@ -22,7 +22,9 @@ public class CommentDTO {
     private String content;
 
     @NotEmpty
-    private String writerName;
+    private String writerName; // 화면 표시용
+
+    private String writerUsername; // 권한 체크용
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;

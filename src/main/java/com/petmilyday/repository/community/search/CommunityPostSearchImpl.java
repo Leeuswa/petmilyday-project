@@ -2,6 +2,7 @@ package com.petmilyday.repository.community.search;
 
 import com.petmilyday.entity.community.CommunityPost;
 import com.petmilyday.entity.community.QCommunityPost;
+import com.petmilyday.entity.member.QMember;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.domain.Page;
@@ -18,23 +19,34 @@ public class CommunityPostSearchImpl extends QuerydslRepositorySupport implement
     }
 
     @Override
-    public Page<CommunityPost> searchAll(String[] types, String keyword, Pageable pageable) {
+    public Page<CommunityPost> searchAll(String[] types, String keyword, boolean anonymousSearch, Pageable pageable) {
 
         QCommunityPost post = QCommunityPost.communityPost;
-        JPQLQuery<CommunityPost> query = from(post);
+        QMember member = QMember.member;
 
-        if ((types != null && types.length > 0) && keyword != null) {
+        JPQLQuery<CommunityPost> query = from(post);
+        query.leftJoin(post.member, member);
+
+        if (types != null && types.length > 0) {
             BooleanBuilder booleanBuilder = new BooleanBuilder();
             for (String type : types) {
                 switch (type) {
                     case "t":
-                        booleanBuilder.or(post.title.contains(keyword));
+                        if (keyword != null && !keyword.isEmpty()) booleanBuilder.or(post.title.contains(keyword));
                         break;
                     case "c":
-                        booleanBuilder.or(post.content.contains(keyword));
+                        if (keyword != null && !keyword.isEmpty()) booleanBuilder.or(post.content.contains(keyword));
                         break;
                     case "w":
-                        booleanBuilder.or(post.member.nickname.contains(keyword));
+                        if (anonymousSearch) {
+                            booleanBuilder.or(post.anonymous.eq(true));
+                        } else if (keyword != null && !keyword.isEmpty()) {
+                            booleanBuilder.or(
+                                    post.anonymous.eq(false).and(
+                                            member.nickname.contains(keyword).or(member.username.contains(keyword))
+                                    )
+                            );
+                        }
                         break;
                 }
             }
@@ -43,10 +55,9 @@ public class CommunityPostSearchImpl extends QuerydslRepositorySupport implement
 
         query.where(post.id.gt(0L));
 
-        this.getQuerydsl().applyPagination(pageable, query);
-
-        List<CommunityPost> list = query.fetch();
         long count = query.fetchCount();
+        this.getQuerydsl().applyPagination(pageable, query);
+        List<CommunityPost> list = query.fetch();
 
         return new PageImpl<>(list, pageable, count);
     }
