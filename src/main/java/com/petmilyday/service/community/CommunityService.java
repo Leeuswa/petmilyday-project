@@ -1,8 +1,8 @@
 package com.petmilyday.service.community;
 
 import com.petmilyday.dto.community.CommunityPostDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.petmilyday.dto.community.PageRequestDTO;
+import com.petmilyday.dto.community.PageResponseDTO;
 
 public interface CommunityService {
 
@@ -14,5 +14,5 @@ public interface CommunityService {
 
     void removePost(Long id);
 
-    Page<CommunityPostDTO> getList(String[] types, String keyword, Pageable pageable);
+    PageResponseDTO<CommunityPostDTO> getList(PageRequestDTO pageRequestDTO);
 }

@@ -39,4 +39,9 @@ public class Comment {
     public void updateContent(String content) {
         this.content = content;
     }
+
+    public void assignMemberAndPost(Member member, CommunityPost post) {
+        this.member = member;
+        this.post = post;
+    }
 }
