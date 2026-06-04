@@ -52,7 +52,8 @@ public class SecurityConfig {
                 // 4. API별 접근 권한(인가) 설정
                 .authorizeHttpRequests(auth -> auth
                         // 회원가입, 로그인, 토큰 재발급 등 인증이 필요 없는 경로 허용
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/", "/member/register", "/member/login", "/member/reissue").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/", "/member/register", "/member/login", "/member/reissue",
+                                "/shop/**", "/api/subscription/**","shop/subscription").permitAll()
                         // 나머지 모든 회원 수정, 탈퇴, 반려동물 프로필 등 API는 JWT 인증 필수
                         .anyRequest().authenticated()
                 )

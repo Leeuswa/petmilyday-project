@@ -1,8 +1,11 @@
 package com.petmilyday.controller.shop;
 
 import com.petmilyday.entity.shop.Orders;
+import com.petmilyday.entity.shop.OrderItem;
+import com.petmilyday.entity.product.Product;
 import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.repository.shop.OrdersRepository;
+import com.petmilyday.repository.shop.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +23,10 @@ import java.util.Map;
 public class PaymentApiController {
     private final MemberRepository memberRepository;
     private final OrdersRepository ordersRepository;
+    private final OrderItemRepository orderItemRepository;
+
+    @jakarta.persistence.PersistenceContext
+    private jakarta.persistence.EntityManager em;
 
     @PostMapping("/ready")
     public ResponseEntity<?> readyStandardPayment(@RequestBody Map<String, Object> params, HttpSession session) {
@@ -53,11 +61,27 @@ public class PaymentApiController {
             body.put("cancel_url", "http://localhost:8080/api/payment/cancel");
             body.put("fail_url", "http://localhost:8080/api/payment/fail");
 
-            // DB 저장을 위해 프론트 전송 값 세션 임시 보관
+            String mainAddress = params.get("deliveryAddress") != null ? params.get("deliveryAddress").toString() : "";
+            String detailAddress = params.get("detailAddress") != null ? params.get("detailAddress").toString() : "";
+            String fullAddress = mainAddress;
+            if (!detailAddress.isEmpty()) {
+                fullAddress += " " + detailAddress;
+            }
+
             session.setAttribute("receiverName", params.get("receiverName"));
-            session.setAttribute("deliveryAddress", params.get("deliveryAddress"));
+            session.setAttribute("deliveryAddress", fullAddress);
             session.setAttribute("totalPrice", totalAmount);
             session.setAttribute("itemName", itemName);
+
+            if (params.get("items") != null) {
+                session.setAttribute("checkoutItems", params.get("items"));
+                session.setAttribute("isCart", "Y");
+            } else {
+                session.setAttribute("productId", params.get("productId"));
+                session.setAttribute("quantity", params.get("quantity"));
+                session.setAttribute("price", params.get("price"));
+                session.setAttribute("isCart", "N");
+            }
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
             ResponseEntity<Map> response = restTemplate.postForEntity(
@@ -72,16 +96,16 @@ public class PaymentApiController {
 
     @GetMapping("/success")
     public ModelAndView paymentSuccess(@RequestParam("pg_token") String pgToken, HttpSession session) {
-        // 1. 변수를 메서드 최상단에 선언해서 세션 값 안전하게 백업
         Integer totalPrice = (Integer) session.getAttribute("totalPrice");
         if (totalPrice == null) {
-            totalPrice = 14000; // 혹시 모를 세션 유실 대비 기본값 방어막 (네 상품 금액에 맞게 세팅)
+            totalPrice = 14000;
         }
 
         try {
             String address = (String) session.getAttribute("deliveryAddress");
             String itemName = (String) session.getAttribute("itemName");
             Long memberId = (Long) session.getAttribute("memberId");
+            String isCart = (String) session.getAttribute("isCart");
 
             if (memberId == null) {
                 memberId = 1L;
@@ -103,17 +127,61 @@ public class PaymentApiController {
 
             ordersRepository.save(newOrder);
 
-            // 2. DB 저장 다 끝난 다음에 세션 지우기! (totalPrice는 위에서 이미 백업 완료)
+            if ("Y".equals(isCart)) {
+                List<Map<String, Object>> cartItems = (List<Map<String, Object>>) session.getAttribute("checkoutItems");
+                if (cartItems != null) {
+                    for (Map<String, Object> item : cartItems) {
+                        Object pIdObj = item.get("id") != null ? item.get("id") : item.get("productId");
+                        if (pIdObj == null) continue;
+
+                        Long pId = Long.valueOf(pIdObj.toString());
+                        int qty = Integer.parseInt(item.get("quantity").toString());
+                        int prc = Integer.parseInt(item.get("price").toString());
+
+                        Product productRef = em.getReference(Product.class, pId);
+
+                        OrderItem orderItem = new OrderItem();
+                        orderItem.setOrders(newOrder);
+                        orderItem.setProduct(productRef);
+                        orderItem.setQuantity(qty);
+                        orderItem.setPrice(prc);
+
+                        orderItemRepository.save(orderItem);
+                    }
+                }
+            } else {
+                Object pIdObj = session.getAttribute("productId");
+                if (pIdObj != null) {
+                    Long productId = Long.valueOf(pIdObj.toString());
+                    int quantity = session.getAttribute("quantity") != null ? Integer.parseInt(session.getAttribute("quantity").toString()) : 1;
+                    int price = session.getAttribute("price") != null ? Integer.parseInt(session.getAttribute("price").toString()) : totalPrice;
+
+                    Product productRef = em.getReference(Product.class, productId);
+
+                    OrderItem orderItem = new OrderItem();
+                    orderItem.setOrders(newOrder);
+                    orderItem.setProduct(productRef);
+                    orderItem.setQuantity(quantity);
+                    orderItem.setPrice(price);
+
+                    orderItemRepository.save(orderItem);
+                }
+            }
+
             session.removeAttribute("receiverName");
             session.removeAttribute("deliveryAddress");
             session.removeAttribute("totalPrice");
             session.removeAttribute("itemName");
+            session.removeAttribute("checkoutItems");
+            session.removeAttribute("productId");
+            session.removeAttribute("quantity");
+            session.removeAttribute("price");
+            session.removeAttribute("isCart");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        // 3. 백업해둔 진짜 금액 데이터를 화면단으로 정확하게 토스!
         ModelAndView mav = new ModelAndView();
         mav.addObject("totalPrice", totalPrice);
         mav.setViewName("shop/order_success");
