@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내 동물 진료기록</title>
+
+    <link th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .page-wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .title-card {
+            background: #ffffff;
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 28px;
+        }
+
+        .record-card {
+            background: #ffffff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            padding: 24px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .record-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 26px rgba(0,0,0,0.11);
+        }
+
+        .badge-done {
+            background-color: #e8f7ee;
+            color: #1f8f4d;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .info-label {
+            color: #868e96;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .empty-card {
+            background: #ffffff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            padding: 50px 20px;
+            text-align: center;
+            color: #868e96;
+        }
+
+        .empty-icon {
+            font-size: 42px;
+            color: #adb5bd;
+            margin-bottom: 12px;
+        }
+
+        .btn-detail {
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .record-meta {
+            color: #868e96;
+            font-size: 0.85rem;
+        }
+
+        .pet-name {
+            color: #2b44cc;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container py-5">
+    <div class="page-wrap">
+
+        <!-- 상단 제목 -->
+        <div class="title-card mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold mb-2">
+                        <i class="bi bi-clipboard2-pulse"></i>
+                        내 동물 진료기록
+                    </h3>
+                    <p class="text-muted mb-0">
+                        진료가 완료된 동물병원 예약 내역을 확인할 수 있습니다.
+                    </p>
+                </div>
+
+                <span class="badge-done">
+                    총 <span th:text="${#lists.size(medicalRecordList)}">0</span>건
+                </span>
+            </div>
+        </div>
+
+        <!-- 진료기록이 없을 때 -->
+        <div th:if="${#lists.isEmpty(medicalRecordList)}"
+             class="empty-card">
+
+            <div class="empty-icon">
+                <i class="bi bi-clipboard-x"></i>
+            </div>
+
+            <h5 class="fw-bold mb-2">
+                진료기록이 없습니다.
+            </h5>
+
+            <p class="mb-3">
+                진료 완료된 예약이 생기면 이곳에서 확인할 수 있습니다.
+            </p>
+
+            <a th:href="@{/hospital/list}"
+               class="btn btn-primary btn-detail">
+                <i class="bi bi-hospital"></i>
+                병원 예약하러 가기
+            </a>
+        </div>
+
+        <!-- 진료기록 목록 -->
+        <div th:each="record : ${medicalRecordList}"
+             class="record-card mb-3">
+
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        <i class="bi bi-hospital"></i>
+                        <span th:text="${record.hospitalName}">병원명</span>
+                    </h5>
+
+                    <div class="text-muted">
+                        반려동물:
+                        <span class="pet-name" th:text="${record.petName}">반려동물명</span>
+                    </div>
+                </div>
+
+                <span class="badge-done">
+                    진료 완료
+                </span>
+            </div>
+
+            <hr>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="info-label">
+                        <i class="bi bi-calendar-check"></i>
+                        진료일
+                    </div>
+                    <div class="info-value"
+                         th:text="${#temporals.format(record.reserveDate, 'yyyy-MM-dd')}">
+                        2026-06-02
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="info-label">
+                        <i class="bi bi-clock"></i>
+                        진료 시간
+                    </div>
+                    <div class="info-value"
+                         th:text="${record.reserveTime}">
+                        10:00
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="info-label">
+                        <i class="bi bi-clipboard2-pulse"></i>
+                        진료과
+                    </div>
+                    <div class="info-value"
+                         th:text="${record.department}">
+                        내과
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <span class="record-meta">
+                    예약 번호:
+                    <span th:text="${record.id}">1</span>
+                </span>
+
+                <a th:href="@{/hospital/{id}(id=${record.hospitalId})}"
+                   class="btn btn-outline-primary btn-sm btn-detail">
+                    <i class="bi bi-hospital"></i>
+                    병원 상세 보기
+                </a>
+            </div>
+        </div>
+
+        <!-- 하단 버튼 -->
+        <div class="mt-4 d-flex gap-2">
+            <a th:href="@{/reservation/list}"
+               class="btn btn-outline-secondary btn-detail">
+                <i class="bi bi-list-ul"></i>
+                내 예약 목록
+            </a>
+
+            <a th:href="@{/hospital/list}"
+               class="btn btn-primary btn-detail">
+                <i class="bi bi-calendar-plus"></i>
+                병원 예약하기
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+</html>

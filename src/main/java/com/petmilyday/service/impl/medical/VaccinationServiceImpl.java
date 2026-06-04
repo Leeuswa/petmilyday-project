@@ -29,4 +29,24 @@ public class VaccinationServiceImpl implements VaccinationService {
                 })
                 .collect(Collectors.toList());
     }
+
+
+    @Override
+    public List<VaccinationResponseDTO> myVaccinationList(String username) {
+        List<Vaccination> vaccinationList =
+                vaccinationRepository.findMyVaccinations(username);
+
+        return vaccinationList.stream()
+                .map(vaccination -> VaccinationResponseDTO.builder()
+                        .id(vaccination.getId())
+                        .petId(vaccination.getPet().getId())
+                        .petName(vaccination.getPet().getName())
+                        .species(vaccination.getPet().getSpecies())
+                        .vaccineName(vaccination.getVaccineName())
+                        .vaccinatedDate(vaccination.getVaccinatedDate())
+                        .nextDate(vaccination.getNextDate())
+                        .build())
+                .collect(Collectors.toList());
+
+    }
 }

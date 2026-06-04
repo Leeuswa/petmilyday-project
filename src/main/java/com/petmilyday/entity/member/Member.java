@@ -81,4 +81,11 @@ public class Member {
     public void withdraw() {
         this.status = AccountStatus.WITHDRAWN;
     }
+
+    public String getDisplayName() {
+        if (this.nickname != null && !this.nickname.trim().isEmpty()) {
+            return this.nickname;
+        }
+        return this.username;
+    }
 }

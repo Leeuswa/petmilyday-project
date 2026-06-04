@@ -10,6 +10,7 @@ import com.petmilyday.service.reservation.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,7 @@ public class HospitalController {
     @Value("${kakao.map.api-key}")
     private String kakaoMapApiKey;
 
+    //병원 리스트 페이지 이동
     @GetMapping("/list")
     public String hospitalList(HospitalRequestDTO dto ,Model model){
         log.info("병원 목록 조회 요청 - keyword: {}, isEmergency: {}, department: {}",
@@ -42,15 +44,28 @@ public class HospitalController {
         return "hospital/hospital_list";
     }
 
+    //병원 상세 페이지 이동
     @GetMapping("/{hospitalId}")
-    public String hospitalDetail(@PathVariable Long hospitalId, Model model) {
+    public String hospitalDetail(@PathVariable Long hospitalId, Model model,
+                                 Authentication authentication) {
         log.info("병원 상세 조회 요청 - hospitalId: {}", hospitalId);
         HospitalResponseDTO dto = hospitalService.hospitalReadOne(hospitalId);
         List<HospitalReviewResponseDTO> reviewList = hospitalReviewService.reviewList(hospitalId);
+
+        Long reviewableReservationId = hospitalReviewService.findReviewableReservationId(
+                hospitalId,
+                authentication.getName()
+        );
+
+
         model.addAttribute("hospital", dto);
         model.addAttribute("reviewList", reviewList);
+        model.addAttribute("reviewableReservationId", reviewableReservationId);
         return "hospital/hospital_detail";
     }
+
+
+
 
 
 

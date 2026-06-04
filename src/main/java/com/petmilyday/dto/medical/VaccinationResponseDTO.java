@@ -11,8 +11,12 @@ import java.time.LocalDate;
 public class VaccinationResponseDTO {
 
     private Long id;
-    private String petName;        // 반려동물 이름
-    private String vaccineName;    // 백신 이름
-    private LocalDate vaccinatedDate; // 접종일
-    private LocalDate nextDate;    // 다음 접종일
+
+    private Long petId;
+    private String petName;
+    private String species;
+
+    private String vaccineName;
+    private LocalDate vaccinatedDate;
+    private LocalDate nextDate;
 }
