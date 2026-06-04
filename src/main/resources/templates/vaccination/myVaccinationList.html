@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>내 동물 예방접종</title>
+
+    <link th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .page-wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .title-card {
+            background: #ffffff;
+            border: none;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 28px;
+        }
+
+        .vaccination-card {
+            background: #ffffff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            padding: 24px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .vaccination-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 26px rgba(0,0,0,0.11);
+        }
+
+        .badge-count {
+            background-color: #eef3ff;
+            color: #2b44cc;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .badge-vaccine {
+            background-color: #e8f7ee;
+            color: #1f8f4d;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .pet-name {
+            color: #2b44cc;
+            font-weight: 700;
+        }
+
+        .info-label {
+            color: #868e96;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            color: #212529;
+            font-weight: 700;
+        }
+
+        .empty-card {
+            background: #ffffff;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            padding: 50px 20px;
+            text-align: center;
+            color: #868e96;
+        }
+
+        .empty-icon {
+            font-size: 42px;
+            color: #adb5bd;
+            margin-bottom: 12px;
+        }
+
+        .btn-detail {
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .date-warning {
+            color: #b52844;
+            font-weight: 700;
+        }
+
+        .date-normal {
+            color: #1f8f4d;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container py-5">
+    <div class="page-wrap">
+
+        <!-- 상단 제목 -->
+        <div class="title-card mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold mb-2">
+                        <i class="bi bi-shield-plus"></i>
+                        내 동물 예방접종
+                    </h3>
+
+                    <p class="text-muted mb-0">
+                        등록된 반려동물의 예방접종 기록과 다음 접종 예정일을 확인할 수 있습니다.
+                    </p>
+                </div>
+
+                <span class="badge-count">
+                    총 <span th:text="${#lists.size(vaccinationList)}">0</span>건
+                </span>
+            </div>
+        </div>
+
+        <!-- 예방접종 기록이 없을 때 -->
+        <div th:if="${#lists.isEmpty(vaccinationList)}"
+             class="empty-card">
+
+            <div class="empty-icon">
+                <i class="bi bi-shield-x"></i>
+            </div>
+
+            <h5 class="fw-bold mb-2">
+                예방접종 기록이 없습니다.
+            </h5>
+
+            <p class="mb-3">
+                등록된 예방접종 기록이 생기면 이곳에서 확인할 수 있습니다.
+            </p>
+
+            <a th:href="@{/member/mypage}"
+               class="btn btn-primary btn-detail">
+                마이페이지로 돌아가기
+            </a>
+        </div>
+
+        <!-- 예방접종 목록 -->
+        <div th:each="vaccination : ${vaccinationList}"
+             class="vaccination-card mb-3">
+
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        <i class="bi bi-shield-check"></i>
+                        <span th:text="${vaccination.vaccineName}">종합백신</span>
+                    </h5>
+
+                    <div class="text-muted">
+                        반려동물:
+                        <span class="pet-name"
+                              th:text="${vaccination.petName}">
+                            초코
+                        </span>
+
+                        <span th:if="${vaccination.species != null}">
+                            (<span th:text="${vaccination.species}">푸들</span>)
+                        </span>
+                    </div>
+                </div>
+
+                <span class="badge-vaccine">
+                    접종 완료
+                </span>
+            </div>
+
+            <hr>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <div class="info-label">
+                        <i class="bi bi-calendar-check"></i>
+                        접종일
+                    </div>
+
+                    <div class="info-value"
+                         th:text="${#temporals.format(vaccination.vaccinatedDate, 'yyyy-MM-dd')}">
+                        2026-05-10
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="info-label">
+                        <i class="bi bi-calendar-plus"></i>
+                        다음 접종 예정일
+                    </div>
+
+                    <div class="info-value"
+                         th:text="${#temporals.format(vaccination.nextDate, 'yyyy-MM-dd')}">
+                        2027-05-10
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <span class="text-muted small">
+                    접종 기록 번호:
+                    <span th:text="${vaccination.id}">1</span>
+                </span>
+
+                <a th:href="@{/member/mypage}"
+                   class="btn btn-outline-primary btn-sm btn-detail">
+                    <i class="bi bi-person"></i>
+                    마이페이지
+                </a>
+            </div>
+        </div>
+
+        <!-- 하단 버튼 -->
+        <div class="mt-4 d-flex gap-2">
+            <a th:href="@{/reservation/medical-records}"
+               class="btn btn-outline-secondary btn-detail">
+                <i class="bi bi-clipboard2-pulse"></i>
+                내 동물 진료기록
+            </a>
+
+            <a th:href="@{/hospital/list}"
+               class="btn btn-primary btn-detail">
+                <i class="bi bi-hospital"></i>
+                병원 예약하기
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+</html>

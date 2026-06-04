@@ -33,4 +33,8 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
                 })
                 .collect(Collectors.toList());
     }
+
+
+
+
 }

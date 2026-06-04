@@ -5,6 +5,7 @@ import com.petmilyday.dto.review.HospitalReviewResponseDTO;
 import com.petmilyday.service.hospital.HospitalReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,7 +35,8 @@ public class HospitalReviewController {
     @PostMapping("/register")
     public String reviewRegister(@Valid HospitalReviewRequestDTO dto,
                                  BindingResult bindingResult,
-                                 RedirectAttributes redirectAttributes){
+                                 RedirectAttributes redirectAttributes,
+                                 Authentication authentication){
 
         //DTO에서 검증값에서 문제가 생겼을 경우
       if (bindingResult.hasErrors()){
@@ -46,7 +48,7 @@ public class HospitalReviewController {
 
         //서비스 로직에서 문제가 생겼을 경우
       try {
-          hospitalReviewService.reviewRegister(dto);
+          hospitalReviewService.reviewRegister(dto,authentication.getName());
       }catch (RuntimeException e){
           redirectAttributes.addFlashAttribute(
                   "error",
@@ -63,18 +65,19 @@ public class HospitalReviewController {
             @PathVariable Long reviewId,
           @Valid  HospitalReviewRequestDTO dto,
             BindingResult bindingResult,
-            RedirectAttributes redirectAttributes){
+            RedirectAttributes redirectAttributes,
+            Authentication authentication){
         if(bindingResult.hasErrors()){
 
             redirectAttributes.addFlashAttribute(
                     "error",
                     bindingResult.getFieldError().getDefaultMessage());
 
-            return "redirect:/review/list/" + dto.getHospitalId();
+            return "redirect:/hospital/" + dto.getHospitalId();
         }
 
         try {
-            hospitalReviewService.reviewModify(reviewId,dto);
+            hospitalReviewService.reviewModify(reviewId,dto,authentication.getName());
         }catch (RuntimeException e){
             redirectAttributes.addFlashAttribute(
                     "error",
@@ -86,15 +89,37 @@ public class HospitalReviewController {
         return "redirect:/hospital/" + dto.getHospitalId();
     }
 
-    //리뷰 삭제
+    // 리뷰 삭제
     @PostMapping("/remove/{reviewId}")
-    public String reviewRemove(
-            @PathVariable Long reviewId,
-            Long hospitalId ){
-        hospitalReviewService.reviewRemove(reviewId);
+    public String reviewRemove(@PathVariable Long reviewId,
+                               Long hospitalId,
+                               Authentication authentication,
+                               RedirectAttributes redirectAttributes) {
+
+        try {
+            hospitalReviewService.reviewRemove(
+                    reviewId,
+                    authentication.getName()
+            );
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute(
+                    "error",
+                    e.getMessage()
+            );
+        }
 
         return "redirect:/hospital/" + hospitalId;
     }
 
+    //마이페이지에 내가 쓴 병원 리뷰
+    @GetMapping("/myReview")
+    public String myReviewList(Authentication authentication,
+                               Model model){
+        List<HospitalReviewResponseDTO> reviewList =
+                hospitalReviewService.myReivewList(authentication.getName());
 
+        model.addAttribute("reviewList",reviewList);
+        return "review/myReviewList";
+
+    }
 }

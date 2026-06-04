@@ -41,12 +41,12 @@ public class ReservationServiceImpl implements ReservationService {
 
 
     @Override
-    public void reservationRegister(ReservationRequestDTO dto) {
+    public void reservationRegister(ReservationRequestDTO dto,String loginId) {
         //병원 조회
         Hospital hospital = hospitalRepository.findById(dto.getHospitalId())
                 .orElseThrow(() -> new RuntimeException("병원을 찾을 수 없습니다."));
         //멤버 조회
-        Member member = memberRepository.findById(1L)
+        Member member = memberRepository.findByUsername(loginId)
                 .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
         //반려동물 조회
         PetProfile pet = petProfileRepository.findById(dto.getPetId())
@@ -96,11 +96,18 @@ public class ReservationServiceImpl implements ReservationService {
 
 
     @Override
-    public List<ReservationResponseDTO> reservationList(Long memberId) {
-        List<Reservation> reservations = reservationRepository
-                .findByMemberIdOrderByCreatedAtDesc(memberId);
+    public List<ReservationResponseDTO> reservationList(String username) {
 
-        log.info("예약 목록 조회 - memberId: {}, 총 {}건", memberId, reservations.size());
+
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(()->new RuntimeException("회원을 찾을 수 없습니다."));
+
+        List<Reservation> reservations = reservationRepository
+                .findByMemberIdOrderByCreatedAtDesc(member.getId());
+
+        log.info("예약 목록 조회 - username: {}, 총 {}건",
+                username,
+                reservations.size());
 
         return reservations.stream()
                 .map(reservation -> {
@@ -150,7 +157,7 @@ public class ReservationServiceImpl implements ReservationService {
                     .countByHospitalAndReserveDateAndReserveTimeAndStatusNot(hospital, date, currentTime, ReservationStatus.CANCEL.name());
             // 예약 가능 여부
             boolean available = currentCount < hospital.getMaxPerSlot();
-            // DTO 생성
+
             ReservationSlotDto slot = ReservationSlotDto.builder()
                     .time(currentTime).available(available)
                     .currentCount((int) currentCount)
@@ -162,6 +169,25 @@ public class ReservationServiceImpl implements ReservationService {
         }
         return slots;
     }
+
+    @Override
+    public List<ReservationResponseDTO> myMedicalRecords(String username) {
+        List<Reservation> medicalRecords = reservationRepository.findMedicalRecords(
+                username, ReservationStatus.DONE.name());
+
+        return medicalRecords.stream().map(
+                reservation -> {
+                    ReservationResponseDTO dto =
+                            modelMapper.map(reservation, ReservationResponseDTO.class);
+                    dto.setHospitalId(reservation.getHospital().getId());
+                    dto.setHospitalName(reservation.getHospital().getName());
+                    dto.setPetName(reservation.getPet().getName());
+
+                    return dto;
+                }).collect(Collectors.toList());
+
+    }
+
         }
 
 
