@@ -59,4 +59,8 @@ public class CommunityPost {
     public void increaseViewCount() {
         this.viewCount++;
     }
+
+    public void addViewCount() {
+        this.viewCount++;
+    }
 }

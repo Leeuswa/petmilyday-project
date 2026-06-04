@@ -106,4 +106,12 @@ public class CommunityServiceImpl implements CommunityService {
                 .total((int) result.getTotalElements())
                 .build();
     }
+
+    @Override
+    public void updateViewCount(Long id) {
+        CommunityPost post = communityPostRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        post.addViewCount();
+    }
+
 }

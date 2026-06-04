@@ -1,176 +1,256 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
 <head>
     <meta charset="UTF-8">
     <title>펫밀리데이 - 게시글 상세</title>
+
+    <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* [디자인] 기본 및 컨테이너 스타일 */
-        body { margin: 0; padding: 0; font-family: 'Noto Sans KR', sans-serif; background-color: #f9f9f9; }
+        body { margin: 0; padding: 0; font-family: 'Sora', 'Noto Sans KR', sans-serif; background-color: #f0f2f7; }
         .container { max-width: 800px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .post-header { border-bottom: 2px solid #0d1433; padding-bottom: 15px; margin-bottom: 20px; }
+        .post-title { font-size: 26px; font-weight: bold; margin: 0 0 10px 0; color: #0d1433; }
+        .post-info { font-size: 14px; color: #3d4670; display: flex; justify-content: space-between; }
+        .post-info-right span { margin-left: 15px; }
+        .post-content { min-height: 250px; line-height: 1.7; color: #3d4670; font-size: 16px; word-break: break-all; white-space: pre-wrap; padding: 10px 0; }
+        .post-actions { text-align: right; border-bottom: 1px solid #d0d5e8; padding-bottom: 20px; margin-bottom: 30px; }
+        .btn { padding: 9px 18px; font-size: 14px; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; text-decoration: none; display: inline-block; margin-left: 5px; }
+        .btn-list { background-color: #e6e9f2; color: #0d1433; }
+        .btn-list:hover { background-color: #d0d5e8; }
+        .btn-edit { background-color: #2b44cc; color: white; }
+        .btn-edit:hover { background-color: #3d58e0; }
+        .btn-delete { background-color: #fceef0; color: #b52844; }
+        .btn-delete:hover { background-color: #fabcc5; }
 
-        /* [디자인] 게시글 헤더 (제목, 작성자, 정보) */
-        .post-header { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 20px; }
-        .post-title { font-size: 24px; font-weight: bold; margin: 0 0 10px 0; color: #333; }
-        .post-info { font-size: 14px; color: #777; display: flex; justify-content: space-between; }
+        .comment-section { margin-top: 30px; }
+        .comment-section h3 { font-size: 18px; color: #0d1433; margin-bottom: 15px; border-bottom: 1px solid #d0d5e8; padding-bottom: 8px; }
+        .comment-list { padding: 0; margin: 0; }
+        .comment-item { padding: 15px; border-bottom: 1px solid #eaedfa; display: flex; flex-direction: column; gap: 6px; position: relative; }
+        .comment-writer { font-weight: bold; color: #0d1433; font-size: 14px; }
+        .comment-date { font-weight: normal; color: #8890b8; font-size: 12px; margin-left: 10px; }
+        .comment-text { color: #3d4670; font-size: 14px; line-height: 1.5; }
+        .comment-buttons { display: flex; gap: 10px; margin-top: 4px; align-items: center; }
+        .comment-btn { background: none; border: none; color: #2b44cc; cursor: pointer; font-size: 12px; font-weight: 600; padding: 0; }
+        .comment-btn:hover { text-decoration: underline; }
+        .comment-btn.del { color: #b52844; }
 
-        /* [디자인] 본문 영역 */
-        .post-content { min-height: 200px; line-height: 1.6; color: #444; font-size: 16px; margin-bottom: 30px; white-space: pre-wrap; }
+        /* 하트 좋아요 디자인 */
+        .like-btn { background: #f0f2f7; border: 1px solid #eaedfa; border-radius: 20px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: #3d4670; font-weight: bold; transition: background 0.2s; }
+        .like-btn:hover { background: #eaedfa; }
+        /* 내가 누른 좋아요(활성화) 상태 디자인 */
+        .like-btn.active { background: #fceef0; border-color: #fabcc5; color: #b52844; }
 
-        /* [디자인] 버튼 영역 */
-        .post-actions { text-align: right; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px; }
-        .btn { padding: 8px 15px; font-size: 14px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; margin-left: 5px; }
-        .btn-list { background-color: #333; color: white; }
-        .btn-edit { background-color: #ff8c00; color: white; }
-        .btn-delete { background-color: #dc3545; color: white; }
-
-        /* [디자인] 댓글 영역 */
-        .comment-section-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
-        .comment-form { display: flex; gap: 10px; margin-bottom: 20px; }
-        .comment-form input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        .comment-form button { background-color: #ff8c00; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
-
-        .comment-list { list-style: none; padding: 0; margin: 0; }
-        .comment-item { border-bottom: 1px solid #eee; padding: 15px 0; }
-        .comment-writer { font-weight: bold; margin-bottom: 5px; font-size: 14px; }
-        .comment-date { font-size: 12px; color: #999; margin-left: 10px; font-weight: normal; }
-        .comment-text { font-size: 15px; color: #333; margin: 5px 0; }
-        .comment-delete-btn { font-size: 12px; color: #dc3545; background: none; border: none; cursor: pointer; padding: 0; }
+        .comment-item.child { margin-left: 40px; background-color: #f8f9fc; border-left: 3px solid #b8bfdc; border-radius: 0 4px 4px 0; }
+        .comment-form { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
+        .comment-form textarea { width: 100%; height: 80px; padding: 12px; border: 1px solid #d0d5e8; border-radius: 4px; box-sizing: border-box; resize: none; outline: none; font-family: inherit; }
+        .comment-form textarea:focus { border-color: #2b44cc; }
+        .comment-submit-btn { align-self: flex-end; padding: 10px 24px; background-color: #0d1433; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .comment-submit-btn:hover { background-color: #2b44cc; }
+        .recomment-form { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; background: #eaedfa; padding: 12px; border-radius: 4px; }
+        .recomment-form textarea { width: 100%; height: 60px; padding: 10px; border: 1px solid #b8bfdc; border-radius: 4px; resize: none; outline: none; font-family: inherit; font-size: 13px; }
+        .recomment-form textarea:focus { border-color: #2b44cc; }
+        .recomment-actions { display: flex; justify-content: flex-end; gap: 8px; }
+        .btn-re-submit { padding: 6px 16px; background-color: #0d1433; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .btn-re-cancel { padding: 6px 16px; background-color: #ffffff; color: #0d1433; border: 1px solid #d0d5e8; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
     </style>
 </head>
 <body>
 
+<div th:replace="~{fragments/header :: header}"></div>
+
 <div class="container">
+
+    <div sec:authorize="isAuthenticated()">
+        <input type="hidden" id="currentUser" th:value="${#authentication.name}">
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <input type="hidden" id="currentUser" value="anonymousUser">
+    </div>
+
+    <input type="hidden" id="currentPostId" th:value="${postDTO.id}">
+
     <div class="post-header">
-        <h1 class="post-title" th:text="${dto.title}">게시글 제목</h1>
+        <h1 class="post-title" th:text="${postDTO.title}"></h1>
         <div class="post-info">
-            <span th:text="'작성자: ' + ${dto.writerName}">작성자 이름</span>
-            <span>
-                    <span th:text="'조회수 ' + ${dto.viewCount}">조회수 0</span> |
-                    <span th:text="${#temporals.format(dto.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
-                </span>
+            <span class="post-writer" th:text="${postDTO.writerName}"></span>
+            <div class="post-info-right">
+                <span>조회수 <th:block th:text="${postDTO.viewCount}"></th:block></span>
+                <span th:text="${postDTO.createdAt != null ? #temporals.format(postDTO.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></span>
+            </div>
         </div>
     </div>
 
-    <div class="post-content" th:text="${dto.content}">게시글 본문 내용이 여기에 들어갑니다.</div>
+    <div class="post-content" th:text="${postDTO.content}"></div>
 
     <div class="post-actions">
         <a th:href="@{/community/list}" class="btn btn-list">목록으로</a>
-
-        <th:block th:if="${#authentication.name == dto.writerUsername}">
-            <a th:href="@{/community/modify(id=${dto.id})}" class="btn btn-edit">수정</a>
-            <form th:action="@{/community/remove}" method="post" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
-                <input type="hidden" name="id" th:value="${dto.id}">
-                <button type="submit" class="btn btn-delete">삭제</button>
-            </form>
+        <th:block sec:authorize="isAuthenticated()">
+            <th:block th:if="${#authentication.name == postDTO.writerUsername}">
+                <a th:href="@{/community/modify(id=${postDTO.id})}" class="btn btn-edit">수정</a>
+                <form th:action="@{/community/remove}" method="post" style="display:inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <input type="hidden" name="id" th:value="${postDTO.id}">
+                    <button type="submit" class="btn btn-delete">삭제</button>
+                </form>
+            </th:block>
         </th:block>
     </div>
 
-    <div class="comment-area">
-        <div class="comment-section-title">댓글</div>
-
+    <div class="comment-section">
+        <h3>댓글</h3>
+        <ul id="replyList" class="comment-list"></ul>
         <div class="comment-form">
-            <input type="text" id="replyContent" placeholder="건전한 댓글 문화를 만들어가요!">
-            <button type="button" onclick="registerComment()">등록</button>
+            <textarea id="replyContent" placeholder="따뜻한 댓글을 남겨주세요."></textarea>
+            <button type="button" class="comment-submit-btn" onclick="registerComment()">댓글 등록</button>
         </div>
-
-        <ul class="comment-list" id="replyList">
-        </ul>
     </div>
 </div>
 
-<script th:inline="javascript">
-    const postId = [[${dto.id}]];
+<script>
+    const postId = document.getElementById("currentPostId").value;
+    const currentUser = document.getElementById("currentUser").value;
 
-    const currentUser = /*[[${#authentication.name}]]*/ 'anonymousUser';
+    // ★ 스프링 시큐리티 CSRF 토큰 세팅 (POST 통신 403 에러 방지용)
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+    // 안전하게 fetch 요청을 보내기 위한 헤더 생성 함수
+    function getAuthHeaders() {
+        const headers = { "Content-Type": "application/json" };
+        if (csrfToken && csrfHeader) {
+            headers[csrfHeader] = csrfToken;
+        }
+        return headers;
+    }
 
     document.addEventListener("DOMContentLoaded", function() {
         loadComments();
     });
 
     function loadComments() {
-        fetch(`/comments/list/${postId}?page=1&size=100`, {
-            method: "GET",
-            credentials: "include"
-        })
+        fetch(`/comments/list/${postId}?page=1&size=100`, { method: "GET", credentials: "include" })
             .then(response => response.json())
             .then(data => {
                 const replyList = document.getElementById("replyList");
                 replyList.innerHTML = "";
-
                 const comments = data.dtoList || [];
 
                 comments.forEach(comment => {
-                    let actionButtons = '';
+                    const li = document.createElement("li");
+                    li.className = comment.parentId ? "comment-item child" : "comment-item";
+
+                    let deleteButton = '';
                     if (currentUser === comment.writerUsername) {
-                        actionButtons = `<button class="comment-delete-btn" onclick="removeComment(${comment.id})">삭제</button>`;
+                        deleteButton = `<button class="comment-btn del" onclick="removeComment(${comment.id})">삭제</button>`;
                     }
 
-                    const li = document.createElement("li");
-                    li.className = "comment-item";
+                    // ★ 하트 아이콘 및 클래스 동적 렌더링
+                    const heartIcon = comment.likedByCurrentUser ? '❤️' : '🤍';
+                    const activeClass = comment.likedByCurrentUser ? 'active' : '';
+
                     li.innerHTML = `
                         <div class="comment-writer">
                             ${comment.writerName}
                             <span class="comment-date">${comment.createdAt ? comment.createdAt.substring(0, 16).replace('T', ' ') : ''}</span>
                         </div>
                         <div class="comment-text">${comment.content}</div>
-                        ${actionButtons} `;
+                        <div class="comment-buttons">
+                            <button class="like-btn ${activeClass}" onclick="likeComment(${comment.id})">${heartIcon} ${comment.likeCount || 0}</button>
+                            ${!comment.parentId ? `<button class="comment-btn" onclick="showReCommentForm(${comment.id})">답글 쓰기</button>` : ''}
+                            ${deleteButton}
+                        </div>
+                        <div id="recomment-form-container-${comment.id}"></div>
+                    `;
                     replyList.appendChild(li);
                 });
             })
-            .catch(error => console.error("댓글 로딩 실패:", error));
+            .catch(error => console.error(error));
     }
 
     function registerComment() {
         const contentInput = document.getElementById("replyContent");
         const content = contentInput.value.trim();
+        if (!content) return alert("댓글 내용을 입력해주세요.");
 
-        if (!content) {
-            alert("댓글 내용을 입력해주세요.");
-            return;
-        }
-
-        const data = {
-            postId: postId,
-            content: content,
-            writerName: "temp"
-        };
-
+        const data = { postId: postId, content: content, writerName: "temp" };
         fetch(`/comments/`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: getAuthHeaders(),
             credentials: "include",
             body: JSON.stringify(data)
         })
             .then(response => {
-                if(response.ok) {
-                    contentInput.value = ""; // 입력창 비우기
-                    loadComments();
-                } else {
-                    response.text().then(text => alert("댓글 등록 실패: " + text));
-                }
-            })
-            .catch(error => console.error("통신 에러:", error));
+                if(response.ok) { contentInput.value = ""; loadComments(); }
+                else { alert("로그인이 필요합니다."); }
+            }).catch(error => console.error(error));
     }
 
     function removeComment(commentId) {
         if(!confirm("댓글을 삭제하시겠습니까?")) return;
-
         fetch(`/comments/${commentId}`, {
             method: "DELETE",
-            credentials: "include" // 로그인 쿠키 전송
+            headers: getAuthHeaders(),
+            credentials: "include"
+        })
+            .then(response => { if(response.ok) loadComments(); else alert("삭제 실패"); })
+            .catch(error => console.error(error));
+    }
+
+    function likeComment(commentId) {
+        if (currentUser === 'anonymousUser') {
+            alert("로그인이 필요한 기능입니다.");
+            return;
+        }
+
+        fetch(`/comments/${commentId}/like`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            credentials: "include",
+            body: JSON.stringify({}) // ★ 빈 데이터를 명시적으로 보내어 서버 에러를 방지합니다.
         })
             .then(response => {
-                if(response.ok) {
-                    loadComments();
-                } else {
-                    alert("댓글 삭제에 실패했습니다.");
-                }
+                if(response.ok) loadComments();
+                else alert("처리에 실패했습니다. 다시 시도해주세요.");
             })
-            .catch(error => console.error("통신 에러:", error));
+            .catch(error => console.error(error));
+    }
+
+    function showReCommentForm(parentId) {
+        const container = document.getElementById(`recomment-form-container-${parentId}`);
+        if(container.innerHTML.trim() !== "") return;
+
+        container.innerHTML = `
+                <div class="recomment-form">
+                    <textarea id="recomment-text-${parentId}" placeholder="답글 내용을 입력해주세요."></textarea>
+                    <div class="recomment-actions">
+                        <button type="button" class="btn-re-cancel" onclick="cancelReComment(${parentId})">취소</button>
+                        <button type="button" class="btn-re-submit" onclick="submitReComment(${parentId})">등록</button>
+                    </div>
+                </div>
+            `;
+    }
+
+    function cancelReComment(parentId) {
+        document.getElementById(`recomment-form-container-${parentId}`).innerHTML = "";
+    }
+
+    function submitReComment(parentId) {
+        const contentInput = document.getElementById(`recomment-text-${parentId}`);
+        const content = contentInput.value.trim();
+        if(!content) return alert("답글 내용을 입력해주세요.");
+
+        const data = { postId: postId, content: content, writerName: "temp", parentId: parentId };
+        fetch(`/comments/`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            credentials: "include",
+            body: JSON.stringify(data)
+        })
+            .then(response => { if(response.ok) loadComments(); else alert("로그인이 필요합니다."); })
+            .catch(error => console.error(error));
     }
 </script>
-
 </body>
 </html>

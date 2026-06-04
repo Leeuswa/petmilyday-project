@@ -15,4 +15,6 @@ public interface CommunityService {
     void removePost(Long id);
 
     PageResponseDTO<CommunityPostDTO> getList(PageRequestDTO pageRequestDTO);
+
+    void updateViewCount(Long id);
 }
