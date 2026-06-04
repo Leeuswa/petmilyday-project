@@ -11,4 +11,6 @@ public interface CommentService {
     void remove(Long id);
 
     PageResponseDTO<CommentDTO> getListOfPost(Long postId, PageRequestDTO pageRequestDTO);
+
+    int toggleLike(String username, Long commentId); // 토글 후 최종 좋아요 개수 반환
 }

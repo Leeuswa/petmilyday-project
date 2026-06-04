@@ -31,4 +31,10 @@ public class CommentDTO {
 
     @JsonIgnore
     private LocalDateTime updatedAt;
+
+    private Long parentId; // 대댓글의 부모 댓글 확인용
+
+    private int likeCount;
+
+    private boolean likedByCurrentUser; // 좋아요 눌려 있는지 확인
 }

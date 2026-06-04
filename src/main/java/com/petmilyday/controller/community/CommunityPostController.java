@@ -4,6 +4,9 @@ import com.petmilyday.dto.community.CommunityPostDTO;
 import com.petmilyday.dto.community.PageRequestDTO;
 import com.petmilyday.dto.community.PageResponseDTO;
 import com.petmilyday.service.community.CommunityService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -70,10 +73,39 @@ public class CommunityPostController {
         return "redirect:/community/list";
     }
 
-    @GetMapping({"/read", "/modify"})
-    public void read(@RequestParam("id") Long id, Model model) {
+    @GetMapping("/read")
+    public String read(@RequestParam("id") Long id, Model model,
+                       HttpServletRequest request, HttpServletResponse response) {
+
+        Cookie[] cookies = request.getCookies();
+        boolean isViewed = false;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("postView_" + id)) {
+                    isViewed = true;
+                    break;
+                }
+            }
+        }
+
+        if (!isViewed) {
+            communityPostService.updateViewCount(id);
+            Cookie viewCookie = new Cookie("postView_" + id, "viewed");
+            viewCookie.setMaxAge(60 * 60 * 24);
+            viewCookie.setPath("/");
+            response.addCookie(viewCookie);
+        }
+
         CommunityPostDTO postDTO = communityPostService.readPost(id);
-        model.addAttribute("dto", postDTO);
+        model.addAttribute("postDTO", postDTO);
+        return "community/read";
+    }
+
+    @GetMapping("/modify")
+    public String modifyGET(@RequestParam("id") Long id, Model model) {
+        CommunityPostDTO postDTO = communityPostService.readPost(id);
+        model.addAttribute("postDTO", postDTO);
+        return "community/modify";
     }
 
     @PostMapping("/modify")
@@ -100,4 +132,5 @@ public class CommunityPostController {
 
         return "redirect:/community/list";
     }
+
 }
