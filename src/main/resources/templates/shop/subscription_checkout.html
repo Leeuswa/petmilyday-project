@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>정기구독 신청 / 결제 - petmilyday</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; }</style>
+</head>
+<body>
+<div class="max-w-6xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-8 text-slate-800">🔄 정기구독 신청 / 결제</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-6">
+            <!-- 배송지 -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-100">
+                <h2 class="text-xl font-bold mb-4 text-slate-700 border-b pb-2">📦 정기배송지 정보</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">수령인</label>
+                        <input type="text" id="receiverName" class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">배송지 주소</label>
+                        <input type="text" id="deliveryAddress" class="w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-hidden focus:border-indigo-500">
+                    </div>
+                </div>
+            </div>
+            <!-- 구독 정보 배지 표시 -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-100">
+                <h2 class="text-xl font-bold mb-4 text-slate-700 border-b pb-2">📅 정기구독 설정 확인</h2>
+                <div class="p-4 bg-emerald-50 text-emerald-900 rounded-xl flex justify-between items-center">
+                    <span class="font-bold">선택하신 정기 배송 주기</span>
+                    <span class="text-lg font-extrabold text-emerald-600" th:text="|매 ${cycleDays}일 마다 자동 배송|">매 30일 마다</span>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-100" style="margin-top: 24px; margin-bottom: 24px;">
+                <h2 class="text-xl font-bold mb-4 text-slate-700 border-b pb-2">💳 정기 결제 수단 선택</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 카카오페이 선택 라디오 -->
+                    <label class="flex items-center justify-between p-4 border border-indigo-500 bg-indigo-50/30 rounded-xl cursor-pointer" id="labelKakao">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">💛</span>
+                            <span class="font-semibold text-slate-800">카카오페이 (자동결제 등록)</span>
+                        </div>
+                        <input type="radio" name="payMethod" value="KAKAO" checked onchange="handlePayMethodChange('KAKAO')" class="w-4 height-4 accent-indigo-600">
+                    </label>
+
+                    <!-- 신용카드 선택 라디오 (준비중) -->
+                    <label class="flex items-center justify-between p-4 border border-slate-200 rounded-xl opacity-60 cursor-not-allowed" id="labelCard">
+                        <div class="flex items-center gap-3">
+                            <span class="text-lg">💳</span>
+                            <span class="font-semibold text-slate-500">신용카드 자동결제 (준비중)</span>
+                        </div>
+                        <input type="radio" name="payMethod" value="CARD" disabled onchange="handlePayMethodChange('CARD')" class="w-4 height-4 accent-slate-400">
+                    </label>
+                </div>
+            </div>
+            <!-- 상품 정보 -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-100">
+                <h2 class="text-xl font-bold mb-4 text-slate-700 border-b pb-2">🛒 구독 상품 정보</h2>
+                <div class="flex justify-between items-center py-4">
+                    <div>
+                        <p class="font-semibold text-slate-800 text-base" th:text="${name}">상품명</p>
+                        <p class="text-sm text-slate-400 mt-1" th:text="|수량: ${quantity}개 / 단가: ${#numbers.formatInteger(price, 0, 'COMMA')}원|"></p>
+                    </div>
+                    <span class="font-bold text-slate-700 text-lg"
+                          th:text="${totalPrice != null ? #numbers.formatInteger(totalPrice, 3, 'COMMA') + '원' : '0원'}">
+                    </span>
+                </div>
+            </div>
+        </div>
+        <!-- 우측 영수증 -->
+        <div class="lg:col-span-1">
+            <div class="bg-white p-6 rounded-2xl border border-slate-100 sticky top-6">
+                <h2 class="text-xl font-bold mb-6 text-slate-700">정기 결제 요약</h2>
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-base font-bold text-slate-800">회당 결제 금액</span>
+                    <span style="font-size: 24px; font-weight: 700; color: var(--accent);"
+                          th:text="${totalPrice != null ? #numbers.formatInteger(totalPrice, 3, 'COMMA') + '원' : '0원'}">
+                    </span>
+                </div>
+                <button onclick="submitSubscription()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg cursor-pointer">
+                    정기구독 결제 승인하기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript">
+    function submitSubscription() {
+        const address = document.getElementById("deliveryAddress").value.trim();
+        if (!address) return alert("배송지 주소를 입력해 주세요!");
+
+        fetch('/api/subscription/ready', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productId: [[${productId}]],
+                quantity: [[${quantity}]],
+                cycleDays: [[${cycleDays}]],
+                itemName: [[${name}]],
+                totalAmount: [[${totalPrice}]]
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if(data.next_redirect_pc_url) {
+                    // 사용자가 주소창 입력한 거 날아가지 않게 보관용 세팅
+                    localStorage.setItem("sub_address", address);
+
+                    // 카카오페이 인증/결제 카톡 팝업창으로 리다이렉트 폭격!!!
+                    location.href = data.next_redirect_pc_url;
+                } else {
+                    alert("카카오페이 통신 실패: " + data.message);
+                }
+            })
+            .catch(err => {
+                console.error("구독 에러:", err);
+                alert("서버 통신 중 오류가 발생했습니다.");
+            });
+    }
+    function handlePayMethodChange(method) {
+        const labelKakao = document.getElementById("labelKakao");
+        const labelCard = document.getElementById("labelCard");
+
+        if (method === 'KAKAO') {
+            labelKakao.className = "flex items-center justify-between p-4 border border-indigo-500 bg-indigo-50/30 rounded-xl cursor-pointer";
+            // 나중에 카드 결제 뚫리면 처리할 영역
+        }
+    }
+    function submitSubscription() {
+        const address = document.getElementById("deliveryAddress").value.trim();
+        if (!address) return alert("배송지 주소를 입력해 주세요!");
+
+        // 어떤 결제 수단 선택했는지 밸류 긁어오기
+        const selectedMethod = document.querySelector('input[name="payMethod"]:checked')?.value;
+
+        if (!selectedMethod) {
+            return alert("결제 수단을 선택해 주세요!");
+        }
+
+        if (selectedMethod === 'KAKAO') {
+            // 카카오페이 정기결제 뼈대 작동!
+            fetch('/api/subscription/ready', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    productId: [[${productId}]],
+                    quantity: [[${quantity}]],
+                    cycleDays: [[${cycleDays}]],
+                    itemName: [[${name}]],
+                    totalAmount: [[${totalPrice}]]
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.next_redirect_pc_url) {
+                        localStorage.setItem("sub_address", address);
+                        location.href = data.next_redirect_pc_url;
+                    } else {
+                        alert("카카오페이 통신 실패: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error("구독 에러:", err);
+                    alert("서버 통신 중 오류가 발생했습니다.");
+                });
+        } else if (selectedMethod === 'CARD') {
+            alert("신용카드 정기 결제는 현재 준비 중입니다. 카카오페이를 이용해 주세요!");
+        }
+    }
+</script>
+</body>
+</html>
