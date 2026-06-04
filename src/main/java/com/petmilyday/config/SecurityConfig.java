@@ -52,6 +52,8 @@ public class SecurityConfig {
                 // 4. API별 접근 권한(인가) 설정
                 .authorizeHttpRequests(auth -> auth
                         // 회원가입, 로그인, 토큰 재발급 등 인증이 필요 없는 경로 허용
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/", "/member/register", "/member/login", "/member/reissue",
+                                "/shop/**", "/api/subscription/**","shop/subscription").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/", "/error").permitAll()
                         .requestMatchers("/member/register", "/member/login", "/member/reissue").permitAll()
                         .requestMatchers("/community/list", "/hospital/list", "/shop/list", "/ai/diagnosis").permitAll()

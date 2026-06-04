@@ -4,233 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${product?.name != null ? product.name + ' — petmilyday' : '상품 상세 — petmilyday'}"></title>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
-        :root{
-            --bg:#f0f2f7;--bg2:#e6e9f2;--bg3:#d8dced;
-            --surface:#ffffff;--border:#d0d5e8;--border2:#b8bfdc;
-            --text:#0d1433;--text2:#3d4670;--text3:#8890b8;
-            --accent:#2b44cc;--accent-light:#eaedfa;--accent-mid:#3d58e0;
-            --r:8px;--rl:14px;
+        body { background-color: #f8f9fa; }
+        .detail-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
-
-        .gnb{position:sticky;top:0;z-index:100;background:var(--text);display:flex;align-items:center;height:56px;padding:0 28px}
-        .logo{font-size:15px;font-weight:700;color:#fff;margin-right:36px;letter-spacing:.5px}
-        .logo span{color:var(--accent-light);opacity:.7;font-weight:300}
-        .nav-links{display:flex;gap:2px;flex:1}
-        .nav-link{padding:6px 14px;border-radius:var(--r);font-size:12px;color:rgba(255,255,255,.5);cursor:pointer;border:none;background:none;font-family:'Sora',sans-serif;font-weight:400;transition:all .15s;letter-spacing:.2px}
-        .nav-link:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.08)}
-        .nav-link.active{color:#fff;background:var(--accent);font-weight:600}
-        .nav-right{display:flex;align-items:center;gap:8px}
-        .nav-btn{padding:6px 16px;border-radius:var(--r);font-size:12px;cursor:pointer;font-family:'Sora',sans-serif;font-weight:500}
-        .nav-btn-ghost{border:1px solid rgba(255,255,255,.25);background:none;color:rgba(255,255,255,.7)}
-        .nav-btn-fill{border:none;background:var(--accent);color:#fff}
-        .nav-icon{width:32px;height:32px;border-radius:var(--r);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
-
-        /* 상세 페이지 전용 CSS */
-        .wrap{max-width:1100px;margin:0 auto;padding:0 28px 80px}
-        .sec{margin-top:20px}
-        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:32px}
-        .divider{height:1px;background:var(--border);margin:20px 0}
-
-        .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 20px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s}
-        .btn-sm{height:32px;padding:0 14px;font-size:12px}
-        .btn-accent{background:var(--accent);color:#fff}
-        .btn-accent:hover{background:var(--accent-mid)}
-        .btn-surface{background:var(--surface);border:1px solid var(--border);color:var(--text)}
-        .btn-surface:hover{background:var(--bg)}
-        .btn-outline{background:rgba(255,255,255,.08);border:1px solid var(--border2);color:var(--text2)}
-
-        .badge{display:inline-flex;align-items:center;font-size:11px;padding:3px 9px;border-radius:4px;font-weight:600;letter-spacing:.3px}
-        .b-accent{background:var(--accent-light);color:var(--accent)}
-        .b-green{background:var(--green-light);color:var(--green)}
-        .stars{color:#d4920a;font-size:12px;letter-spacing:1px}
-        .fxb{display:flex;align-items:center;justify-content:space-between}
-
-        .detail-grid { display: grid; grid-template-columns: 420px 1fr; gap: 40px; align-items: start; }
-        .detail-img-area { width: 100%; height: 420px; background: var(--bg2); border-radius: var(--rl); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .detail-img-area img { width: 100%; height: 100%; object-fit: cover; }
-
-        .detail-tabs { display: flex; border-bottom: 2px solid var(--border); margin-top: 40px; }
-        .detail-tab { padding: 14px 28px; font-size: 14px; font-weight: 600; color: var(--text3); cursor: pointer; border: none; background: none; font-family: 'Sora'; position: relative; }
-        .detail-tab.on { color: var(--accent); }
-        .detail-tab.on::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: var(--accent); }
-
-        .tab-content { display: none; margin-top: 32px; }
-        .tab-content.active { display: block; }
-
-        .spec-table { width: 100%; border-collapse: collapse; }
-        .spec-table td { padding: 14px 18px; border-bottom: 1px solid var(--border); font-size: 13px; }
-        .spec-table td.label { width: 140px; color: var(--text3); font-weight: 500; background: var(--bg); }
-        .spec-table td.value { color: var(--text); font-weight: 400; }
-
-        .review-item, .qna-item { border-bottom: 1px solid var(--border); padding: 18px 4px; }
-        .qna-form { background: var(--bg); border-radius: var(--rl); padding: 20px; margin-bottom: 24px; }
-        .textarea { width: 100%; height: 80px; border: 1px solid var(--border); border-radius: var(--r); padding: 12px; font-family: 'Sora'; font-size: 13px; resize: none; margin-bottom: 10px; }
-
-        .qty-box { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: var(--surface); width: fit-content; height: 36px; }
-        .qty-btn { width: 36px; height: 100%; background: none; border: none; font-size: 16px; font-weight: 600; color: var(--text2); cursor: pointer; transition: background 0.15s; }
-        .qty-btn:hover { background: var(--bg2); }
-        .qty-input { width: 44px; height: 100%; border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border); text-align: center; font-size: 13px; font-weight: 600; color: var(--text); font-family: 'Sora'; }
-        .qty-input::-webkit-outer-spin-button, .qty-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .info-label { color: #636e72; font-size: 0.85rem; }
+        .stars { color: #ffa502; }
+        .spec-table th { width: 120px; color: #636e72; background-color: #f1f2f6; }
     </style>
 </head>
 <body th:data-base-price="${product?.price != null ? product.price : 0}">
-
 <div th:replace="~{fragments/header :: header}"></div>
 
-<div class="wrap" style="padding-top: 40px;">
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
-        <button class="btn btn-surface btn-sm" onclick="location.href='/shop?category=ALL'">&larr; 목록으로 돌아가기</button>
+<div class="container py-5">
+
+    <div class="mb-4">
+        <a th:href="@{/shop?category=ALL}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> 목록으로
+        </a>
     </div>
 
-    <div class="sec" th:if="${product != null}">
-        <div class="card">
-            <div class="detail-grid">
-                <div class="detail-img-area">
-                    <img th:if="${product.imgUrl != null}" th:src="${product.imgUrl}" alt="상품 이미지">
-                    <div th:if="${product.imgUrl == null}">🛋️ <span th:text="${product.name}">Product</span></div>
+    <div class="row g-4" th:if="${product != null}">
+
+        <!-- 왼쪽 영역: 상품 이미지 및 탭 메뉴 -->
+        <div class="col-md-8">
+            <div class="card detail-card p-4 mb-4">
+                <div class="row g-4">
+                    <div class="col-md-5">
+                        <div class="ratio ratio-1x1 bg-light rounded-3 overflow-hidden border">
+                            <img th:if="${product.imgUrl != null}" th:src="${product.imgUrl}" class="img-fluid" style="object-fit: cover;" alt="상품 이미지">
+                            <div th:if="${product.imgUrl == null}" class="d-flex align-items-center justify-content-center text-muted">No Image</div>
+                        </div>
+                    </div>
+                    <div class="col-md-7 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="mb-2">
+                                <span class="badge bg-primary bg-opacity-10 text-primary" th:text="${product.category}"></span>
+                                <span class="badge bg-success bg-opacity-10 text-success" th:text="${product.petSpecies}"></span>
+                            </div>
+                            <h3 class="fw-bold mb-2" th:text="${product.name}"></h3>
+                            <div class="mb-3">
+                                <span class="stars" id="topStars">★★★★★</span>
+                                <span class="small text-muted ms-1" id="topReviewText">(5.0) 후기 0개</span>
+                            </div>
+                            <h4 class="fw-bold text-primary" th:text="${product.price != null ? #numbers.formatInteger(product.price, 3, 'COMMA') + '원' : '0원'}"></h4>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="detail-info-area" style="display:flex; flex-direction:column;">
-                    <div style="display:flex; gap:12px; margin-bottom:12px;">
-                        <span class="badge b-accent" th:text="${product.category}">Category</span>
-                        <span class="badge b-green" th:text="${product.petSpecies}">Pet Type</span>
-                    </div>
-                    <h1 style="font-size:28px; font-weight:700;" th:text="${product.name}">상품명</h1>
+            <!-- 하단 정보 탭 구역 -->
+            <div class="card detail-card p-4 mb-4">
+                <ul class="nav nav-tabs mb-4" id="detailTabs">
+                    <li class="nav-item">
+                        <button class="nav-link active fw-bold text-dark border-0 border-bottom" onclick="switchTab(0)">상품 정보</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold text-secondary border-0 border-bottom" id="reviewTabBtn" onclick="switchTab(1)">리뷰 (0)</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold text-secondary border-0 border-bottom" id="qnaTabBtn" onclick="switchTab(2)">문의/Q&A (0)</button>
+                    </li>
+                </ul>
 
-                    <div style="display:flex; gap:8px; margin-top:8px; align-items:center;">
-                        <div class="stars" id="topStars">★★★★★</div>
-                        <div style="font-size:12px; color:var(--text3)" id="topReviewText">(5.0) 후기 0개</div>
-                    </div>
-
-                    <div style="font-size:24px; font-weight:700; color:var(--accent); margin-top:12px;" th:text="${product.price != null ? #numbers.formatInteger(product.price, 3, 'COMMA') + '원' : '0원'}">Price</div>
-                    <div class="divider"></div>
-
-                    <!-- 수량 선택 박스 -->
-                    <div class="fxb" style="margin-bottom: 16px; background: var(--bg); padding: 12px; border-radius: var(--r);">
-                        <span style="font-weight:600; font-size:12px;">수량 선택</span>
-                        <div class="qty-box">
-                            <button class="qty-btn" onclick="changeQuantity(-1)">-</button>
-                            <input type="number" class="qty-input" id="productQty" value="1" min="1" readonly>
-                            <button class="qty-btn" onclick="changeQuantity(1)">+</button>
+                <div class="tab-content">
+                    <div id="tab-info" class="tab-pane fade show active">
+                        <table class="table table-bordered align-middle text-center small mb-4">
+                            <tbody>
+                            <tr>
+                                <th class="spec-table th">상품명</th> <td th:text="${product.name}"></td>
+                                <th class="spec-table th">카테고리</th> <td th:text="${product.category}"></td>
+                            </tr>
+                            <tr>
+                                <th class="spec-table th">권장 대상</th> <td th:text="${product.petSpecies}"></td>
+                                <th class="spec-table th">주요 성분</th> <td th:text="${product.material != null ? product.material : '상세참조'}"></td>
+                            </tr>
+                            <tr>
+                                <th class="spec-table th">사이즈/용량</th> <td th:text="${product.sizeInfo != null ? product.sizeInfo : '상세참조'}"></td>
+                                <th class="spec-table th">제조국</th> <td th:text="${product.origin != null ? product.origin : '상세참조'}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="mt-4">
+                            <h5 class="fw-bold mb-2"><i class="bi bi-file-text"></i> Product Story</h5>
+                            <p th:text="${product.description != null ? product.description : '상품 상세 설명이 없습니다.'}" class="text-secondary small lh-lg" style="white-space:pre-wrap;"></p>
                         </div>
                     </div>
 
-                    <!-- 정기구독 주기 셀렉트 박스 구역 -->
-                    <div class="fxb" style="margin-bottom: 20px; background: var(--bg); padding: 12px; border-radius: var(--r);">
-                        <span style="font-weight:600; font-size:12px;">정기배송 주기</span>
-                        <select id="subscriptionCycle" style="height:36px; border:1px solid var(--border); border-radius:4px; font-size:13px; font-weight:600; padding:0 10px; background:var(--surface); cursor:pointer; font-family:'Sora';">
-                            <option value="14">14일 마다 (2주)</option>
-                            <option value="30" selected>30일 마다 (4주)</option>
-                            <option value="60">60일 마다 (8주)</option>
-                        </select>
+                    <div id="tab-reviews" class="tab-pane d-none">
+                        <div id="reviewContainer" class="d-flex flex-column gap-3"></div>
                     </div>
 
-                    <div class="fxb" style="margin-bottom: 24px;">
-                        <span style="font-weight:700; font-size:12px;">총 합계 금액</span>
-                        <span id="totalPriceDisplay" th:text="${product.price != null ? #numbers.formatInteger(product.price, 3, 'COMMA') + '원' : '0원'}" style="font-size:22px; font-weight:700; color:var(--accent);">Total</span>
-                    </div>
-
-                    <!-- [★오리지널 디자인 클래스 복구 셋업 완료!] -->
-                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: auto;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                            <!-- 네 원래 클래스인 btn-surface 와 btn-accent 사용 -->
-                            <button class="btn btn-surface" th:onclick="addToCart([[${product.id}]])" style="height:46px; font-weight:600;">장바구니 담기</button>
-                            <button class="btn btn-accent"
-                                    id="btnBuyNow"
-                                    th:data-id="${product.id}"
-                                    th:data-name="${product.name}"
-                                    th:data-price="${product.price}"
-                                    onclick="buyNow()"
-                                    style="height:46px; font-weight:600;">
-                                바로 구매하기
-                            </button>
+                    <div id="tab-qna" class="tab-pane d-none">
+                        <div class="p-3 bg-light rounded-3 mb-4 border">
+                            <textarea class="form-control mb-2" id="qnaInput" rows="3" placeholder="문의 내용을 입력해 주세요." style="resize:none; font-size:13px;"></textarea>
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-primary btn-sm" onclick="addQna()"><i class="bi bi-check-lg"></i> 문의 등록</button>
+                            </div>
                         </div>
-                        <!-- 구독 버튼도 네 원래 오리지널 파란색 디자인(btn-accent)에 깊이감 살짝 더해 정렬 -->
-                        <button class="btn btn-accent"
-                                id="btnSubBuy"
-                                th:data-id="${product.id}"
-                                th:data-name="${product.name}"
-                                th:data-price="${product.price}"
-                                onclick="goToSubscriptionCheckout()"
-                                style="width:100%; height:46px; font-weight:600; background-color:var(--accent-mid);">
-                            매달 알아서 배송! 정기구독 신청
-                        </button>
+                        <div id="qnaContainer" class="d-flex flex-column gap-3"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card" style="margin-top: 24px;">
-            <div class="detail-tabs">
-                <div class="detail-tab on" onclick="switchTab(0)">상품 정보</div>
-                <div class="detail-tab" id="reviewTabBtn" onclick="switchTab(1)">리뷰 (0)</div>
-                <div class="detail-tab" id="qnaTabBtn" onclick="switchTab(2)">문의/Q&A (0)</div>
-            </div>
+        <!-- 오른쪽 영역: 주문 옵션 설정 패널 -->
+        <div class="col-md-4">
+            <div class="card detail-card p-4">
+                <h5 class="fw-bold mb-3 text-center">주문 옵션 설정</h5>
 
-            <div id="tab-info" class="tab-content active">
-                <table class="spec-table" style="border: 1px solid var(--border);">
-                    <tbody>
-                    <tr>
-                        <td class="label">상품명</td>
-                        <td class="value" th:text="${product.name}">Name</td>
-                        <td class="label">카테고리</td>
-                        <td class="value" th:text="${product.category}">Category</td>
-                    </tr>
-                    <tr>
-                        <td class="label">권장 대상</td>
-                        <td class="value" th:text="${product.petSpecies}">Species</td>
-                        <td class="label">주요 소재/성분</td>
-                        <td class="value" th:text="${product.material != null ? product.material : '상세참조'}">Material</td>
-                    </tr>
-                    <tr>
-                        <td class="label">사이즈/용량</td>
-                        <td class="value" th:text="${product.sizeInfo != null ? product.sizeInfo : '상세참조'}">Size</td>
-                        <td class="label">제조국/제조원</td>
-                        <td class="value" th:text="${product.origin != null ? product.origin : '상세참조'}">Origin</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div style="margin-top:40px;">
-                    <h3 style="margin-bottom:16px;">Product Story</h3>
-                    <p th:text="${product.description != null ? product.description : '상품 상세 설명이 등록되지 않았습니다.'}" style="font-size:13px; line-height:1.9; white-space:pre-wrap;">Story Content</p>
-                </div>
-            </div>
-
-            <div id="tab-reviews" class="tab-content">
-                <div id="reviewContainer"></div>
-            </div>
-
-            <div id="tab-qna" class="tab-content">
-                <div class="qna-form">
-                    <textarea class="textarea" id="qnaInput" placeholder="문의 내용을 입력해 주세요. 등록 시 즉시 반영됩니다."></textarea>
-                    <div style="display:flex; justify-content:flex-end;">
-                        <button class="btn btn-accent btn-sm" onclick="addQna()">문의 등록</button>
+                <!-- 수량 선택 -->
+                <div class="mb-3">
+                    <p class="info-label mb-1"><i class="bi bi-plus-minus"></i> 수량 선택</p>
+                    <div class="input-group input-group-sm">
+                        <button class="btn btn-outline-secondary fw-bold" type="button" onclick="changeQuantity(-1)">-</button>
+                        <input type="number" class="form-control text-center bg-white fw-bold" id="productQty" value="1" readonly>
+                        <button class="btn btn-outline-secondary fw-bold" type="button" onclick="changeQuantity(1)">+</button>
                     </div>
                 </div>
-                <div id="qnaContainer"></div>
+
+                <!-- 정기배송 주기 선택 -->
+                <div class="mb-3">
+                    <p class="info-label mb-1"><i class="bi bi-arrow-repeat"></i> 정기배송 주기</p>
+                    <select id="subscriptionCycle" class="form-select form-select-sm fw-bold">
+                        <option value="14">14일 마다 (2주)</option>
+                        <option value="30" selected>30일 마다 (4주)</option>
+                        <option value="60">60일 마다 (8주)</option>
+                    </select>
+                </div>
+
+                <hr>
+
+                <!-- 실시간 최종 금액 반영 스팟 -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="fw-bold small text-secondary">총 합계 금액</span>
+                    <span id="totalPriceDisplay" th:text="${product.price != null ? #numbers.formatInteger(product.price, 3, 'COMMA') + '원' : '0원'}" class="fs-4 fw-bold text-primary"></span>
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100" th:onclick="addToCart([[${product.id}]])"><i class="bi bi-cart"></i> 담기</button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-primary w-100" id="btnBuyNow" th:data-id="${product.id}" th:data-name="${product.name}" th:data-price="${product.price}" onclick="buyNow()"><i class="bi bi-credit-card"></i> 바로구매</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-success w-100 py-2.5 fw-bold" id="btnSubBuy" th:data-id="${product.id}" th:data-name="${product.name}" th:data-price="${product.price}" onclick="goToSubscriptionCheckout()"><i class="bi bi-calendar-heart"></i> 정기구독 신청</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="sec" th:if="${product == null}" style="text-align: center; padding: 100px 0;">
-        <h2 style="font-size: 24px; color: var(--rose); margin-bottom: 10px;">상품을 찾을 수 없습니다 😢</h2>
-        <p style="color: var(--text3); margin-bottom: 20px;">삭제되었거나 존재하지 않는 상품입니다.</p>
-        <button class="btn btn-accent" onclick="location.href='/shop?category=ALL'">쇼핑몰 홈으로 가기</button>
+    <!-- 예외 처리 -->
+    <div class="card detail-card text-center py-5 my-5" th:if="${product == null}">
+        <h4 class="text-danger fw-bold mb-2">존재하지 않는 상품입니다 😢</h4>
+        <a th:href="@{/shop?category=ALL}" class="btn btn-primary btn-sm mt-3 px-4">쇼핑몰 홈 가기</a>
     </div>
 </div>
 
-<script>
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+<script th:inline="javascript">
     const basePrice = parseInt(document.body.getAttribute('data-base-price')) || 0;
 
     function changeQuantity(amount) {
         const input = document.getElementById('productQty');
         const display = document.getElementById('totalPriceDisplay');
         if(!input || !display) return;
-
         let val = parseInt(input.value) + amount;
         if (val < 1) return;
         input.value = val;
@@ -238,184 +184,88 @@
     }
 
     function switchTab(idx) {
-        document.querySelectorAll('.detail-tab').forEach((t, i) => t.classList.toggle('on', i === idx));
-        document.querySelectorAll('.tab-content').forEach((c, i) => c.classList.toggle('active', i === idx));
+        const tabs = document.querySelectorAll('#detailTabs .nav-link');
+        const panes = [document.getElementById('tab-info'), document.getElementById('tab-reviews'), document.getElementById('tab-qna')];
+        tabs.forEach((t, i) => t.classList.toggle('active', i === idx));
+        panes.forEach((p, i) => p.classList.toggle('d-none', i !== idx));
     }
 
     const dummyReviews = [
         { author: '펫밀리러버', rating: 5, date: '2026.05.20', text: '기호성이 너무 좋아요! 우리 애가 이것만 찾네요.' },
-        { author: '초코아빠', rating: 5, date: '2026.05.18', text: '배송도 빠르고 포장도 아주 깔끔합니다. 만족해요.' },
-        { author: '정민바라기', rating: 4, date: '2026.05.15', text: '처음엔 낯설어하더니 지금은 잘 적응해서 씁니다. 가성비 최고!' },
-        { author: '뭉치맘', rating: 5, date: '2026.05.12', text: '재구매 의사 100%입니다. 주변 집사들한테도 다 추천했어요.' },
-        { author: '멍냥이최고', rating: 4, date: '2026.05.10', text: '튼튼하고 마감 처리도 잘 되어 있어서 안심하고 써요.' },
-        { author: '김집사', rating: 5, date: '2026.05.08', text: '사진보다 실물이 훨씬 예쁘네요! 사이즈도 딱 맞습니다.' },
-        { author: '댕댕러브', rating: 5, date: '2026.05.05', text: '이 가격에 이 퀄리티라니... 펫밀리데이 자주 이용할게요.' },
-        { author: '나만고양이없어', rating: 4, date: '2026.05.01', text: '배송이 하루 만에 와서 놀랐어요. 급하게 필요했는데 감사합니다.' },
-        { author: '보리누나', rating: 5, date: '2026.04.28', text: '성분이 착해서 피부 예민한 우리 애한테도 트러블 없이 잘 맞네요.' },
-        { author: '코코형아', rating: 5, date: '2026.04.25', text: '다른 데서 산 것보다 내구성도 좋고 애도 편안해해서 대만족입니다!' },
-        { author: '호두엄마', rating: 5, date: '2026.04.20', text: '선물용으로 샀는데 받는 사람도 강아지도 다 좋아해서 뿌듯해요~' }
+        { author: '초코아빠', rating: 5, date: '2026.05.18', text: '배송도 빠르고 포장도 아주 깔끔합니다. 만족해요.' }
     ];
 
     const dummyQnAs = [
-        { author: '김*진', date: '2026.05.24', q: '유통기한이 언제까지인가요?', a: '제조일로부터 18개월입니다. 최근 제조된 상품으로 발송해 드립니다.' },
-        { author: '박*민', date: '2026.05.22', q: '세탁기 돌려도 되나요?', a: '네, 세탁망에 넣어 울코스로 단독 세탁을 권장합니다.' },
-        { author: '이*영', date: '2026.05.20', q: '오늘 주문하면 언제 도착하나요?', a: '오후 2시 이전 결제 완료 시 당일 출고되어 보통 다음 날 도착합니다.' },
-        { author: '최*호', date: '2026.05.18', q: '사이즈 교환 가능한가요?', a: '상품 훼손 및 사용 흔적이 없는 경우 수령 후 7일 이내 왕복 택배비 부담 시 교환 가능합니다.' },
-        { author: '정*은', date: '2026.05.15', q: '동물들이 써도 안전한 성분인가요?', a: '네, 안전하게 사용할 수 있도록 유해물질 검사를 완료한 제품입니다.' },
-        { author: '강*수', date: '2026.05.12', q: '비회원도 구매할 수 있나요?', a: '네, 비회원 구매 가능합니다. 단, 회원 가입 시 포인트 적립 혜택을 받으실 수 있습니다.' },
-        { author: '조*현', date: '2026.05.10', q: '대량 구매 시 할인 되나요?', a: '대량 구매 관련은 고객센터(1588-0000)로 문의주시면 상세히 안내해 드리겠습니다.' },
-        { author: '윤*아', date: '2026.05.08', q: '옵션 변경하고 싶은데 배송 준비중이네요.', a: '배송 준비중 상태에서는 직접 변경이 어려우며, 고객센터로 긴급 연락 부탁드립니다.' },
-        { author: '장*우', date: '2026.05.05', q: '선물 포장 가능한가요?', a: '현재 별도의 선물 포장 서비스는 제공하지 않으나, 안전하고 깔끔하게 박스 포장되어 발송됩니다.' },
-        { author: '임*희', date: '2026.05.02', q: '품절된 상품 재입고 언제 되나요?', a: '해당 상품의 재입고 일정은 홈페이지 공지사항을 통해 추후 안내해 드릴 예정입니다.' }
+        { author: '김*진', date: '2026.05.24', q: '유통기한이 언제까지인가요?', a: '제조일로부터 18개월입니다. 최근 제조된 상품으로 발송해 드립니다.' }
     ];
 
     document.addEventListener("DOMContentLoaded", () => {
         const reviewContainer = document.getElementById('reviewContainer');
         let totalRating = 0;
-
-        dummyReviews.forEach(r => {
-            totalRating += r.rating;
-            const starStr = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-            reviewContainer.innerHTML += `
-                <div class="review-item">
-                    <div class="fxb"><span style="font-weight:600;">${r.author}</span><span class="stars">${starStr}</span></div>
-                    <div style="font-size:11px; color:var(--text3); margin-top:4px;">${r.date}</div>
-                    <p style="font-size:13px; margin-top:8px;">${r.text}</p>
-                </div>
-            `;
-        });
-
+        if (reviewContainer) {
+            dummyReviews.forEach(r => {
+                totalRating += r.rating;
+                reviewContainer.innerHTML += `
+                    <div class="pb-3 border-bottom small">
+                        <div class="d-flex justify-content-between"><strong>${r.author}</strong><span class="stars">${'★'.repeat(r.rating)}</span></div>
+                        <div class="text-muted text-xs">${r.date}</div>
+                        <p class="text-secondary mb-0 mt-1">${r.text}</p>
+                    </div>`;
+            });
+        }
         const avgRating = (totalRating / dummyReviews.length).toFixed(1);
-        const avgStars = Math.round(avgRating);
-        document.getElementById('topStars').innerText = '★'.repeat(avgStars) + '☆'.repeat(5 - avgStars);
         document.getElementById('topReviewText').innerText = `(${avgRating}) 후기 ${dummyReviews.length}개`;
         document.getElementById('reviewTabBtn').innerText = `리뷰 (${dummyReviews.length})`;
 
         const qnaContainer = document.getElementById('qnaContainer');
-        dummyQnAs.forEach(q => {
-            qnaContainer.innerHTML += `
-                <div class="qna-item">
-                    <div class="fxb"><span style="font-weight:600;">Q. ${q.q}</span><span class="badge b-green">답변완료</span></div>
-                    <div style="font-size:11px; color:var(--text3); margin-top:4px;">${q.author} · ${q.date}</div>
-                    <div style="background:var(--bg); padding:10px; border-radius:6px; margin-top:8px;">
-                        <span style="font-size:12px; color:var(--text2);"><strong>A. petmilyday:</strong> ${q.a}</span>
-                    </div>
-                </div>
-            `;
-        });
+        if (qnaContainer) {
+            dummyQnAs.forEach(q => {
+                qnaContainer.innerHTML += `
+                    <div class="pb-3 border-bottom small">
+                        <div class="d-flex justify-content-between"><strong>Q. ${q.q}</strong><span class="badge bg-success bg-opacity-10 text-success">답변완료</span></div>
+                        <div class="text-muted text-xs">${q.author} · ${q.date}</div>
+                        <div class="bg-light p-2 rounded mt-1 border text-secondary"><strong>A. petmilyday:</strong> ${q.a}</div>
+                    </div>`;
+            });
+        }
         document.getElementById('qnaTabBtn').innerText = `문의/Q&A (${dummyQnAs.length})`;
     });
 
     function addQna() {
         const txt = document.getElementById('qnaInput').value;
         if(!txt.trim()) return alert('내용을 입력하세요!');
-
-        const today = new Date();
-        const dateStr = today.getFullYear() + '.' + String(today.getMonth() + 1).padStart(2, '0') + '.' + String(today.getDate()).padStart(2, '0');
-
         const item = document.createElement('div');
-        item.className = 'qna-item';
-        item.innerHTML = `
-            <div class="fxb"><span style="font-weight:600;">Q. ${txt}</span><span class="badge b-accent">답변대기</span></div>
-            <div style="font-size:11px; color:var(--text3); margin-top:4px;">나 · ${dateStr}</div>
-        `;
-
+        item.className = 'pb-3 border-bottom small';
+        item.innerHTML = `<div class="d-flex justify-content-between"><strong>Q. ${txt}</strong><span class="badge bg-primary bg-opacity-10 text-primary">답변대기</span></div>`;
         document.getElementById('qnaContainer').prepend(item);
         document.getElementById('qnaInput').value = '';
-
-        const qnaTab = document.getElementById('qnaTabBtn');
-        const currentCount = parseInt(qnaTab.innerText.match(/\d+/)[0]);
-        qnaTab.innerText = `문의/Q&A (${currentCount + 1})`;
         alert('문의가 성공적으로 등록되었습니다!');
     }
 
     function addToCart(productId) {
         const qtyInput = document.getElementById('productQty');
         const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
-
         fetch('/api/cart/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ productId: productId, quantity: quantity })
-        })
-            .then(response => {
-                if (response.ok) {
-                    if (confirm('장바구니에 성공적으로 담겼습니다! 장바구니 페이지로 이동할까요?')) {
-                        location.href = '/cart';
-                    }
-                } else {
-                    response.text().then(msg => alert('담기 실패: ' + msg));
-                }
-            });
+        }).then(res => { if (res.ok && confirm('장바구니 이동할까요?')) location.href = '/cart'; });
     }
 
-    // 바로 구매하기 연동 완료
     function buyNow() {
         const btn = document.getElementById('btnBuyNow');
-        if(!btn) {
-            alert("바로구매 버튼 바인딩 실패!");
-            return;
-        }
-
-        const productId = btn.getAttribute('data-id');
-        const productName = btn.getAttribute('data-name');
-        const productPrice = parseInt(btn.getAttribute('data-price')) || 0;
-
         const qtyInput = document.getElementById('productQty');
         const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
-
-        // 가방 싸서 세션에 담기
-        const checkoutItems = [{
-            productId: productId,
-            quantity: quantity,
-            name: productName,
-            price: productPrice
-        }];
-
+        const checkoutItems = [{ productId: btn.getAttribute('data-id'), quantity: quantity, name: btn.getAttribute('data-name'), price: parseInt(btn.getAttribute('data-price')) }];
         sessionStorage.setItem("checkoutItems", JSON.stringify(checkoutItems));
-
-        // ⭕ 팝업창 띄우지 않고, 일반 주문/결제 화면으로 즉시 질주!!
-        location.href = "/order/checkout";
+        location.href = "/shop/checkout";
     }
 
-    // 2. [매달 알아서 배송! 정기구독 신청] 버튼 함수
     function goToSubscriptionCheckout() {
         const btn = document.getElementById('btnSubBuy');
-        if(!btn) return;
-
-        const productId = btn.getAttribute('data-id');
-        const productName = btn.getAttribute('data-name');
-        const productPrice = btn.getAttribute('data-price');
-
-        const cycleSelect = document.getElementById('subscriptionCycle');
-        const cycleDays = cycleSelect ? parseInt(cycleSelect.value) : 30;
-
-        const qtyInput = document.getElementById('productQty');
-        const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
-
-        // ⭕ 구독은 결제창 가기 전에 유저한테 주기 확인 사살 알림 띄워주는게 국룰!
-        if (confirm(`선택하신 상품을 ${cycleDays}일 주기로 정기구독 신청 화면으로 이동하시겠습니까?`)) {
-            // 확인 누르면 구독 전용 결제창으로 파라미터 들고 점프!
-            location.href = `/order/subscription-checkout?productId=${productId}&quantity=${quantity}&cycleDays=${cycleDays}&name=${encodeURIComponent(productName)}&price=${productPrice}`;
-        }
-    }
-
-    // 정기구독 결제 토스 연동 완료
-    function goToSubscriptionCheckout() {
-        const btn = document.getElementById('btnSubBuy');
-        if(!btn) return;
-
-        const productId = btn.getAttribute('data-id');
-        const productName = btn.getAttribute('data-name');
-        const productPrice = btn.getAttribute('data-price');
-
-        const cycleSelect = document.getElementById('subscriptionCycle');
-        const cycleDays = cycleSelect ? parseInt(cycleSelect.value) : 30;
-
-        const qtyInput = document.getElementById('productQty');
-        const quantity = qtyInput ? parseInt(qtyInput.value) : 1;
-
-        location.href = `/order/subscription-checkout?productId=${productId}&quantity=${quantity}&cycleDays=${cycleDays}&name=${encodeURIComponent(productName)}&price=${productPrice}`;
+        const cycleDays = parseInt(document.getElementById('subscriptionCycle').value) || 30;
+        const quantity = parseInt(document.getElementById('productQty').value) || 1;
+        location.href = `/shop/subscription-checkout?productId=${btn.getAttribute('data-id')}&quantity=${quantity}&cycleDays=${cycleDays}&name=${encodeURIComponent(btn.getAttribute('data-name'))}&price=${btn.getAttribute('data-price')}`;
     }
 </script>
 </body>

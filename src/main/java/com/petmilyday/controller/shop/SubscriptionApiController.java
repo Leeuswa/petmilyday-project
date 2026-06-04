@@ -1,10 +1,16 @@
 package com.petmilyday.controller.shop;
 
 import com.petmilyday.entity.shop.Subscription;
-import com.petmilyday.entity.shop.SubscriptionStatus; // enum 위치에 맞게 수정 필요
-import com.petmilyday.repository.shop.SubscriptionRepository; // 네 repository 경로 확인
+import com.petmilyday.entity.shop.SubscriptionStatus;
+import com.petmilyday.entity.shop.Orders;
+import com.petmilyday.entity.shop.OrderItem;
+import com.petmilyday.entity.product.Product;
+import com.petmilyday.repository.shop.SubscriptionRepository;
+import com.petmilyday.repository.shop.OrdersRepository;
+import com.petmilyday.repository.shop.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,20 +26,24 @@ import java.util.Map;
 public class SubscriptionApiController {
 
     private final SubscriptionRepository subscriptionRepository;
+    private final OrdersRepository ordersRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @jakarta.persistence.PersistenceContext
     private jakarta.persistence.EntityManager em;
 
+    /**
+     * 카카오페이 정기결제 준비 API
+     */
     @PostMapping("/ready")
     public ResponseEntity<?> readySubscription(@RequestBody Map<String, Object> params, HttpSession session) {
         try {
             RestTemplate restTemplate = new RestTemplate();
 
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "SECRET_KEY DEV84178147170D9A889C5E6A7155387119098D0"); // 네가 바꾼 진짜 DEV 키 적용
+            headers.set("Authorization", "SECRET_KEY DEV84178147170D9A889C5E6A7155387119098D0");
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // 프론트에서 가맹점 ID들을 넘겨주지 않으면 기본값으로 방어
             String partnerOrderId = params.get("partnerOrderId") != null ? params.get("partnerOrderId").toString() : "petmily_sub_1";
             String partnerUserId = params.get("partnerUserId") != null ? params.get("partnerUserId").toString() : "petmily_user_1";
 
@@ -59,11 +69,23 @@ public class SubscriptionApiController {
             body.put("cancel_url", "http://localhost:8080/api/subscription/cancel");
             body.put("fail_url", "http://localhost:8080/api/subscription/fail");
 
-            // ⭐️ [매우 중요] 파트너 ID 세트까지 세션에 완벽하게 박멸 박제하기
+            String mainAddress = params.get("deliveryAddress") != null ? params.get("deliveryAddress").toString() : "";
+            String detailAddress = params.get("detailAddress") != null ? params.get("detailAddress").toString() : "";
+            String fullAddress = mainAddress;
+            if (!detailAddress.isEmpty()) {
+                fullAddress += " " + detailAddress;
+            }
+
+            session.setAttribute("receiverName", params.get("receiverName"));
+            session.setAttribute("receiverPhone", params.get("receiverPhone"));
+            session.setAttribute("deliveryAddress", fullAddress);
+            session.setAttribute("deliveryMemo", detailAddress);
+
             session.setAttribute("totalPrice", totalAmount);
+            session.setAttribute("itemName", itemName);
             session.setAttribute("productId", params.get("productId") != null ? ((Number) params.get("productId")).longValue() : 1L);
             session.setAttribute("cycleDays", params.get("cycleDays") != null ? ((Number) params.get("cycleDays")).intValue() : 30);
-            session.setAttribute("quantity", 1);
+            session.setAttribute("quantity", params.get("quantity") != null ? ((Number) params.get("quantity")).intValue() : 1);
             session.setAttribute("partnerOrderId", partnerOrderId);
             session.setAttribute("partnerUserId", partnerUserId);
 
@@ -83,6 +105,9 @@ public class SubscriptionApiController {
         }
     }
 
+    /**
+     * 카카오페이 정기결제 승인 완료 및 구독 데이터 적재 API
+     */
     @GetMapping("/success")
     public ModelAndView subscriptionSuccess(@RequestParam("pg_token") String pgToken, HttpSession session) {
         Integer totalPrice = (Integer) session.getAttribute("totalPrice");
@@ -94,8 +119,13 @@ public class SubscriptionApiController {
             Integer cycleDays = (Integer) session.getAttribute("cycleDays");
             Integer quantity = (Integer) session.getAttribute("quantity");
             Long memberId = (Long) session.getAttribute("memberId");
+            String itemName = (String) session.getAttribute("itemName");
 
-            // 세션에서 레디 때 썼던 진짜 파트너 ID 세트 복원하기
+            String address = (String) session.getAttribute("deliveryAddress");
+            String receiverName = (String) session.getAttribute("receiverName");
+            String receiverPhone = (String) session.getAttribute("receiverPhone");
+            String deliveryMemo = (String) session.getAttribute("deliveryMemo");
+
             String partnerOrderId = (String) session.getAttribute("partnerOrderId");
             String partnerUserId = (String) session.getAttribute("partnerUserId");
 
@@ -106,17 +136,16 @@ public class SubscriptionApiController {
             if (partnerOrderId == null) partnerOrderId = "petmily_sub_1";
             if (partnerUserId == null) partnerUserId = "petmily_user_1";
 
-            // 🔄 카카오페이 최종 승인(Approve) API 호출
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "SECRET_KEY DEV84178147170D9A889C5E6A7155387119098D0"); // DEV 키 장착
+            headers.set("Authorization", "SECRET_KEY DEV84178147170D9A889C5E6A7155387119098D0");
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             Map<String, Object> approveBody = new HashMap<>();
             approveBody.put("cid", "TCSUBSCRIP");
             approveBody.put("tid", tid);
-            approveBody.put("partner_order_id", partnerOrderId); // ready 때랑 100% 동일한 값 세팅
-            approveBody.put("partner_user_id", partnerUserId);   // ready 때랑 100% 동일한 값 세팅
+            approveBody.put("partner_order_id", partnerOrderId);
+            approveBody.put("partner_user_id", partnerUserId);
             approveBody.put("pg_token", pgToken);
 
             HttpEntity<Map<String, Object>> approveRequest = new HttpEntity<>(approveBody, headers);
@@ -131,7 +160,6 @@ public class SubscriptionApiController {
                 System.out.println("🔥 정기결제 빌링키 sid 발급 성공: " + sid);
             }
 
-            // 📦 JPA 엔티티 생성 및 데이터 인서트
             com.petmilyday.entity.member.Member orderMember = em.getReference(com.petmilyday.entity.member.Member.class, memberId);
             com.petmilyday.entity.product.Product subProduct = em.getReference(com.petmilyday.entity.product.Product.class, productId);
 
@@ -142,6 +170,7 @@ public class SubscriptionApiController {
             newSubscription.setCycleDays(cycleDays);
             newSubscription.setNextDeliveryDate(LocalDate.now().plusDays(cycleDays));
             newSubscription.setBillingKey(sid);
+            newSubscription.setCreatedAt(LocalDateTime.now());
 
             try {
                 newSubscription.setStatus(SubscriptionStatus.ACTIVE);
@@ -151,14 +180,35 @@ public class SubscriptionApiController {
 
             subscriptionRepository.save(newSubscription);
 
-            // 세션 정리
+            int currentRound = 1;
+            Orders firstOrder = newSubscription.createOrder(itemName, totalPrice, pgToken, currentRound);
+
+            if (address != null) {
+                firstOrder.setDeliveryAddress(address);
+            }
+
+            ordersRepository.save(firstOrder);
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrders(firstOrder);
+            orderItem.setProduct(subProduct);
+            orderItem.setQuantity(quantity);
+            orderItem.setPrice(totalPrice);
+
+            orderItemRepository.save(orderItem);
+
             session.removeAttribute("totalPrice");
             session.removeAttribute("productId");
             session.removeAttribute("cycleDays");
             session.removeAttribute("quantity");
             session.removeAttribute("tid");
+            session.removeAttribute("itemName");
             session.removeAttribute("partnerOrderId");
             session.removeAttribute("partnerUserId");
+            session.removeAttribute("receiverName");
+            session.removeAttribute("receiverPhone");
+            session.removeAttribute("deliveryAddress");
+            session.removeAttribute("deliveryMemo");
 
         } catch (Exception e) {
             System.err.println("❌ 정기구독 최종 승인 단계 실패 로그:");
@@ -169,5 +219,52 @@ public class SubscriptionApiController {
         mav.addObject("totalPrice", totalPrice);
         mav.setViewName("shop/subscription_success");
         return mav;
+    }
+
+    /**
+     * 정기구독 해지 처리 (Thymeleaf Form POST 수신)
+     */
+    @Transactional
+    @PostMapping("/cancel")
+    public ModelAndView cancelSubscription(@RequestParam("subId") Long subId) {
+        try {
+            Subscription subscription = subscriptionRepository.findById(subId)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 구독 내역이 존재하지 않습니다. ID: " + subId));
+
+            subscription.setStatus(SubscriptionStatus.CANCELLED);
+            subscriptionRepository.saveAndFlush(subscription);
+            System.out.println("✅ 구독 해지 완료! 구독 ID: " + subId);
+
+        } catch (Exception e) {
+            System.err.println("❌ 구독 해지 실패:");
+            e.printStackTrace();
+        }
+
+        return new ModelAndView("redirect:/shop/subscription");
+    }
+
+    /**
+     * 배송 주기 변경 처리 (Thymeleaf Form POST 수신)
+     */
+    @Transactional
+    @PostMapping("/change-cycle")
+    public ModelAndView changeSubscriptionCycle(@RequestParam("subId") Long subId,
+                                                @RequestParam("cycleDays") int cycleDays) {
+        try {
+            Subscription subscription = subscriptionRepository.findById(subId)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 구독 내역이 존재하지 않습니다. ID: " + subId));
+
+            subscription.setCycleDays(cycleDays);
+            subscription.setNextDeliveryDate(LocalDate.now().plusDays(cycleDays));
+
+            subscriptionRepository.saveAndFlush(subscription);
+            System.out.println("✅ 구독 주기 변경 완료! 구독 ID: " + subId + " -> 변경된 주기: " + cycleDays + "일");
+
+        } catch (Exception e) {
+            System.err.println("❌ 주기 변경 실패:");
+            e.printStackTrace();
+        }
+
+        return new ModelAndView("redirect:/shop/subscription");
     }
 }

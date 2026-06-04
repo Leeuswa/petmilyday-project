@@ -1,12 +1,14 @@
 package com.petmilyday.controller.shop;
 
+import com.petmilyday.config.jwt.JwtTokenProvider;
 import com.petmilyday.dto.product.ProductResponseDto;
-import com.petmilyday.dto.shop.SubscriptionResponseDto; // [★추가] DTO 임포트
+import com.petmilyday.dto.shop.SubscriptionResponseDto;
 import com.petmilyday.service.product.ProductService;
-import com.petmilyday.service.shop.SubscriptionService;   // [★추가] 서비스 임포트
+import com.petmilyday.service.shop.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,7 +21,8 @@ import java.util.List;
 public class ShopController {
 
     private final ProductService productService;
-    private final SubscriptionService subscriptionService; // [★추가] 구독 서비스 주입
+    private final SubscriptionService subscriptionService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/shop")
     public String showShopPage(@RequestParam(required = false) String category,
@@ -37,16 +40,13 @@ public class ShopController {
         model.addAttribute("productList", products);
         model.addAttribute("activeTab", "shop");
 
-        // 로그인 한 상태라면 실제 구독 목록을 DB에서 긁어와서 모델에 담는다!
         if (principal != null) {
             model.addAttribute("loggedInUser", principal.getName());
-
-            // [★추가] 실제 로그인한 유저의 이메일(ID)로 ACTIVE 상태인 구독 리스트 조회
             List<SubscriptionResponseDto> subList = subscriptionService.getActiveSubscriptions(principal.getName());
             model.addAttribute("subscriptionList", subList);
         }
 
-        return "shop";
+        return "shop/shop";
     }
 
     @GetMapping("/shop/detail/{id}")
@@ -63,36 +63,35 @@ public class ShopController {
 
         return "shop/detail";
     }
-    // ShopController.java 내부나 하단에 추가
 
     @GetMapping("/shop/subscription")
     public String showSubscriptionManagementPage(Model model, Principal principal) {
+
         if (principal == null) {
-            return "redirect:/member/login";
+            model.addAttribute("loggedInUser", null);
+            model.addAttribute("activeTab", "shop");
+            model.addAttribute("subscriptionList", List.of()); // 빈 리스트 넘겨서 에러 방지
         }
+        else {
+            model.addAttribute("loggedInUser", principal.getName());
+            model.addAttribute("activeTab", "shop");
 
-        // [★수정] 다른 화면들과 똑같이 세션 로그인 ID(username)를 모델에 확실히 꽂아줌!
-        model.addAttribute("loggedInUser", principal.getName());
-        model.addAttribute("activeTab", "shop");
-
-        // DB에서 시큐리티 username 기반으로 ACTIVE 상태인 정기구독 리스트를 완벽히 긁어옴
-        List<SubscriptionResponseDto> subList = subscriptionService.getActiveSubscriptions(principal.getName());
-        model.addAttribute("subscriptionList", subList);
+            List<SubscriptionResponseDto> subList = subscriptionService.getActiveSubscriptions(principal.getName());
+            model.addAttribute("subscriptionList", subList);
+        }
 
         return "shop/subscription_manage";
     }
 
-    @GetMapping("/order/subscription-checkout")
+    @GetMapping("/shop/subscription-checkout")
     public String subscriptionCheckoutPage(@RequestParam("productId") Long productId,
                                            @RequestParam("quantity") int quantity,
                                            @RequestParam("cycleDays") int cycleDays,
                                            @RequestParam("name") String name,
                                            @RequestParam("price") int price,
                                            Model model) {
-        // 상품 단가랑 수량 곱해서 회당 진짜 결제 금액 연산 완료
         int totalPrice = price * quantity;
 
-        // 뷰단(HTML)에서 0원이나 null 안 뜨게 확실하게 바인딩
         model.addAttribute("productId", productId);
         model.addAttribute("quantity", quantity);
         model.addAttribute("cycleDays", cycleDays);
@@ -100,7 +99,6 @@ public class ShopController {
         model.addAttribute("price", price);
         model.addAttribute("totalPrice", totalPrice);
 
-        // templates/shop/subscription_checkout.html 화면 렌더링 리턴!
         return "shop/subscription_checkout";
     }
 }
