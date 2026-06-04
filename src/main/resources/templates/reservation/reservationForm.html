@@ -111,32 +111,30 @@
                         <select class="form-select"
                                 name="petId">
 
-                            <option value="1">
-                                멍멍이 (골든리트리버)
+                            <option th:each="pet : ${petList}"
+                                    th:value="${pet.id}"
+                                    th:text="${pet.name}">
                             </option>
 
                         </select>
                     </div>
 
-                    <!-- 진료과 -->
                     <div class="mb-3">
 
                         <label class="form-label fw-bold">
-
                             진료과
-
                         </label>
 
                         <select class="form-select"
                                 name="department">
 
-                            <option value="내과">내과</option>
-                            <option value="외과">외과</option>
-                            <option value="피부과">피부과</option>
-                            <option value="치과">치과</option>
-                            <option value="안과">안과</option>
+                            <option th:each="dept : ${#strings.arraySplit(hospitalDTO.department, ',')}"
+                                    th:value="${dept}"
+                                    th:text="${dept}">
+                            </option>
 
                         </select>
+
                     </div>
 
                     <!-- 예약 날짜 -->

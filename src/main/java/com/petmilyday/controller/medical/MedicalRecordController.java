@@ -19,6 +19,7 @@ import java.util.List;
 public class MedicalRecordController {
     private final MedicalRecordService medicalRecordService;
 
+
     @GetMapping("/record/{petId}")
     public String medicalRecordGet(@PathVariable Long petId, Model model){
         List<MedicalRecordResponseDTO> list = medicalRecordService.medicalRecordList(petId);

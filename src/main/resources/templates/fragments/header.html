@@ -22,44 +22,55 @@
       background: var(--surface);
       border-bottom: 1px solid var(--border);
       font-family: 'Sora', sans-serif;
+      position: relative;
+      z-index: 1000;
     }
-    .logo {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      text-decoration: none;
-    }
+    .logo { font-size: 20px; font-weight: 700; color: var(--text); text-decoration: none; }
     .logo span { color: var(--accent); }
-    .nav-link {
-      margin-left: 24px;
-      color: var(--text2);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 14px;
-    }
+    .nav-link { margin-left: 24px; color: var(--text2); text-decoration: none; font-weight: 500; font-size: 14px; }
     .nav-link:hover { color: var(--accent); }
     .nav-link.active { color: var(--accent); font-weight: 600; }
-    .btn {
-      padding: 8px 16px;
-      border-radius: var(--r);
-      font-weight: 500;
-      text-decoration: none;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .btn-outline {
-      border: 1px solid var(--border2);
-      color: var(--text2);
-      background: transparent;
-    }
-    .btn-accent {
-      background: var(--accent);
-      color: white;
-      border: none;
-    }
+    .btn { padding: 8px 16px; border-radius: var(--r); font-weight: 500; text-decoration: none; font-size: 13px; cursor: pointer; }
+    .btn-outline { border: 1px solid var(--border2); color: var(--text2); background: transparent; }
+    .btn-accent { background: var(--accent); color: white; border: none; }
     .btn-sm { padding: 6px 12px; font-size: 12px; }
     .fxa { display: flex; align-items: center; }
     .g12 { gap: 12px; }
+
+    /* ── 드롭다운 ── */
+    .mypage-wrap {
+      position: relative;
+    }
+    .mypage-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      padding-top: 8px;
+      z-index: 999;
+    }
+    .mypage-dropdown-inner {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      box-shadow: 0 8px 24px rgba(13,20,51,.12);
+      min-width: 170px;
+      overflow: hidden;
+    }
+    .mypage-wrap:hover .mypage-dropdown { display: block; }
+    .mypage-dropdown a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: var(--text2);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background .12s;
+    }
+    .mypage-dropdown a:hover { background: #f1f3fe; color: var(--accent); }
+    .mypage-dropdown hr { margin: 4px 0; border-color: var(--border); }
   </style>
 
   <div class="logo">petmily<span>day</span></div>
@@ -70,6 +81,7 @@
   <a th:href="@{/used}" class="nav-link">중고거래</a>
   <a th:href="@{/community}" class="nav-link">커뮤니티</a>
   <div style="flex:1"></div>
+
   <div class="fxa g12">
     <th:block sec:authorize="isAnonymous()">
       <a th:href="@{/member/login}" class="btn btn-outline btn-sm">로그인</a>
@@ -80,7 +92,20 @@
       <span style="font-size: 14px; color: var(--text2); margin-right: 8px;">
         <span sec:authentication="name" style="font-weight: 600;">사용자</span>님
       </span>
-      <a th:href="@{/member/mypage}" class="btn btn-outline btn-sm">마이페이지</a>
+
+      <div class="mypage-wrap">
+        <a th:href="@{/member/mypage}" class="btn btn-outline btn-sm">마이페이지 ▾</a>
+        <div class="mypage-dropdown">
+          <div class="mypage-dropdown-inner">
+            <a th:href="@{/member/mypage}">👤 회원정보 수정</a>
+            <hr>
+            <a th:href="@{/reservation/medical-records}"> 내 동물 진료기록</a>
+            <a th:href="@{/vaccination/myVaccination}"> 내 동물 예방접종</a>
+            <a th:href="@{/review/myReview}"> 내가 쓴 병원 리뷰보기</a>
+          </div>
+        </div>
+      </div>
+
       <a th:href="@{/member/logout}" class="btn btn-outline btn-sm" style="color: #b52844; border-color: #b52844;">로그아웃</a>
     </th:block>
   </div>
