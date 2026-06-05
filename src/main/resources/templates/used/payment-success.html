@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>petmilyday - 결제 완료</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f6fa;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .navbar-custom {
+            background-color: #0f172a;
+            padding: 15px 0;
+            color: white;
+        }
+
+        .success-container {
+            max-width: 720px;
+            margin: 70px auto;
+        }
+
+        .success-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+
+        .success-header {
+            background: linear-gradient(135deg, #3b82f6, #22c55e);
+            color: white;
+            padding: 38px;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 10px;
+        }
+
+        .success-body {
+            padding: 35px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .label {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .value {
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .price {
+            font-size: 1.5rem;
+            color: #2563eb;
+        }
+
+        .status-box {
+            margin-top: 25px;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .btn-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn-area a {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar-custom">
+    <div class="container">
+        <h4 class="fw-bold mb-0">petmilyday</h4>
+    </div>
+</nav>
+
+<div class="success-container">
+
+    <div class="success-card">
+
+        <div class="success-header">
+            <div class="success-icon">🎉</div>
+
+            <h2 class="fw-bold mb-2">
+                결제가 완료되었습니다
+            </h2>
+
+            <div>
+                거래 상태가 판매완료로 변경되었습니다.
+            </div>
+        </div>
+
+        <div class="success-body">
+
+            <div class="info-row">
+                <div class="label">상품명</div>
+                <div class="value" th:text="${post.title}">
+                    상품명
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="label">결제금액</div>
+                <div class="value price">
+                    <span th:text="${#numbers.formatInteger(post.price,0,'COMMA')}">
+                        0
+                    </span>원
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="label">거래상태</div>
+                <div class="value">
+                    판매완료
+                </div>
+            </div>
+
+            <div class="status-box">
+                채팅방에서 거래 상대방 매너평가를 진행할 수 있습니다.
+            </div>
+
+            <div class="btn-area">
+
+                <a th:href="@{/used/detail/{id}(id=${post.id})}"
+                   class="btn btn-primary">
+                    게시글 보기
+                </a>
+
+                <a href="/used/list"
+                   class="btn btn-outline-secondary">
+                    중고거래 목록
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
