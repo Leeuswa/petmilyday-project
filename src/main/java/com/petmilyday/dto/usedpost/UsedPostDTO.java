@@ -4,6 +4,8 @@ import com.petmilyday.entity.used.ItemCondition;
 import com.petmilyday.entity.used.UsedPost;
 import com.petmilyday.entity.used.UsedPostImg;
 import com.petmilyday.entity.used.UsedPostStatus;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,7 +31,9 @@ public class UsedPostDTO {
 
     private String category;
 
-    private int price;
+    @Min(0)
+    @Max(1000000000)
+    private Integer price;
 
     private String region;
 

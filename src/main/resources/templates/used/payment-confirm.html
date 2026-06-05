@@ -6,12 +6,42 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f6fa;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .pay-container {
+            max-width: 650px;
+            margin: 80px auto;
+        }
+
+        .pay-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .notice-box {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #c2410c;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+    </style>
 </head>
-<body style="background:#f4f6fa;">
 
-<div class="container" style="max-width:650px; margin-top:80px;">
+<body>
 
-    <div class="card shadow-sm border-0 rounded-4">
+<div class="pay-container">
+
+    <div class="pay-card">
 
         <div class="card-body p-5">
 
@@ -21,19 +51,28 @@
 
             <div class="mb-3">
                 <strong>상품명</strong>
-                <div th:text="${post.title}"></div>
+                <div th:text="${post.title}">
+                    상품명
+                </div>
             </div>
 
             <div class="mb-3">
                 <strong>결제금액</strong>
                 <div class="text-primary fs-4 fw-bold">
-                    <span th:text="${#numbers.formatInteger(post.price,0,'COMMA')}"></span>원
+                    <span th:text="${#numbers.formatInteger(post.price,0,'COMMA')}">
+                        0
+                    </span>원
                 </div>
             </div>
 
             <div class="mb-4">
                 <strong>결제수단</strong>
-                <div>카카오페이</div>
+                <div>카카오페이 테스트 결제</div>
+            </div>
+
+            <div class="notice-box mb-4">
+                현재 카카오페이는 개발용 Mockup 결제창으로 연동되어 있습니다.<br>
+                실제 결제는 발생하지 않으며, 시연용으로 테스트 결제 완료 처리를 할 수 있습니다.
             </div>
 
             <form th:action="@{/payment/ready}" method="post">
@@ -44,10 +83,15 @@
 
                 <button type="submit"
                         class="btn btn-warning w-100 py-3 fw-bold">
-                    카카오페이로 결제하기
+                    카카오페이 결제창 열기
                 </button>
 
             </form>
+
+            <a th:href="@{/payment/test-success(postId=${post.id})}"
+               class="btn btn-success w-100 mt-2 py-3 fw-bold">
+                테스트 결제 완료 처리
+            </a>
 
             <a th:href="@{/used/detail/{id}(id=${post.id})}"
                class="btn btn-outline-secondary w-100 mt-2">
