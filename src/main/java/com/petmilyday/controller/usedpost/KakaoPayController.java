@@ -2,6 +2,7 @@ package com.petmilyday.controller.usedpost;
 
 import com.petmilyday.entity.member.Member;
 import com.petmilyday.entity.used.UsedPost;
+import com.petmilyday.entity.used.UsedPostStatus;
 import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.repository.used.UsedPostRepository;
 import com.petmilyday.service.usedpost.KakaoPayService;
@@ -61,14 +62,19 @@ public class KakaoPayController {
 
 
     // 결제 성공
-    @GetMapping("/payment/success")
-    public String success(
-            @RequestParam("pg_token") String pgToken,
+    @GetMapping("/payment/test-success")
+    public String testSuccess(
+            @RequestParam Long postId,
             Model model
     ) {
 
         UsedPost post =
-                kakaoPayService.approve(pgToken);
+                usedPostRepository.findById(postId)
+                        .orElseThrow();
+
+        post.setStatus(UsedPostStatus.SOLD);
+
+        usedPostRepository.save(post);
 
         model.addAttribute("post", post);
 

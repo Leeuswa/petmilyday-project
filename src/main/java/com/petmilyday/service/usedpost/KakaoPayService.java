@@ -6,5 +6,5 @@ public interface KakaoPayService {
 
     String ready(Long postId, Long buyerId);
 
-    UsedPost approve(String pgToken);
+    UsedPost approve(Long postId, String pgToken);
 }
