@@ -1,13 +1,15 @@
 package com.petmilyday.service.impl.usedpost;
 
-import com.petmilyday.entity.member.Member;
-import com.petmilyday.repository.member.MemberRepository;
-import com.petmilyday.entity.used.*;
-import com.petmilyday.repository.wishlist.WishlistRepository;
+import com.petmilyday.dto.usedpost.ChatRoomListDTO;
 import com.petmilyday.dto.usedpost.UsedPostDTO;
-import com.petmilyday.entity.used.UsedPost;
+import com.petmilyday.entity.chat.ChatRoom;
+import com.petmilyday.entity.member.Member;
+import com.petmilyday.entity.used.*;
+import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.repository.used.UsedPostImgRepository;
+import com.petmilyday.repository.used.UsedPostReportRepository;
 import com.petmilyday.repository.used.UsedPostRepository;
+import com.petmilyday.repository.wishlist.WishlistRepository;
 import com.petmilyday.service.usedpost.UsedPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +33,7 @@ public class UsedPostServiceImpl implements UsedPostService {
     private final UsedPostImgRepository imgRepository;
     private final WishlistRepository wishlistRepository;
     private final MemberRepository memberRepository;
+    private final UsedPostReportRepository usedPostReportRepository;
 
     // =========================
     // 전체 목록
@@ -87,24 +91,29 @@ public class UsedPostServiceImpl implements UsedPostService {
     public void write(
             UsedPostDTO dto,
             List<MultipartFile> files,
-            Long memberId
+            String username
     ) throws IOException {
 
-        if (memberId == null) {
+        if (username == null || username.isBlank()) {
             throw new RuntimeException("로그인이 필요합니다.");
         }
 
         UsedPost post = dto.toEntity();
 
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() ->
                         new RuntimeException("회원 없음"));
 
         post.setMember(member);
 
-        post.setOfferAccepted(Boolean.TRUE.equals(dto.getOfferAccepted()));
+        post.setOfferAccepted(
+                Boolean.TRUE.equals(dto.getOfferAccepted())
+        );
 
         post.setCreatedAt(LocalDateTime.now());
+
+        // 추가
+        post.setIsHidden(false);
 
         UsedPost savedPost =
                 usedPostRepository.save(post);
@@ -155,25 +164,47 @@ public class UsedPostServiceImpl implements UsedPostService {
     // =========================
     @Override
     @Transactional
-    public void reportPost(Long postId) {
+    public void reportPost(
+            Long postId,
+            Long memberId,
+            String reason,
+            String content
+    ) {
 
         UsedPost post =
                 usedPostRepository.findById(postId)
                         .orElseThrow(() ->
                                 new RuntimeException("게시글 없음"));
 
-        int currentCount =
-                post.getReportCount() != null
-                        ? post.getReportCount()
-                        : 0;
+        Member member =
+                memberRepository.findById(memberId)
+                        .orElseThrow(() ->
+                                new RuntimeException("회원 없음"));
 
-        currentCount++;
+        boolean alreadyReported =
+                usedPostReportRepository.existsByUsedPost_IdAndMember_Id(
+                        postId,
+                        memberId
+                );
 
-        post.setReportCount(currentCount);
+        if (alreadyReported) {
+            throw new RuntimeException("이미 신고한 게시글입니다.");
+        }
 
-        // 신고 5회 이상 숨김
-        if (currentCount >= 5) {
+        UsedPostReport report =
+                UsedPostReport.builder()
+                        .usedPost(post)
+                        .member(member)
+                        .reason(reason)
+                        .content(content)
+                        .createdAt(LocalDateTime.now())
+                        .build();
 
+        usedPostReportRepository.save(report);
+
+        post.setReportCount(post.getReportCount() + 1);
+
+        if (post.getReportCount() >= 5) {
             post.setIsHidden(true);
         }
 
@@ -202,7 +233,9 @@ public class UsedPostServiceImpl implements UsedPostService {
         post.setCategory(dto.getCategory());
         post.setItemCondition(dto.getItemCondition());
 
-        post.setOfferAccepted(Boolean.TRUE.equals(dto.getOfferAccepted()));
+        post.setOfferAccepted(
+                Boolean.TRUE.equals(dto.getOfferAccepted())
+        );
 
         post.setUpdatedAt(LocalDateTime.now());
 
@@ -254,6 +287,7 @@ public class UsedPostServiceImpl implements UsedPostService {
                         .orElseThrow(() ->
                                 new RuntimeException("게시글 없음"));
 
+
         post.setStatus(UsedPostStatus.SOLD);
 
         usedPostRepository.save(post);
@@ -271,7 +305,9 @@ public class UsedPostServiceImpl implements UsedPostService {
 
         return usedPostRepository.findAllById(ids)
                 .stream()
-                .filter(post -> post.getIsHidden() == null || !post.getIsHidden())
+                .filter(post ->
+                        post.getIsHidden() == null
+                                || !post.getIsHidden())
                 .map(UsedPostDTO::new)
                 .toList();
     }

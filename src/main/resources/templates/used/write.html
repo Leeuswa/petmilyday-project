@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>petmilyday - 중고거래 글쓰기</title>
@@ -18,9 +18,47 @@
 
 <nav class="navbar-custom">
     <div class="container d-flex align-items-center">
-        <h4 class="fw-bold mb-0 me-5">petmilyday</h4>
+        <h4 class="fw-bold mb-0 me-5"
+            style="cursor:pointer;"
+            onclick="location.reload()">
+            petmilyday
+        </h4>
         <div class="d-flex flex-grow-1">
             <a href="/used/list" class="nav-link active">중고거래</a>
+
+            <div class="d-flex align-items-center">
+
+                <!-- 비로그인 -->
+                <div sec:authorize="isAnonymous()" class="d-flex">
+
+                    <a href="/member/login"
+                       class="btn btn-sm btn-outline-light me-2">
+                        로그인
+                    </a>
+
+                    <a href="/member/register"
+                       class="btn btn-sm btn-primary">
+                        회원가입
+                    </a>
+
+                </div>
+
+                <!-- 로그인 -->
+                <div sec:authorize="isAuthenticated()"
+                     class="d-flex align-items-center">
+
+        <span class="text-white me-3"
+              sec:authentication="name">
+        </span>
+
+                    <a href="/member/login"
+                       class="btn btn-sm btn-danger">
+                        로그아웃
+                    </a>
+
+                </div>
+
+            </div>
         </div>
     </div>
 </nav>
@@ -33,11 +71,13 @@
     <div class="write-box">
         <form th:action="@{/used/write}" method="post" enctype="multipart/form-data">
 
-            <input type="hidden" name="memberId" value="1">
-
             <div class="mb-3">
                 <label class="form-label">작성자</label>
-                <input type="text" class="form-control" value="테스트유저" readonly style="background-color: #e9ecef;">
+                <input type="text"
+                       class="form-control"
+                       th:value="${writerName != null and !#strings.isEmpty(writerName)} ? ${writerName} : ${memberId}"
+                       readonly
+                       style="background-color: #e9ecef;">
             </div>
 
             <div class="mb-3">

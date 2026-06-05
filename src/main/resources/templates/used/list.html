@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>petmilyday - 중고거래</title>
@@ -137,29 +137,66 @@
 <nav class="navbar-custom">
     <div class="container d-flex align-items-center">
 
-        <h4 class="fw-bold mb-0 me-5">
+        <h4 class="fw-bold mb-0 me-5"
+            style="cursor:pointer;"
+            onclick="location.reload()">
             petmilyday
         </h4>
 
         <div class="d-flex flex-grow-1">
-            <a href="#" class="nav-link">홈</a>
-            <a href="#" class="nav-link">동물병원 예약</a>
+            <a href="/" class="nav-link">홈</a>
+            <a href="/hospital/list" class="nav-link">동물병원 예약</a>
             <a href="#" class="nav-link">AI 자가진단</a>
-            <a href="#" class="nav-link">동물용품샵</a>
-            <a href="#" class="nav-link active">중고거래</a>
-            <a href="#" class="nav-link">커뮤니티</a>
+            <a href="/shop" class="nav-link">동물용품샵</a>
+
+            <a href="/used/list"
+               class="nav-link active">
+                중고거래
+            </a>
+
+            <a href="/chat/list"
+               class="nav-link">
+                채팅
+            </a>
+
+            <a href="#" class="nav-link">
+                커뮤니티
+            </a>
         </div>
 
         <div class="d-flex align-items-center">
+
             <span class="me-3">🔔</span>
 
-            <button class="btn btn-sm btn-outline-light me-2">
-                로그인
-            </button>
+            <!-- 로그인 안 했을 때 -->
+            <div sec:authorize="isAnonymous()" class="d-flex">
 
-            <button class="btn btn-sm btn-primary">
-                회원가입
-            </button>
+                <a href="/member/login"
+                   class="btn btn-sm btn-outline-light me-2">
+                    로그인
+                </a>
+
+                <a href="/member/register"
+                   class="btn btn-sm btn-primary">
+                    회원가입
+                </a>
+
+            </div>
+
+            <!-- 로그인 했을 때 -->
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center">
+
+        <span class="text-white me-3"
+              sec:authentication="name">
+        </span>
+
+                <a href="/member/login"
+                   class="btn btn-sm btn-danger">
+                    로그아웃
+                </a>
+
+            </div>
+
         </div>
 
     </div>
@@ -254,47 +291,46 @@
             <a th:href="@{/used/list(
                 keyword=${keyword},
                 category=${category},
-                region=${region},
-                condition=${condition}
+                region=${region}
             )}"
                class="btn-filter"
-               th:classappend="${condition == null and offerAccepted != true and onlyWish != true} ? 'active'">
+               th:classappend="${condition == null and (offerAccepted == null or offerAccepted == false) and onlyWish != true} ? 'active'">
                 전체
             </a>
 
             <!-- 새제품 -->
             <a th:href="@{/used/list(
-                keyword=${keyword},
-                category=${category},
-                region=${region},
-                condition='NEW'
-            )}"
+    keyword=${keyword},
+    category=${category},
+    region=${region},
+    condition='NEW'
+)}"
                class="btn-filter"
-               th:classappend="${condition == 'NEW'} ? 'active'">
+               th:classappend="${condition != null and condition.name() == 'NEW'} ? 'active'">
                 새제품
             </a>
 
             <!-- 거의새것 -->
             <a th:href="@{/used/list(
-                keyword=${keyword},
-                category=${category},
-                region=${region},
-                condition='LIKE_NEW'
-            )}"
+    keyword=${keyword},
+    category=${category},
+    region=${region},
+    condition='LIKE_NEW'
+)}"
                class="btn-filter"
-               th:classappend="${condition == 'LIKE_NEW'} ? 'active'">
+               th:classappend="${condition != null and condition.name() == 'LIKE_NEW'} ? 'active'">
                 거의새것
             </a>
 
             <!-- 중고 -->
             <a th:href="@{/used/list(
-                keyword=${keyword},
-                category=${category},
-                region=${region},
-                condition='USED'
-            )}"
+    keyword=${keyword},
+    category=${category},
+    region=${region},
+    condition='USED'
+)}"
                class="btn-filter"
-               th:classappend="${condition == 'USED'} ? 'active'">
+               th:classappend="${condition != null and condition.name() == 'USED'} ? 'active'">
                 중고
             </a>
 
@@ -325,6 +361,7 @@
             </a>
 
         </div>
+    </div>
 
     <div id="post-list">
 
@@ -341,7 +378,7 @@
 
         </div>
 
-        <div th:if="${not posts.content.isEmpty()}">
+        <div th:if="${posts != null and not posts.content.isEmpty()}">
 
             <a th:each="post : ${posts.content}"
                th:href="@{/used/detail/{id}(id=${post.id})}"
@@ -376,8 +413,18 @@
                             0원
                         </p>
 
-                        <p class="text-muted small mb-1"
-                           th:text="'작성자: ' + ${post.writerName}">
+                        <p class="text-muted small mb-1">
+
+                            작성자:
+                            <span th:text="${post.writerName}"></span>
+
+                            <span class="ms-2 text-warning fw-semibold">
+        ⭐
+                            <span th:text="${post.mannerAverage != null ? #numbers.formatDecimal(post.mannerAverage, 1, 1) : '0.0'}">
+                                0.0
+                            </span>
+                        </span>
+
                         </p>
 
                         <small class="text-muted"
@@ -401,63 +448,66 @@
 
         </div>
 
-        <nav th:if="${posts.totalPages > 0}"
-             aria-label="Page navigation"
-             class="mt-5">
-
+        <nav>
             <ul class="pagination justify-content-center">
 
+
+                <!-- 이전 -->
                 <li class="page-item"
                     th:classappend="${posts.first} ? 'disabled'">
 
                     <a class="page-link"
-                       th:href="@{/used/list(page=${posts.number - 1},
-                        keyword=${keyword},
-                        category=${category},
-                        region=${region},
-                        condition=${condition},
-                        offerAccepted=${offerAccepted},
-                        onlyWish=${onlyWish})}">
+                       th:href="@{/used/list(
+           page=${posts.number - 1},
+           keyword=${keyword},
+           category=${category},
+           region=${region},
+           condition=${condition},
+           offerAccepted=${offerAccepted}
+       )}">
                         이전
                     </a>
 
                 </li>
 
+                <!-- 페이지 번호 -->
                 <li class="page-item"
-                    th:each="i : ${#numbers.sequence(startPage, endPage)}"
-                    th:classappend="${i - 1 == posts.number} ? 'active'">
+                    th:each="i : ${#numbers.sequence(startPage,endPage)}"
+                    th:classappend="${i == currentPage} ? 'active'">
 
                     <a class="page-link"
-                       th:href="@{/used/list(page=${i - 1},
-                            keyword=${keyword},
-                            category=${category},
-                            region=${region},
-                            condition=${condition},
-                            offerAccepted=${offerAccepted},
-                            onlyWish=${onlyWish})}"
-                       th:text="${i}">
+                       th:href="@{/used/list(
+           page=${i},
+           keyword=${keyword},
+           category=${category},
+           region=${region},
+           condition=${condition},
+           offerAccepted=${offerAccepted}
+       )}"
+                       th:text="${i + 1}">
                     </a>
 
                 </li>
 
+                <!-- 다음 -->
                 <li class="page-item"
                     th:classappend="${posts.last} ? 'disabled'">
 
                     <a class="page-link"
-                       th:href="@{/used/list(page=${posts.number + 1},
-                            keyword=${keyword},
-                            category=${category},
-                            region=${region},
-                            condition=${condition},
-                            offerAccepted=${offerAccepted},
-                            onlyWish=${onlyWish})}">
+                       th:href="@{/used/list(
+           page=${posts.number + 1},
+           keyword=${keyword},
+           category=${category},
+           region=${region},
+           condition=${condition},
+           offerAccepted=${offerAccepted}
+       )}">
                         다음
                     </a>
 
                 </li>
 
             </ul>
-
         </nav>
 
     </div>

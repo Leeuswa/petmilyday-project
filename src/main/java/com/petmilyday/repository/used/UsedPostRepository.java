@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UsedPostRepository extends JpaRepository<UsedPost, Long> {
 
@@ -85,4 +86,8 @@ public interface UsedPostRepository extends JpaRepository<UsedPost, Long> {
         WHERE u.id = :id
     """)
     void softDelete(@Param("id") Long id);
+
+    Optional<UsedPost> findByPaymentKey(String paymentKey);
+
+    Optional<UsedPost> findTopByOrderByIdDesc();
 }

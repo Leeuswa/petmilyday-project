@@ -44,9 +44,11 @@ public class UsedPost {
     @Enumerated(EnumType.STRING)
     private UsedPostStatus status;
 
+    @Builder.Default
     @Column(name = "report_count")
     private Integer reportCount = 0;
 
+    @Builder.Default
     @Column(name = "is_hidden")
     private Boolean isHidden = false;
 
@@ -73,4 +75,11 @@ public class UsedPost {
     public Long getMemberId() {
         return (this.member != null) ? this.member.getId() : null;
     }
+
+    private String paymentKey;
+
+    @Column(name = "buyer_id")
+    private Long buyerId;
+
+    private Double mannerAverage;
 }

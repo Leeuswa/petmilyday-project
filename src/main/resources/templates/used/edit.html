@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>petmilyday - 게시글 수정</title>
@@ -83,27 +83,54 @@
 
     <div class="container d-flex align-items-center">
 
-        <h4 class="fw-bold mb-0 me-5">
+        <h4 class="fw-bold mb-0 me-5"
+            style="cursor:pointer;"
+            onclick="location.reload()">
             petmilyday
         </h4>
 
         <div class="d-flex flex-grow-1">
-            <a href="#" class="nav-link">홈</a>
-            <a href="#" class="nav-link">동물병원 예약</a>
+            <a href="/" class="nav-link">홈</a>
+            <a href="/hospital/list" class="nav-link">동물병원 예약</a>
             <a href="#" class="nav-link">AI 자가진단</a>
-            <a href="#" class="nav-link">동물용품샵</a>
-            <a href="#" class="nav-link active">중고거래</a>
+            <a href="/shop" class="nav-link">동물용품샵</a>
+            <a href="/used/list" class="nav-link active">중고거래</a>
             <a href="#" class="nav-link">커뮤니티</a>
         </div>
 
         <div class="d-flex align-items-center">
+
             <span class="me-3">🔔</span>
-            <button class="btn btn-sm btn-outline-light me-2">
-                로그인
-            </button>
-            <button class="btn btn-sm btn-primary">
-                회원가입
-            </button>
+
+            <!-- 로그인 안 했을 때 -->
+            <div sec:authorize="isAnonymous()" class="d-flex">
+
+                <a href="/member/login"
+                   class="btn btn-sm btn-outline-light me-2">
+                    로그인
+                </a>
+
+                <a href="/member/register"
+                   class="btn btn-sm btn-primary">
+                    회원가입
+                </a>
+
+            </div>
+
+            <!-- 로그인 했을 때 -->
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center">
+
+        <span class="text-white me-3"
+              sec:authentication="name">
+        </span>
+
+                <a href="/member/login"
+                   class="btn btn-sm btn-danger">
+                    로그아웃
+                </a>
+
+            </div>
+
         </div>
 
     </div>
