@@ -81,17 +81,14 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
 
-        // 소셜 로그인 회원은 비밀번호 변경 불가 처리 (선택 사항)
         if (member.getSocialType() != null) {
             throw new IllegalArgumentException("소셜 로그인 회원은 비밀번호를 변경할 수 없습니다.");
         }
 
-        // 기존 비밀번호가 맞는지 확인
         if (!passwordEncoder.matches(request.getCurrentPassword(), member.getPassword())) {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
         }
 
-        // 새 비밀번호 암호화 후 변경
         member.updatePassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
@@ -133,6 +130,20 @@ public class MemberServiceImpl implements MemberService {
         return MemberDTO.LoginResponse.builder()
                 .token(token)
                 .username(member.getUsername())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberDTO.MyPageResponse getMyPageInfo(String username) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        return MemberDTO.MyPageResponse.builder()
+                .username(member.getUsername())
+                .name(member.getName())
+                .nickname(member.getNickname())
+                .email(member.getEmail())
                 .build();
     }
 }
