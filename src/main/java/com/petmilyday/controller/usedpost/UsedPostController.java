@@ -74,6 +74,11 @@ public class UsedPostController {
         }
     }
 
+    @GetMapping("/used")
+    public String usedRedirect() {
+        return "redirect:/used/list";
+    }
+
     // =========================
     // LIST
     // =========================
