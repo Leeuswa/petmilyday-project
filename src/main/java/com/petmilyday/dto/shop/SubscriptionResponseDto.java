@@ -15,7 +15,6 @@ public class SubscriptionResponseDto {
     private LocalDate nextDeliveryDate; // 다음 배송일 (05.25 배송)
     private String status;           // 상태 (ACTIVE)
 
-    // 엔티티를 DTO로 슥 변환해주는 생성자
     public SubscriptionResponseDto(Subscription subscription) {
         this.id = subscription.getId();
         this.productName = subscription.getProduct().getName();
