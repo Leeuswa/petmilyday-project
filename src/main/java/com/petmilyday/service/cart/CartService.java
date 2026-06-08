@@ -25,7 +25,6 @@ public class CartService {
 
     @Transactional
     public void addCart(Long userId, CartRequestDto requestDto) {
-        // [수정된 부분] findById -> findByUserId 로 변경!
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseGet(() -> cartRepository.save(new Cart(userId)));
 
@@ -52,7 +51,7 @@ public class CartService {
                 .map(CartItemResponseDto::new).toList();
     }
 
-    // [★추가] 수량 변경 (+, - 버튼)
+    //수량 변경
     @Transactional
     public void updateQuantity(Long cartItemId, Integer quantity) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
@@ -60,7 +59,7 @@ public class CartService {
         cartItem.updateQuantity(quantity);
     }
 
-    // [★추가] 아이템 삭제 (X 버튼, 선택 삭제)
+    //아이템 삭제
     @Transactional
     public void deleteCartItems(List<Long> cartItemIds) {
         cartItemRepository.deleteAllById(cartItemIds);
@@ -70,7 +69,6 @@ public class CartService {
         Cart cart = cartRepository.findByUserId(userId).orElse(null);
         if (cart == null) return 0;
 
-        // 장바구니에 담긴 아이템 리스트의 사이즈(종류 수)를 반환
         return cart.getCartItems().size();
     }
 }

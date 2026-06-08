@@ -16,10 +16,9 @@ public class CartViewController {
 
     @GetMapping("/cart")
     public String cartPage(Model model) {
-        Long mockUserId = 1L; // 데모용 임시 유저
+        Long mockUserId = 1L;
         List<CartItemResponseDto> cartItems = cartService.getCartItems(mockUserId);
 
-        // 백엔드에서 찾은 리스트를 화면(HTML)으로 쏴줌!
         model.addAttribute("cartItems", cartItems);
         return "cart/cart";
     }

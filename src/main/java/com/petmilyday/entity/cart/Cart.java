@@ -14,10 +14,10 @@ public class Cart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 장바구니 고유 번호 (자동 생성)
+    private Long id;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId; // 회원 ID (에러 났던 바로 그 부분!)
+    private Long userId;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CartItem> cartItems = new ArrayList<>();

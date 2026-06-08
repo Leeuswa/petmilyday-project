@@ -7,6 +7,5 @@ import java.util.Optional;
 
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
-    // 유저 ID로 장바구니 찾기!
     Optional<Cart> findByUserId(Long userId);
 }

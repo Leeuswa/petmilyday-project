@@ -37,7 +37,6 @@ public class OrderService {
         for (int i = 0; i < ordersList.size(); i++) {
             Orders orders = ordersList.get(i);
 
-            // 🟢 [수정] DB 글자 잘림 현상 방어: '(1회' 라는 단어만 들어가도 무조건 정기구독으로 인정하고 필터링!
             if (orders.getOrderName() != null && orders.getOrderName().contains("(1회")) {
                 continue;
             }

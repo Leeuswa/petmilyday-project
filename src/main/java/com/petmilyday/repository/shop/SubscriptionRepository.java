@@ -9,7 +9,5 @@ import java.util.List;
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
 
-    // ❌ 기존 코드: findByMemberEmailAndStatus
-    // ⭕ 수정 코드: email 대신 username으로 기둥을 바꿔준다!
     List<Subscription> findByMemberUsernameAndStatus(String username, SubscriptionStatus status);
 }
