@@ -10,10 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,23 +22,50 @@ public class PetProfileServiceImpl implements PetProfileService {
 
     private final PetProfileRepository petProfileRepository;
     private final MemberRepository memberRepository;
+    private final ModelMapper modelMapper;
 
-
-
-    //반려동물 정보 가져오기
     @Override
+    @Transactional(readOnly = true)
     public List<PetProFileDTO> petList(String loginId) {
-
         Member member = memberRepository.findByUsername(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("회원 ID가 올바르지 않습니다."));
 
         List<PetProfile> petProfileList = petProfileRepository.findByMember(member);
 
         return petProfileList.stream()
-                .map(pet -> PetProFileDTO.builder()
-                        .id(pet.getId())
-                        .name(pet.getName())
-                        .build()
-        ).collect(Collectors.toList());
+                .map(pet -> modelMapper.map(pet, PetProFileDTO.class))
+                .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    public void registerPet(String loginId, PetProFileDTO dto) {
+        Member member = memberRepository.findByUsername(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        PetProfile petProfile = PetProfile.builder()
+                .member(member)
+                .name(dto.getName())
+                .species(dto.getSpecies())
+                .breed(dto.getBreed())
+                .age(dto.getAge())
+                .build();
+
+        petProfileRepository.save(petProfile);
+    }
+
+    @Override
+    @Transactional
+    public void deletePet(Long petId, String loginId) {
+        PetProfile petProfile = petProfileRepository.findById(petId)
+                .orElseThrow(() -> new IllegalArgumentException("반려동물 프로필을 찾을 수 없습니다."));
+
+        if (!petProfile.getMember().getUsername().equals(loginId)) {
+            throw new IllegalArgumentException("삭제 권한이 없습니다.");
+        }
+
+        petProfileRepository.delete(petProfile);
+    }
+
+
 }
