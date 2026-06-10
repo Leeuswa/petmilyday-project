@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
     <meta charset="UTF-8">
     <title>petmilyday - 채팅</title>
 
@@ -11,27 +13,6 @@
         body {
             background-color: #f4f6fa;
             font-family: 'Pretendard', sans-serif;
-        }
-
-        .navbar-custom {
-            background-color: #0f172a;
-            padding: 15px 0;
-            color: white;
-        }
-
-        .nav-link {
-            color: #cbd5e1 !important;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 0.95rem;
-        }
-
-        .nav-link.active {
-            color: white !important;
-            font-weight: bold;
-            background: #3b82f6;
-            padding: 5px 15px;
-            border-radius: 8px;
         }
 
         .main-container {
@@ -133,57 +114,26 @@
             border: 1px solid #e2e8f0;
             padding: 10px;
         }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sora', sans-serif;
+        }
+
+        body {
+            background: #f0f2f7;
+            color: #0d1433;
+            font-size: 14px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 
 <body>
 
-<nav class="navbar-custom">
-    <div class="container d-flex align-items-center">
-
-        <h4 class="fw-bold mb-0 me-5"
-            style="cursor:pointer;"
-            onclick="location.reload()">
-            petmilyday
-        </h4>
-
-        <div class="d-flex flex-grow-1">
-            <a href="/used/list" class="nav-link">중고거래</a>
-            <a href="/chat/list" class="nav-link active">채팅</a>
-
-            <div class="d-flex align-items-center">
-
-                <div sec:authorize="isAnonymous()" class="d-flex">
-                    <a href="/member/login"
-                       class="btn btn-sm btn-outline-light me-2">
-                        로그인
-                    </a>
-
-                    <a href="/member/register"
-                       class="btn btn-sm btn-primary">
-                        회원가입
-                    </a>
-                </div>
-
-                <div sec:authorize="isAuthenticated()"
-                     class="d-flex align-items-center">
-
-                    <span class="text-white me-3"
-                          sec:authentication="name">
-                    </span>
-
-                    <a href="/member/login"
-                       class="btn btn-sm btn-danger">
-                        로그아웃
-                    </a>
-
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-</nav>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <div class="main-container">
 

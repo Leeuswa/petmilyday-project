@@ -38,9 +38,7 @@ public class UsedPostController {
     private final MannerScoreService mannerScoreService;
     private final UsedPostReportRepository usedPostReportRepository;
 
-    // =========================
     // ItemCondition 변환
-    // =========================
     private ItemCondition parseCondition(String value) {
 
         if (value == null || value.isBlank()) {
@@ -56,9 +54,7 @@ public class UsedPostController {
         }
     }
 
-    // =========================
     // UsedPostStatus 변환
-    // =========================
     private UsedPostStatus parseStatus(String value) {
 
         if (value == null || value.isBlank()) {
@@ -79,9 +75,7 @@ public class UsedPostController {
         return "redirect:/used/list";
     }
 
-    // =========================
     // LIST
-    // =========================
     @GetMapping("/used/list")
     public String list(
             @RequestParam(required = false) String keyword,
@@ -211,9 +205,7 @@ public class UsedPostController {
         return "used/list";
     }
 
-    // =========================
     // WRITE FORM
-    // =========================
     @GetMapping("/used/write")
     public String writeForm(
             Authentication authentication,
@@ -265,9 +257,7 @@ public class UsedPostController {
         return "redirect:/used/list";
     }
 
-    // =========================
     // DETAIL
-    // =========================
     @GetMapping("/used/detail/{id}")
     public String detail(
 
@@ -333,9 +323,7 @@ public class UsedPostController {
         return "used/detail";
     }
 
-    // =========================
     // REPORT
-    // =========================
     @PostMapping("/used/report/{id}")
     public String report(
             @PathVariable Long id,
@@ -373,9 +361,7 @@ public class UsedPostController {
                 + "?reportSuccess=true";
     }
 
-    // =========================
     // EDIT FORM
-    // =========================
     @GetMapping("/used/edit/{id}")
     public String editForm(
 
@@ -412,9 +398,7 @@ public class UsedPostController {
         return "used/edit";
     }
 
-    // =========================
     // EDIT
-    // =========================
     @PostMapping("/used/edit/{id}")
     public String edit(
 
@@ -445,9 +429,7 @@ public class UsedPostController {
         return "redirect:/used/detail/" + id;
     }
 
-    // =========================
     // STATUS 변경
-    // =========================
     @PostMapping("/used/status/{id}")
     public String changeStatus(
 
@@ -487,9 +469,7 @@ public class UsedPostController {
         return "redirect:/used/detail/" + id;
     }
 
-    // =========================
     // 판매 완료
-    // =========================
     @PostMapping("/used/complete/{id}")
     public String completeSale(
             @PathVariable Long id,
@@ -518,9 +498,7 @@ public class UsedPostController {
         return "redirect:/used/detail/" + id;
     }
 
-    // =========================
     // 찜 목록
-    // =========================
     @GetMapping("/wishlist/list")
     public String wishList(
 
@@ -577,7 +555,7 @@ public class UsedPostController {
             return "redirect:/member/login";
         }
 
-        // 🔥 작성자 체크 (핵심 보안)
+        // 작성자 체크
         if (!post.getMember().getId().equals(member.getId())) {
             return "redirect:/used/detail/" + id;
         }

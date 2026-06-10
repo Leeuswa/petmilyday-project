@@ -60,27 +60,6 @@ public class KakaoPayController {
         return "redirect:" + redirectUrl;
     }
 
-
-    // 결제 성공
-    @GetMapping("/payment/test-success")
-    public String testSuccess(
-            @RequestParam Long postId,
-            Model model
-    ) {
-
-        UsedPost post =
-                usedPostRepository.findById(postId)
-                        .orElseThrow();
-
-        post.setStatus(UsedPostStatus.SOLD);
-
-        usedPostRepository.save(post);
-
-        model.addAttribute("post", post);
-
-        return "used/payment-success";
-    }
-
     // 결제 취소
     @GetMapping("/payment/cancel")
     public String cancel() {
@@ -93,5 +72,40 @@ public class KakaoPayController {
     public String fail() {
 
         return "redirect:/used/list";
+    }
+
+    @GetMapping("/payment/test-success")
+    public String testSuccess(
+            @RequestParam Long postId,
+            Authentication authentication,
+            Model model
+    ) {
+
+        if (authentication == null) {
+            return "redirect:/member/login";
+        }
+
+        String username = authentication.getName();
+
+        Member member =
+                memberRepository.findByUsername(username)
+                        .orElseThrow();
+
+        UsedPost post =
+                usedPostRepository.findById(postId)
+                        .orElseThrow();
+
+        post.setBuyerId(member.getId());
+        post.setStatus(UsedPostStatus.SOLD);
+
+        if (post.getPaymentKey() == null || post.getPaymentKey().isBlank()) {
+            post.setPaymentKey("TEST-" + System.currentTimeMillis());
+        }
+
+        usedPostRepository.save(post);
+
+        model.addAttribute("post", post);
+
+        return "used/payment-success";
     }
 }
