@@ -1,7 +1,9 @@
 package com.petmilyday.controller.member;
 
 import com.petmilyday.dto.member.MemberDTO;
+import com.petmilyday.dto.member.PetProFileDTO;
 import com.petmilyday.service.member.MemberService;
+import com.petmilyday.service.member.PetProfileService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -14,12 +16,15 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
+    private final PetProfileService petProfileService;
 
     // 1. 회원가입 화면 요청 (GET /member/register)
     @GetMapping("/register")
@@ -224,5 +229,51 @@ public class MemberController {
             model.addAttribute("globalError", e.getMessage());
             return "member/modify-password";
         }
+    }
+
+    @GetMapping("/pet-profile")
+    public String petProfilePage(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        List<PetProFileDTO> petList = petProfileService.petList(username);
+        model.addAttribute("petList", petList);
+        model.addAttribute("newPet", new PetProFileDTO());
+
+        return "member/pet-profile";
+    }
+
+    @PostMapping("/pet-profile/register")
+    public String registerPet(@Valid @ModelAttribute("newPet") PetProFileDTO dto,
+                              BindingResult bindingResult,
+                              RedirectAttributes redirectAttributes,
+                              Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        if (bindingResult.hasErrors()) {
+            List<PetProFileDTO> petList = petProfileService.petList(username);
+            model.addAttribute("petList", petList);
+            return "member/pet-profile";
+        }
+
+        petProfileService.registerPet(username, dto);
+        redirectAttributes.addFlashAttribute("successMsg", "반려동물이 성공적으로 등록되었습니다.");
+        return "redirect:/member/pet-profile";
+    }
+
+    @PostMapping("/pet-profile/delete/{id}")
+    public String deletePet(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        try {
+            petProfileService.deletePet(id, username);
+            redirectAttributes.addFlashAttribute("successMsg", "프로필이 삭제되었습니다.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+        }
+
+        return "redirect:/member/pet-profile";
     }
 }

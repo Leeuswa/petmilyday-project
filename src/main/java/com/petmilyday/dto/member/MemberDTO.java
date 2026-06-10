@@ -39,7 +39,7 @@ public class MemberDTO {
         private String email;
 
         @Size(max = 30, message = "닉네임은 30자 이내여야 합니다.")
-        private String nickname; // 전달되지 않거나 비어있으면 서비스단에서 처리 (NULL 허용) [cite: 1, 7]
+        private String nickname;
     }
 
     @Getter
