@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
     <meta charset="UTF-8">
     <title>매너 평가</title>
 
@@ -56,16 +58,25 @@
             font-weight: bold;
         }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sora', sans-serif;
+        }
+
+        body {
+            background: #f0f2f7;
+            color: #0d1433;
+            font-size: 14px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 
-<body>
+<div th:replace="~{fragments/header :: header}"></div>
 
-<div class="navbar-custom">
-    <div class="container">
-        <h5 class="mb-0">petmilyday</h5>
-    </div>
-</div>
+<body>
 
 <div class="main-container">
 
