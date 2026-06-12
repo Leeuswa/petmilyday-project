@@ -67,12 +67,20 @@ public class MeetupPost {
         this.updatedAt = LocalDateTime.now();
     }
 
+    // 모임 정보 수정 및 인원 상태 체크
     public void updateMeetup(String title, String content, String location, LocalDateTime meetupDate, int maxParticipants) {
         this.title = title;
         this.content = content;
         this.location = location;
         this.meetupDate = meetupDate;
         this.maxParticipants = maxParticipants;
+
+        // 정원 충족 여부에 따른 상태 자동 전환
+        if (this.currentParticipants >= maxParticipants) {
+            this.status = MeetupStatus.CLOSED;
+        } else if (this.status == MeetupStatus.CLOSED && this.currentParticipants < maxParticipants) {
+            this.status = MeetupStatus.RECRUITING;
+        }
     }
 
     // 인원 증가 및 변경 로직
@@ -93,5 +101,9 @@ public class MeetupPost {
         if (this.status == MeetupStatus.CLOSED && this.currentParticipants < this.maxParticipants) {
             this.status = MeetupStatus.RECRUITING;
         }
+    }
+
+    public void addViewCount() {
+        this.viewCount++;
     }
 }

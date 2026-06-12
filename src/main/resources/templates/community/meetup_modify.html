@@ -31,7 +31,9 @@
 
     <div class="form-group">
       <label for="meetupDate">모임 일시</label>
-      <input type="datetime-local" id="meetupDate" th:field="*{meetupDate}" class="form-control">
+      <input type="datetime-local" id="meetupDate" name="meetupDate"
+             th:value="${postDTO.meetupDate != null ? #temporals.format(postDTO.meetupDate, 'yyyy-MM-dd''T''HH:mm') : ''}"
+             class="form-control">
       <span class="error-msg" th:if="${#fields.hasErrors('meetupDate')}" th:errors="*{meetupDate}">일시 오류</span>
     </div>
 

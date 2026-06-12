@@ -7,6 +7,7 @@
 </head>
 <body>
 <nav class="gnb" th:fragment="header">
+
   <style>
     :root {
       --surface: #ffffff;
@@ -18,6 +19,12 @@
       --accent-light: #eaedfa;
       --bg2: #f0f2f7;
       --r: 8px;
+    }
+
+    /* === 링크 색상 변질 방지 리셋 === */
+    a, a:visited, a:active {
+      text-decoration: none;
+      color: inherit;
     }
 
     .gnb {
@@ -34,8 +41,7 @@
     .logo {
       font-size: 20px;
       font-weight: 700;
-      color: var(--text);
-      text-decoration: none;
+      color: var(--text) !important;
       margin-right: 30px;
     }
 
@@ -45,8 +51,7 @@
 
     .nav-link {
       margin: 0 15px;
-      color: var(--text2);
-      text-decoration: none;
+      color: var(--text2) !important;
       font-weight: 500;
       font-size: 15px;
       transition: color 0.2s;
@@ -54,7 +59,7 @@
 
     .nav-link:hover,
     .nav-link.active {
-      color: var(--accent);
+      color: var(--accent) !important;
     }
 
     .dropdown {
@@ -89,11 +94,10 @@
     .dropdown-content a {
       display: block;
       padding: 12px 16px;
-      color: var(--text2);
+      color: var(--text2) !important;
       font-size: 14px;
       font-weight: 500;
       text-align: center;
-      text-decoration: none;
       border-bottom: 1px solid var(--bg2);
       transition: all 0.2s ease;
     }
@@ -104,7 +108,7 @@
 
     .dropdown-content a:hover {
       background-color: var(--accent-light);
-      color: var(--accent);
+      color: var(--accent) !important;
       font-weight: 600;
     }
 
@@ -112,7 +116,6 @@
       padding: 8px 16px;
       border-radius: var(--r);
       font-weight: 600;
-      text-decoration: none;
       font-size: 13px;
       cursor: pointer;
       display: inline-block;
@@ -121,9 +124,7 @@
     .btn-outline {
       border: 1px solid var(--border2);
       background: transparent;
-      color: var(--text2);
-      border-radius: var(--r);
-      text-decoration: none;
+      color: var(--text2) !important;
     }
 
     .btn-outline:hover {
@@ -132,10 +133,8 @@
 
     .btn-accent {
       background: var(--accent);
-      color: white;
+      color: white !important;
       border: none;
-      border-radius: var(--r);
-      text-decoration: none;
     }
 
     .btn-accent:hover {
@@ -156,20 +155,30 @@
       gap: 12px;
     }
 
+    /* 마이페이지 및 아바타 공통 드롭다운 */
     .mypage-wrap {
       position: relative;
     }
 
-    .mypage-dropdown {
+    .mypage-dropdown, .avatar-dropdown {
       display: none;
       position: absolute;
       top: 100%;
-      right: 0;
       padding-top: 8px;
       z-index: 9999;
     }
 
-    .mypage-wrap:hover .mypage-dropdown {
+    .mypage-dropdown {
+      right: 0;
+    }
+
+    .avatar-dropdown {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .mypage-wrap:hover .mypage-dropdown,
+    .avatar-wrap:hover .avatar-dropdown {
       display: block;
     }
 
@@ -188,15 +197,19 @@
       gap: 8px;
       padding: 10px 16px;
       font-size: 13px;
-      color: var(--text2);
-      text-decoration: none;
-      white-space: nowrap;
+      color: var(--text2) !important;
       transition: background 0.12s;
+      text-align: left;
+    }
+
+    /* 진료기록/예방접종 줄바꿈 시 정렬을 위한 내부 텍스트 세팅 */
+    .mypage-dropdown a .menu-text {
+      line-height: 1.4;
     }
 
     .mypage-dropdown a:hover {
       background: #f1f3fe;
-      color: var(--accent);
+      color: var(--accent) !important;
     }
 
     .mypage-dropdown hr {
@@ -206,12 +219,37 @@
     }
 
     .logout-btn {
-      color: #b52844;
+      color: #b52844 !important;
       border-color: #b52844;
     }
 
     .logout-btn:hover {
       background: #fff1f4;
+    }
+
+    /* 동물 프로필 관련 */
+    .avatar-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .profile-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--bg2);
+      border: 2px solid var(--border);
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23b8bfdc"><path d="M12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>');
+      background-size: cover;
+      background-position: center;
+      transition: all 0.2s ease;
+    }
+
+    .avatar-wrap:hover .profile-avatar {
+      border-color: var(--accent);
+      transform: scale(1.05);
     }
   </style>
 
@@ -220,11 +258,12 @@
   <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a>
   <a th:href="@{/shop}" class="nav-link">동물용품샵</a>
 
+  <a th:href="@{/used}" class="nav-link">중고거래</a>
+
   <div class="dropdown">
-    <span class="nav-link dropbtn">게시판</span>
+    <span class="nav-link dropbtn">게시판 ▾</span>
     <div class="dropdown-content">
       <a th:href="@{/community/list}">일반 게시판</a>
-      <a th:href="@{/used}">중고거래</a>
       <a th:href="@{/community/meetup/list}">모임 게시판</a>
     </div>
   </div>
@@ -238,6 +277,23 @@
     </th:block>
 
     <th:block sec:authorize="isAuthenticated()">
+
+      <div class="avatar-wrap">
+        <div class="profile-avatar"></div>
+        <div class="avatar-dropdown">
+          <div class="mypage-dropdown-inner">
+            <a th:href="@{/reservation/medical-records}">
+              <span>🩺</span>
+              <span class="menu-text">내 동물<br>진료기록</span>
+            </a>
+            <a th:href="@{/vaccination/myVaccination}">
+              <span>💉</span>
+              <span class="menu-text">내 동물<br>예방접종</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
       <span style="font-size: 14px; font-weight: 500; color: var(--text2);">
         <span sec:authentication="name"></span>님
       </span>
@@ -248,14 +304,15 @@
           <div class="mypage-dropdown-inner">
             <a th:href="@{/member/mypage}">👤 회원정보 수정</a>
             <hr>
-            <a th:href="@{/reservation/medical-records}">내 동물 진료기록</a>
-            <a th:href="@{/vaccination/myVaccination}">내 동물 예방접종</a>
-            <a th:href="@{/review/myReview}">내가 쓴 병원 리뷰보기</a>
+            <a th:href="@{/review/myReview}">📝 내가 쓴 리뷰</a>
+            <a th:href="@{/community/my_posts}">📋 내가 쓴 일반 게시판 글</a>
+            <a th:href="@{/community/meetup/my_posts}">🤝 내가 쓴 모임 게시판 글</a>
           </div>
         </div>
       </div>
 
       <a th:href="@{/member/logout}" class="btn btn-outline btn-sm logout-btn">로그아웃</a>
+
     </th:block>
   </div>
 </nav>

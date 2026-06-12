@@ -19,4 +19,8 @@ public interface MeetupService {
     void cancelMeetup(Long id, String username);
 
     void deleteMeetup(Long id, String username);
+
+    void modifyMeetup(String username, MeetupPostDTO dto);
+
+    void updateViewCount(Long id);
 }

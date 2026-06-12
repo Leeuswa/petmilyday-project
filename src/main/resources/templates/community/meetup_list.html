@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/community/list.css}">
     <style>
-        /* 모집 상태 전용 디자인 */
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; color: white; display: inline-block; vertical-align: middle; }
         .badge.recruiting { background-color: #2b44cc; }
         .badge.closed { background-color: #b8bfdc; }
@@ -20,7 +19,7 @@
 <div th:replace="~{fragments/header :: header}"></div>
 
 <div class="container">
-    <h2 class="page-title">산책 / 번개 모임</h2>
+    <h2 class="page-title">산책 모임</h2>
 
     <div class="board-list">
         <div class="board-item" th:each="post : ${responseDTO.dtoList}" style="padding: 20px; border-bottom: 1px solid #d0d5e8;">

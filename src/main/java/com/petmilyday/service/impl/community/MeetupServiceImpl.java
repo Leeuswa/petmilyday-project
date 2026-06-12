@@ -3,6 +3,7 @@ package com.petmilyday.service.impl.community;
 import com.petmilyday.dto.community.MeetupPostDTO;
 import com.petmilyday.entity.community.MeetupParticipant;
 import com.petmilyday.entity.community.MeetupPost;
+import com.petmilyday.entity.community.MeetupStatus;
 import com.petmilyday.entity.member.Member;
 import com.petmilyday.repository.community.MeetupParticipantRepository;
 import com.petmilyday.repository.community.MeetupPostRepository;
@@ -50,22 +51,29 @@ public class MeetupServiceImpl implements MeetupService {
         return savedPost.getId();
     }
 
+    // 목록 조회 시 마감 상태 실시간 검증 반영
     @Override
     @Transactional(readOnly = true)
     public List<MeetupPostDTO> getList() {
-        // 모임 목록 DTO 변환 반환
         return meetupPostRepository.findAll().stream()
-                .map(post -> MeetupPostDTO.builder()
-                        .id(post.getId())
-                        .title(post.getTitle())
-                        .location(post.getLocation())
-                        .meetupDate(post.getMeetupDate())
-                        .currentParticipants(post.getCurrentParticipants())
-                        .maxParticipants(post.getMaxParticipants())
-                        .status(post.getStatus().name())
-                        .hostName(post.getHost().getNickname() != null ? post.getHost().getNickname() : post.getHost().getName())
-                        .viewCount(post.getViewCount())
-                        .build())
+                .map(post -> {
+                    // 인원 충족 시 마감 상태 강제 적용
+                    String calculatedStatus = post.getCurrentParticipants() >= post.getMaxParticipants()
+                            ? MeetupStatus.CLOSED.name()
+                            : post.getStatus().name();
+
+                    return MeetupPostDTO.builder()
+                            .id(post.getId())
+                            .title(post.getTitle())
+                            .location(post.getLocation())
+                            .meetupDate(post.getMeetupDate())
+                            .currentParticipants(post.getCurrentParticipants())
+                            .maxParticipants(post.getMaxParticipants())
+                            .status(calculatedStatus)
+                            .hostName(post.getHost().getNickname() != null ? post.getHost().getNickname() : post.getHost().getName())
+                            .viewCount(post.getViewCount())
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
@@ -139,5 +147,25 @@ public class MeetupServiceImpl implements MeetupService {
 
         meetupParticipantRepository.deleteByMeetupPostId(id);
         meetupPostRepository.delete(post);
+    }
+
+    @Override
+    public void modifyMeetup(String username, MeetupPostDTO dto) {
+        MeetupPost post = meetupPostRepository.findById(dto.getId()).orElseThrow();
+
+        // 작성자 본인 확인 검증
+        if (!post.getHost().getUsername().equals(username)) {
+            throw new IllegalStateException("모임 수정 권한이 없습니다.");
+        }
+
+        // 엔티티 데이터 변경 수행
+        post.updateMeetup(dto.getTitle(), dto.getContent(), dto.getLocation(), dto.getMeetupDate(), dto.getMaxParticipants());
+    }
+
+    // 조회수 증가 로직 구현
+    @Override
+    public void updateViewCount(Long id) {
+        MeetupPost post = meetupPostRepository.findById(id).orElseThrow();
+        post.addViewCount();
     }
 }
