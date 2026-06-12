@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>펫밀리데이 - 모임 커뮤니티</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/community/list.css}">
+    <style>
+        /* 모집 상태 전용 디자인 */
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; color: white; display: inline-block; vertical-align: middle; }
+        .badge.recruiting { background-color: #2b44cc; }
+        .badge.closed { background-color: #b8bfdc; }
+        .meetup-meta-info { margin-top: 8px; font-size: 14px; color: #3d4670; display: flex; gap: 15px; }
+        .meetup-meta-info b { color: #0d1433; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+    <h2 class="page-title">산책 / 번개 모임</h2>
+
+    <div class="board-list">
+        <div class="board-item" th:each="post : ${responseDTO.dtoList}" style="padding: 20px; border-bottom: 1px solid #d0d5e8;">
+            <div class="board-item-link-zone" style="display: flex; align-items: center; gap: 10px;">
+                <span th:if="${post.status == 'RECRUITING'}" class="badge recruiting">모집중</span>
+                <span th:if="${post.status == 'CLOSED'}" class="badge closed">마감</span>
+
+                <a th:href="@{/community/meetup/read(id=${post.id})}" style="font-size: 18px; font-weight: 600; color: #0d1433; text-decoration: none;">
+                    <span th:text="${post.title}">모임 제목</span>
+                </a>
+            </div>
+
+            <div class="meetup-meta-info">
+                <span>📍 장소: <b th:text="${post.location}">장소</b></span>
+                <span>⏰ 일시: <b th:text="${#temporals.format(post.meetupDate, 'yyyy-MM-dd HH:mm')}">일시</b></span>
+                <span>👥 인원: <b th:text="${post.currentParticipants} + ' / ' + ${post.maxParticipants} + '명'">인원</b></span>
+            </div>
+
+            <div style="font-size: 13px; color: #3d4670; margin-top: 10px;">
+                주최자: <span th:text="${post.hostName}">작성자</span> | 조회수: <span th:text="${post.viewCount}">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="list-footer" style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="flex: 1;"></div>
+        <a href="/community/meetup/register" class="write-btn" style="text-decoration: none; text-align: center;">모임 만들기</a>
+    </div>
+</div>
+
+</body>
+</html>

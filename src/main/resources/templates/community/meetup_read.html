@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>펫밀리데이 - 모임 상세</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/community/read.css}">
+    <style>
+        /* 모임 정보 전용 박스 디자인 */
+        .meetup-detail-box { background: #f0f2f7; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #d0d5e8; }
+        .meetup-detail-box p { margin: 8px 0; font-size: 15px; color: #3d4670; }
+        .meetup-detail-box strong { color: #0d1433; }
+        .action-button-zone { margin: 25px 0; }
+        .btn-join { background-color: #2b44cc; color: white; padding: 12px 24px; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+        .btn-leave { background-color: #3d4670; color: white; padding: 12px 24px; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+        .btn-block { background-color: #b8bfdc; color: #fff; padding: 12px 24px; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; width: 100%; cursor: not-allowed; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container" th:object="${postDTO}">
+
+    <div class="post-header">
+        <h1 class="post-title" th:text="*{title}">모임 제목</h1>
+        <div class="post-info">
+            <span class="writer" th:text="'👑 주최자: ' + *{hostName}">주최자</span>
+            <span class="date" th:text="${#temporals.format(createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
+            <span class="views" th:text="'조회 ' + *{viewCount}">조회 0</span>
+        </div>
+    </div>
+
+    <div class="meetup-detail-box">
+        <p>📍 <b>모임 장소 :</b> <span th:text="*{location}">장소</span></p>
+        <p>⏰ <b>모임 일시 :</b> <span th:text="${#temporals.format(postDTO.meetupDate, 'yyyy-MM-dd HH:mm')}">일시</span></p>
+        <p>👥 <b>참여 현황 :</b> <span th:text="*{currentParticipants} + ' / ' + *{maxParticipants} + ' 명'">0/0명</span></p>
+    </div>
+
+    <div class="post-content" th:text="*{content}">
+        모임 상세 설명 본문 내용
+    </div>
+
+    <div class="action-button-zone">
+        <form th:if="*{isParticipating}" th:action="@{/community/meetup/cancel/{id}(id=*{id})}" method="post">
+            <button type="submit" class="btn-leave" onclick="return confirm('모임 신청을 취소하시겠습니까?');">❌ 참여 취소하기</button>
+        </form>
+
+        <form th:if="!*{isParticipating} and *{status == 'RECRUITING'}" th:action="@{/community/meetup/join/{id}(id=*{id})}" method="post">
+            <button type="submit" class="btn-join">🙌 모임 동반 참여하기</button>
+        </form>
+
+        <div th:if="!*{isParticipating} and *{status == 'CLOSED'}" class="btn-block">🔒 인원 마감</div>
+    </div>
+
+    <div class="btn-group">
+        <a th:href="@{/community/meetup/list}" class="btn-list" style="text-decoration: none; text-align: center;">목록</a>
+        <form th:if="${#authentication.name == postDTO.hostUsername}" th:action="@{/community/meetup/remove}" method="post" style="display:inline;">
+            <input type="hidden" name="id" th:value="*{id}">
+            <button type="submit" class="btn-delete" onclick="return confirm('모임 게시글을 완전히 삭제하시겠습니까?');">삭제</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
