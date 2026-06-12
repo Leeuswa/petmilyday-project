@@ -3,12 +3,12 @@ package com.petmilyday.controller.shop;
 import com.petmilyday.config.jwt.JwtTokenProvider;
 import com.petmilyday.dto.product.ProductResponseDto;
 import com.petmilyday.dto.shop.SubscriptionResponseDto;
+import com.petmilyday.repository.shop.OrdersRepository;
 import com.petmilyday.service.product.ProductService;
 import com.petmilyday.service.shop.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +23,7 @@ public class ShopController {
     private final ProductService productService;
     private final SubscriptionService subscriptionService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final OrdersRepository ordersRepository;
 
     @GetMapping("/shop")
     public String showShopPage(@RequestParam(required = false) String category,
@@ -49,6 +50,7 @@ public class ShopController {
         return "shop/shop";
     }
 
+    // 상품 상세페이지 조회 및 리뷰 권한 체크
     @GetMapping("/shop/detail/{id}")
     public String showProductDetail(@PathVariable("id") Long id,
                                     Model model,
@@ -57,9 +59,15 @@ public class ShopController {
         ProductResponseDto product = productService.getProductById(id);
         model.addAttribute("product", product);
 
+        boolean isBuyer = false;
+
         if (principal != null) {
             model.addAttribute("loggedInUser", principal.getName());
+            // 구매 이력 여부 조회
+            isBuyer = ordersRepository.existsByUsernameAndProductId(principal.getName(), id);
         }
+
+        model.addAttribute("isBuyer", isBuyer);
 
         return "shop/detail";
     }
@@ -70,7 +78,7 @@ public class ShopController {
         if (principal == null) {
             model.addAttribute("loggedInUser", null);
             model.addAttribute("activeTab", "shop");
-            model.addAttribute("subscriptionList", List.of()); // 빈 리스트 넘겨서 에러 방지
+            model.addAttribute("subscriptionList", List.of());
         }
         else {
             model.addAttribute("loggedInUser", principal.getName());

@@ -62,7 +62,7 @@
             <div class="card detail-card p-4 mb-4">
                 <ul class="nav nav-tabs mb-4" id="detailTabs">
                     <li class="nav-item">
-                        <button class="nav-link active fw-bold text-dark border-0 border-bottom" onclick="switchTab(0)">상품 정보</button>
+                        <button class="nav-link active fw-bold text-dark border-0 border-bottom" onclick="switchTab(0)">정보</button>
                     </li>
                     <li class="nav-item">
                         <button class="nav-link fw-bold text-secondary border-0 border-bottom" id="reviewTabBtn" onclick="switchTab(1)">리뷰 (0)</button>
@@ -97,7 +97,7 @@
                     </div>
 
                     <div id="tab-reviews" class="tab-pane d-none">
-                        <div class="p-4 bg-white rounded-3 mb-4 border shadow-sm">
+                        <div th:if="${isBuyer}" class="p-4 bg-white rounded-3 mb-4 border shadow-sm">
                             <h6 class="fw-bold mb-3"><i class="bi bi-pencil-square"></i> 구매 후기 작성하기</h6>
                             <div class="mb-3 d-flex align-items-center gap-2">
                                 <span class="info-label mb-0">평점 선택</span>
@@ -124,6 +124,10 @@
                             <div class="d-flex justify-content-end">
                                 <button class="btn btn-primary btn-sm px-4 fw-bold" onclick="submitRealReview()"><i class="bi bi-check-lg"></i> 리뷰 등록</button>
                             </div>
+                        </div>
+
+                        <div th:unless="${isBuyer}" class="p-3 bg-light rounded-3 mb-4 border text-center text-danger small fw-bold">
+                            해당 상품을 구매한 회원만 후기를 작성할 수 있습니다.
                         </div>
 
                         <div id="reviewContainer" class="d-flex flex-column gap-3"></div>
@@ -196,7 +200,7 @@
 <script th:inline="javascript">
     const basePrice = parseInt(document.body.getAttribute('data-base-price')) || 0;
     const currentProductId = [[${product?.id}]];
-    let uploadedImageUrl = null; // S3 리턴 링크 캐싱용 변수
+    let uploadedImageUrl = null;
 
     function changeQuantity(amount) {
         const input = document.getElementById('productQty');

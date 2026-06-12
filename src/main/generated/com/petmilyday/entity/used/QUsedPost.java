@@ -22,6 +22,8 @@ public class QUsedPost extends EntityPathBase<UsedPost> {
 
     public static final QUsedPost usedPost = new QUsedPost("usedPost");
 
+    public final NumberPath<Long> buyerId = createNumber("buyerId", Long.class);
+
     public final StringPath category = createString("category");
 
     public final StringPath content = createString("content");
@@ -36,9 +38,13 @@ public class QUsedPost extends EntityPathBase<UsedPost> {
 
     public final EnumPath<ItemCondition> itemCondition = createEnum("itemCondition", ItemCondition.class);
 
+    public final NumberPath<Double> mannerAverage = createNumber("mannerAverage", Double.class);
+
     public final com.petmilyday.entity.member.QMember member;
 
     public final BooleanPath offerAccepted = createBoolean("offerAccepted");
+
+    public final StringPath paymentKey = createString("paymentKey");
 
     public final NumberPath<Integer> price = createNumber("price", Integer.class);
 
