@@ -32,9 +32,7 @@ public class SubscriptionApiController {
     @jakarta.persistence.PersistenceContext
     private jakarta.persistence.EntityManager em;
 
-    /**
-     * 카카오페이 정기결제 준비 API
-     */
+    // 카카오페이 정기결제 준비 및 세션 데이터 임시 저장
     @PostMapping("/ready")
     public ResponseEntity<?> readySubscription(@RequestBody Map<String, Object> params, HttpSession session) {
         try {
@@ -105,9 +103,7 @@ public class SubscriptionApiController {
         }
     }
 
-    /**
-     * 카카오페이 정기결제 승인 완료 및 구독 데이터 적재 API
-     */
+    // 정기결제 최종 승인 및 구독 빌링키(SID) 관리 데이터 구축
     @GetMapping("/success")
     public ModelAndView subscriptionSuccess(@RequestParam("pg_token") String pgToken, HttpSession session) {
         Integer totalPrice = (Integer) session.getAttribute("totalPrice");
@@ -221,9 +217,7 @@ public class SubscriptionApiController {
         return mav;
     }
 
-    /**
-     * 정기구독 해지 처리 (Thymeleaf Form POST 수신)
-     */
+    // 활성화된 정기구독 상태를 해지 상태로 수정
     @Transactional
     @PostMapping("/cancel")
     public ModelAndView cancelSubscription(@RequestParam("subId") Long subId) {
@@ -243,9 +237,7 @@ public class SubscriptionApiController {
         return new ModelAndView("redirect:/shop/subscription");
     }
 
-    /**
-     * 배송 주기 변경 처리 (Thymeleaf Form POST 수신)
-     */
+    // 정기구독 배송 주기 변경 및 차기 배송일 업데이트
     @Transactional
     @PostMapping("/change-cycle")
     public ModelAndView changeSubscriptionCycle(@RequestParam("subId") Long subId,

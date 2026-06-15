@@ -13,6 +13,7 @@ public class CartApiController {
 
     private final CartService cartService;
 
+    // 장바구니에 상품 추가
     @PostMapping("/add")
     public ResponseEntity<String> addCart(@RequestBody CartRequestDto requestDto) {
         Long mockUserId = 1L;
@@ -25,17 +26,21 @@ public class CartApiController {
         }
     }
 
+    // 장바구니에 담긴 상품의 수량 수정
     @PutMapping("/update/{cartItemId}")
     public ResponseEntity<String> updateQuantity(@PathVariable Long cartItemId, @RequestBody java.util.Map<String, Integer> request) {
         cartService.updateQuantity(cartItemId, request.get("quantity"));
         return ResponseEntity.ok("수정완료");
     }
 
+    // 장바구니에 선택된 상품 항목들 삭제
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteItems(@RequestBody java.util.List<Long> cartItemIds) {
         cartService.deleteCartItems(cartItemIds);
         return ResponseEntity.ok("삭제완료");
     }
+
+    // 장바구니에 담긴 총 상품 개수 조회
     @GetMapping("/count")
     public ResponseEntity<Integer> getCartCount() {
         Long mockUserId = 1L;

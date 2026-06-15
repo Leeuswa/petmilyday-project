@@ -31,8 +31,7 @@ public class ShopController {
     private final PetProfileRepository petProfileRepository;
     private final MemberRepository memberRepository;
 
-    /* 상점 메인 및 펫 프로필 연동 */
-    /* 상점 메인 및 펫 프로필 성능 최적화 연동 */
+    // 쇼핑몰 메인 페이지 및 카테고리별 상품/구독/반려동물 프로필 연동
     @GetMapping("/shop")
     public String showShopPage(@RequestParam(required = false) String category,
                                Model model,
@@ -49,16 +48,13 @@ public class ShopController {
         model.addAttribute("productList", products);
         model.addAttribute("activeTab", "shop");
 
-        // 2. 로그인 유저 정보 및 펫 프로필은 루프 밖에서 딱 '한 번만' 조회
         if (principal != null) {
             String username = principal.getName();
             model.addAttribute("loggedInUser", username);
 
-            // 정기구독 목록 조회
             List<SubscriptionResponseDto> subList = subscriptionService.getActiveSubscriptions(username);
             model.addAttribute("subscriptionList", subList);
 
-            // 회원 엔티티 및 펫 목록 단 1회만 조회 (N+1 방지)
             Member member = memberRepository.findByUsername(username).orElse(null);
             if (member != null) {
                 List<PetProfile> petList = petProfileRepository.findByMember(member);
@@ -73,7 +69,7 @@ public class ShopController {
         return "shop/shop";
     }
 
-    /* 상품 상세페이지 */
+    // 상품 상세 정보 조회 및 구매 여부 검증
     @GetMapping("/shop/detail/{id}")
     public String showProductDetail(@PathVariable("id") Long id,
                                     Model model,
@@ -94,7 +90,7 @@ public class ShopController {
         return "shop/detail";
     }
 
-    /* 정기구독 관리 페이지 */
+    // 회원의 활성화된 정기구독 목록 관리 페이지
     @GetMapping("/shop/subscription")
     public String showSubscriptionManagementPage(Model model, Principal principal) {
 
@@ -114,7 +110,7 @@ public class ShopController {
         return "shop/subscription_manage";
     }
 
-    /* 정기구독 결제 페이지 */
+    // 선택한 상품 및 주기 기준 정기구독 결제 주문서 페이지
     @GetMapping("/shop/subscription-checkout")
     public String subscriptionCheckoutPage(@RequestParam("productId") Long productId,
                                            @RequestParam("quantity") int quantity,

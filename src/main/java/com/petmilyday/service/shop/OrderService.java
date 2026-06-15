@@ -27,9 +27,8 @@ public class OrderService {
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
 
-    /**
-     * 회원별 주문 내역 조회
-     */
+    // 회원별 주문 내역 조회
+
     public List<OrderResponseDto> getOrderHistory(String username) {
         List<Orders> ordersList = ordersRepository.findByMemberUsernameOrderByCreatedAtDesc(username);
         List<OrderResponseDto> responseList = new ArrayList<>();
@@ -66,9 +65,7 @@ public class OrderService {
         return responseList;
     }
 
-    /**
-     * 신규 상품 주문 생성
-     */
+    // 신규 상품 주문 생성
     @Transactional
     public Long createOrder(OrderRequestDto requestDto, String username) {
         Member member = memberRepository.findByUsername(username)
