@@ -34,6 +34,13 @@ public class SecurityConfig {
                 // 무상태 환경이므로 CSRF 공격 보호를 비활성화
                 .csrf(csrf -> csrf.disable())
 
+                .logout(logout -> logout
+                        .logoutUrl("/member/logout") // 우리가 지정한 로그아웃 URL 주소
+                        .logoutSuccessUrl("/")       // 성공 시 리다이렉트할 주소
+                        .deleteCookies("Authorization", "JSESSIONID") // 🌟 브라우저 쿠키 강제 파기 명시
+                        .invalidateHttpSession(true) // 기존 세션 무효화
+                )
+
                 // 폼 로그인 화면이나 기존 세션 기반 로그아웃 메커니즘을 사용하지 않으므로 비활성화
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
@@ -54,7 +61,7 @@ public class SecurityConfig {
                         // 회원가입, 로그인, 토큰 재발급 등 인증이 필요 없는 경로 허용
                         .requestMatchers("/shop/**", "/api/subscription/**","/shop/subscription").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/", "/error").permitAll()
-                        .requestMatchers("/member/register", "/member/login", "/member/reissue").permitAll()
+                        .requestMatchers("/member/register", "/member/login", "/member/reissue", "/member/check-username").permitAll()
                         .requestMatchers("/community/list", "/hospital/list", "/shop/list", "/ai/diagnosis").permitAll()
 
                         // 메인 관리자 페이지는 ADMIN 권한만 접근 가능

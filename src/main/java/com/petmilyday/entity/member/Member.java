@@ -14,13 +14,13 @@ public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 기본키 (AUTO_INCREMENT)
+    private Long id; // 번호 (AUTO_INCREMENT)
 
     @Column(nullable = false, unique = true, length = 50)
     private String username; // 아이디
 
     @Column(length = 30)
-    private String nickname; // 닉네임 (Null 허용)
+    private String nickname; // 닉네임
 
     @Column(nullable = false, length = 100)
     private String password; // 비밀번호 (BCrypt 암호화)
@@ -31,11 +31,26 @@ public class Member {
     @Column(nullable = false, unique = true, length = 100)
     private String email; // 이메일
 
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber; // 전화번호
+
+    @Column(nullable = false, length = 255)
+    private String address; // 주소
+
+    @Column(name = "detail_address", length = 100)
+    private String detailAddress; // 상세 주소
+
+    @Column(name = "profile_image_url", length = 255)
+    private String profileImageUrl; // 프로필 이미지 URL
+
+    @Column(length = 100)
+    private String bio; // 한 줄 소개
+
     @Column(name = "social_type", length = 20)
-    private String socialType; // 소셜 로그인 타입 (일반 가입은 NULL)
+    private String socialType; // 소셜 로그인 타입
 
     @Column(name = "social_id", length = 100)
-    private String socialId; // 소셜 로그인 ID (일반 가입은 NULL)
+    private String socialId; // 소셜 로그인 ID
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -66,10 +81,19 @@ public class Member {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // 회원 정보 수정 (닉네임, 이메일)
-    public void updateProfile(String nickname, String email) {
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // 회원 정보 수정
+    public void updateProfile(String nickname, String email, String phoneNumber, String address, String detailAddress, String bio) {
         this.nickname = nickname;
         this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.detailAddress = detailAddress;
+        this.bio = bio;
     }
 
     // 비밀번호 변경
@@ -77,7 +101,7 @@ public class Member {
         this.password = newPassword;
     }
 
-    // 회원 탈퇴 (Soft Delete)
+    // 회원 탈퇴
     public void withdraw() {
         this.status = AccountStatus.WITHDRAWN;
     }
