@@ -158,6 +158,31 @@
             color:#94a3b8;
         }
 
+        .stats-grid{
+            display:grid;
+            grid-template-columns:repeat(2,1fr);
+            gap:18px;
+            margin-bottom:30px;
+        }
+
+        .stat-card{
+            background:white;
+            border:1px solid #d7dced;
+            border-radius:16px;
+            padding:22px;
+        }
+
+        .stat-title{
+            color:#64748b;
+            font-size:14px;
+            margin-bottom:10px;
+        }
+
+        .stat-value{
+            font-size:28px;
+            font-weight:700;
+            color:#3d58e0;
+        }
     </style>
 </head>
 
@@ -223,6 +248,37 @@
             </div>
 
         </a>
+
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-title">총 진단 횟수</div>
+
+            <div class="stat-value"
+                 th:text="${totalDiagnosisCount ?: 0}">
+                0
+            </div>
+        </div>
+
+        <div class="stat-card">
+
+            <div class="stat-title">
+                최근 진단일
+            </div>
+
+            <div class="stat-value"
+                 th:if="${lastDiagnosisDate != null}"
+                 th:text="${#temporals.format(lastDiagnosisDate,'yyyy-MM-dd')}">
+            </div>
+
+            <div class="stat-value"
+                 th:if="${lastDiagnosisDate == null}">
+                없음
+            </div>
+
+        </div>
 
     </div>
 

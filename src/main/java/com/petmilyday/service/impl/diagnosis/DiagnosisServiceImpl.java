@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -114,6 +113,11 @@ public class DiagnosisServiceImpl implements DiagnosisService {
 
         disease = normalizeDisease(disease, symptomText);
         severity = normalizeSeverity(severity, symptomText);
+
+        if ("판단불가".equals(disease)) {
+            severity = "LOW";
+        }
+
         String recommend = normalizeRecommend(disease);
 
         DiagnosisHistory history =
@@ -169,6 +173,19 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             return "판단불가";
         }
 
+        if (text.contains("안녕하세요")
+                || text.contains("날씨")
+                || text.contains("좋네요")
+                || text.contains("귀여")
+                || text.contains("예뻐")
+                || text.contains("사랑스러")
+                || text.contains("배고파요")
+                || text.contains("저를 좋아")
+                || text.contains("산책 다녀왔")) {
+
+            return "판단불가";
+        }
+
         if (text.contains("판단불가")) {
             return "판단불가";
         }
@@ -185,17 +202,14 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             return "알레르기성 피부염";
         }
 
-        if (text.contains("귀여")) {
-            return "판단불가";
-        }
-
         if (text.contains("귀를 긁")
                 || text.contains("귀가")
                 || text.contains("귀에서")
                 || text.contains("귀 안")
                 || text.contains("외이")
                 || text.contains("머리를 흔")
-                || text.contains("귀 냄새")) {
+                || text.contains("귀 냄새")
+                || text.contains("귀를 자주")) {
 
             return "외이염";
         }
@@ -226,14 +240,18 @@ public class DiagnosisServiceImpl implements DiagnosisService {
                 || text.contains("사료")
                 || text.contains("식욕")
                 || text.contains("먹지")
-                || text.contains("안 먹")) {
+                || text.contains("안 먹")
+                || text.contains("먹는 양")) {
 
             return "식욕부진";
         }
 
         if (text.contains("스트레스")
                 || text.contains("불안")
-                || text.contains("숨")) {
+                || text.contains("숨어")
+                || text.contains("숨는")
+                || text.contains("낯선")
+                || text.contains("이사")) {
 
             return "스트레스";
         }
@@ -255,16 +273,19 @@ public class DiagnosisServiceImpl implements DiagnosisService {
 
         text = text.toUpperCase();
 
-        if (text.contains("피")
+        if (text.contains("피가 섞")
                 || text.contains("혈변")
                 || text.contains("반복 구토")
                 || text.contains("계속 구토")
                 || text.contains("물을 안")
                 || text.contains("물도 안")
+                || text.contains("물을 거의")
                 || text.contains("움직이지")
+                || text.contains("무기력")
                 || text.contains("축 처")
                 || text.contains("호흡")
-                || text.contains("숨을")) {
+                || text.contains("숨을 빠르게")
+                || text.contains("힘없이")) {
 
             return "HIGH";
         }
@@ -275,13 +296,17 @@ public class DiagnosisServiceImpl implements DiagnosisService {
 
         if (text.contains("며칠")
                 || text.contains("3일")
+                || text.contains("이틀")
                 || text.contains("일주일")
                 || text.contains("계속")
                 || text.contains("심해")
                 || text.contains("식욕")
                 || text.contains("붉")
                 || text.contains("빨갛")
-                || text.contains("긁")) {
+                || text.contains("긁")
+                || text.contains("털이 빠")
+                || text.contains("냄새")
+                || text.contains("구토")) {
 
             return "MEDIUM";
         }
