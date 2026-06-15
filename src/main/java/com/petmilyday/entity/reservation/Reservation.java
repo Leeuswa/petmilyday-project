@@ -48,9 +48,9 @@ public class Reservation {
     @Column(nullable = false, length = 50)
     private String department;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private String status = "WAITING";
-
+    private ReservationStatus status = ReservationStatus.WAITING;
     private Integer waitNumber;
 
     @Column(length = 255)
@@ -61,7 +61,25 @@ public class Reservation {
     private LocalDateTime createdAt;
 
     public void cancel(String cancelReason){
-        this.status = "CANCEL";
+        this.status = ReservationStatus.CANCEL;
         this.cancelReason = cancelReason;
+    }
+    //승인 메서드
+    public void approve() {
+        this.status = ReservationStatus.APPROVED;
+    }
+
+    public void adminCancel(){
+        this.status = ReservationStatus.CANCEL;
+        this.cancelReason ="관리자가 예약 승인을 거부했습니다.";
+    }
+
+    public void rejectByHospitalManager(){
+        this.status = ReservationStatus.CANCEL;
+        this.cancelReason = "병원 관리자가 예약 승인을 거부했습니다.";
+    }
+
+    public void done() {
+        this.status = ReservationStatus.DONE;
     }
 }

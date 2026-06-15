@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>병원 상세</title>
+  <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <aside th:replace="~{fragments/adminSidebar :: adminSidebar('hospitals')}"></aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div>
+        <h2>병원 상세</h2>
+        <p>메인 관리자가 등록한 병원 기본정보입니다.</p>
+      </div>
+      <a th:href="@{/admin/hospitals/}" class="btn btn-outline">목록</a>
+    </div>
+
+    <div class="card">
+
+      <div th:if="${message}" class="alert">
+        <p th:text="${message}"></p>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-label">병원명</div>
+        <div class="detail-value" th:text="${hospitalDTO.name}">병원명</div>
+
+        <div class="detail-label">주소</div>
+        <div class="detail-value" th:text="${hospitalDTO.address}">주소</div>
+
+        <div class="detail-label">전화번호</div>
+        <div class="detail-value" th:text="${hospitalDTO.phone}">전화번호</div>
+
+        <div class="detail-label">위도</div>
+        <div class="detail-value" th:text="${hospitalDTO.latitude}">37.0000000</div>
+
+        <div class="detail-label">경도</div>
+        <div class="detail-value" th:text="${hospitalDTO.longitude}">127.0000000</div>
+      </div>
+
+      <div class="actions">
+        <a th:href="@{/admin/hospitals/}" class="btn btn-gray">목록</a>
+
+        <a th:href="@{/admin/hospitals/{id}/modify(id=${hospitalDTO.id})}"
+           class="btn btn-primary">
+          수정
+        </a>
+
+        <form th:action="@{/admin/hospitals/{id}/remove(id=${hospitalDTO.id})}"
+              method="post"
+              style="display:inline;"
+              onsubmit="return confirm('병원을 삭제하시겠습니까?')">
+          <button type="submit" class="btn btn-danger">
+            삭제
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script th:src="@{/js/admin/adminHospital.js}"></script>
+</body>
+</html>

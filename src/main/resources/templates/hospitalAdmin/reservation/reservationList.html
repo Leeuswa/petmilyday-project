@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>병원 예약 관리</title>
+  <link th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container py-5">
+
+  <h2 class="fw-bold mb-4">병원 예약 관리</h2>
+
+  <div class="card p-4">
+    <table class="table table-hover align-middle">
+      <thead>
+      <tr>
+        <th>번호</th>
+        <th>예약일</th>
+        <th>예약시간</th>
+        <th>병원명</th>
+        <th>반려동물</th>
+        <th>진료과목</th>
+        <th>상태</th>
+        <th>대기번호</th>
+        <th>관리</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr th:if="${#lists.isEmpty(reservationList)}">
+        <td colspan="9" class="text-center text-muted">
+          예약 내역이 없습니다.
+        </td>
+      </tr>
+
+      <tr th:each="reservation, stat : ${reservationList}">
+        <td th:text="${stat.count}">1</td>
+        <td th:text="${reservation.reserveDate}">2026-06-06</td>
+        <td th:text="${reservation.reserveTime}">10:00</td>
+        <td th:text="${reservation.hospitalName}">병원명</td>
+        <td th:text="${reservation.petName}">반려동물</td>
+        <td th:text="${reservation.department}">진료과목</td>
+
+        <td>
+          <span th:if="${reservation.status == 'WAITING'}"
+                class="badge bg-warning text-dark">
+            승인대기
+          </span>
+
+          <span th:if="${reservation.status == 'APPROVED'}"
+                class="badge bg-primary">
+            승인완료
+          </span>
+
+          <span th:if="${reservation.status == 'DONE'}"
+                class="badge bg-success">
+            진료완료
+          </span>
+
+          <span th:if="${reservation.status == 'CANCEL'}"
+                class="badge bg-danger">
+            취소
+          </span>
+        </td>
+
+        <td th:text="${reservation.waitNumber}">1</td>
+
+        <td>
+          <!-- 승인대기 상태: 승인/거절 -->
+          <div th:if="${reservation.status == 'WAITING'}"
+               class="d-flex gap-2">
+
+            <form th:action="@{/hospitalAdmin/reservations/{id}/approve(id=${reservation.id})}"
+                  method="post">
+              <button type="submit" class="btn btn-success btn-sm">
+                승인
+              </button>
+            </form>
+
+            <form th:action="@{/hospitalAdmin/reservations/{id}/reject(id=${reservation.id})}"
+                  method="post">
+              <button type="submit"
+                      class="btn btn-danger btn-sm"
+                      onclick="return confirm('예약을 거절하시겠습니까?')">
+                거절
+              </button>
+            </form>
+          </div>
+
+          <!-- 승인완료 상태: 진료기록 작성 -->
+          <a th:if="${reservation.status == 'APPROVED'}"
+             th:href="@{/hospitalAdmin/medicalRecords/register/{reservationId}(reservationId=${reservation.id})}"
+             class="btn btn-primary btn-sm">
+            진료기록 작성
+          </a>
+
+          <!-- 진료완료 상태 -->
+          <span th:if="${reservation.status == 'DONE'}"
+                class="text-muted small">
+            진료완료
+          </span>
+
+          <!-- 취소 상태 -->
+          <span th:if="${reservation.status == 'CANCEL'}"
+                class="text-muted small">
+            취소됨
+          </span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="modal fade" id="messageModal" tabindex="-1"
+     th:if="${message != null}">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">알림</h5>
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p th:text="${message}" class="mb-0"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-primary"
+                data-bs-dismiss="modal">
+          확인
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+
+<script th:if="${message != null}">
+  const messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+  messageModal.show();
+</script>
+
+</body>
+</html>

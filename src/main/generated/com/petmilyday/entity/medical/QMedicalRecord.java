@@ -28,11 +28,21 @@ public class QMedicalRecord extends EntityPathBase<MedicalRecord> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final StringPath memo = createString("memo");
+
     public final StringPath pdfUrl = createString("pdfUrl");
 
     public final com.petmilyday.entity.member.QPetProfile pet;
 
+    public final StringPath prescription = createString("prescription");
+
     public final com.petmilyday.entity.reservation.QReservation reservation;
+
+    public final StringPath treatment = createString("treatment");
+
+    public final BooleanPath vaccinated = createBoolean("vaccinated");
+
+    public final StringPath vaccineName = createString("vaccineName");
 
     public final DatePath<java.time.LocalDate> visitDate = createDate("visitDate", java.time.LocalDate.class);
 

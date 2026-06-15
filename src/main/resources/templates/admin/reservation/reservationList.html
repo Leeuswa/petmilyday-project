@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>전체 예약 현황</title>
+  <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <aside th:replace="~{fragments/adminSidebar :: adminSidebar('reservations')}"></aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div>
+        <h2>전체 예약 현황</h2>
+        <p>전체 병원의 예약 현황을 확인합니다. 예약 승인과 거절은 병원 관리자가 처리합니다.</p>
+      </div>
+    </div>
+
+    <div class="card">
+
+      <div th:if="${message}" class="alert">
+        <p th:text="${message}"></p>
+      </div>
+
+      <table class="table">
+        <thead>
+        <tr>
+          <th>예약번호</th>
+          <th>병원명</th>
+          <th>예약자</th>
+          <th>예약일</th>
+          <th>예약시간</th>
+          <th>상태</th>
+          <th>비고</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:if="${reservationList == null or reservationList.isEmpty()}">
+          <td colspan="7" style="text-align:center;">
+            예약 내역이 없습니다.
+          </td>
+        </tr>
+
+        <tr th:each="reservation : ${reservationList}">
+          <td th:text="${reservation.id}">1</td>
+          <td th:text="${reservation.hospitalName}">펫밀리 동물병원</td>
+          <td th:text="${reservation.memberName}">홍길동</td>
+          <td th:text="${reservation.reservationDate}">2026-06-05</td>
+          <td th:text="${reservation.reservationTime}">14:00</td>
+
+          <td>
+            <span th:if="${reservation.status.name() == 'WAITING'}"
+                  class="badge badge-gray">
+              승인대기
+            </span>
+
+            <span th:if="${reservation.status.name() == 'APPROVED'}"
+                  class="badge badge-primary">
+              승인완료
+            </span>
+
+            <span th:if="${reservation.status.name() == 'DONE'}"
+                  class="badge badge-primary">
+              진료완료
+            </span>
+
+            <span th:if="${reservation.status.name() == 'CANCEL'}"
+                  class="badge badge-danger">
+              취소
+            </span>
+          </td>
+
+          <td>
+            <span>조회 전용</span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script th:src="@{/js/admin/adminHospital.js}"></script>
+</body>
+</html>
