@@ -55,6 +55,13 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/", "/error").permitAll()
                         .requestMatchers("/member/register", "/member/login", "/member/reissue").permitAll()
                         .requestMatchers("/community/list", "/hospital/list", "/shop/list", "/ai/diagnosis").permitAll()
+
+                        // 메인 관리자 페이지는 ADMIN 권한만 접근 가능
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        // 병원 관리자 페이지는 HOSPITAL_ADMIN 권한만 접근 가능
+                        .requestMatchers("/hospitalAdmin/**").hasRole("HOSPITAL_ADMIN")
+
                         // 나머지 모든 회원 수정, 탈퇴, 반려동물 프로필 등 API는 JWT 인증 필수
                         .anyRequest().authenticated()
                 )

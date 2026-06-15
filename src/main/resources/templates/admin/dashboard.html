@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 대시보드</title>
+  <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
+
+  <style>
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .dashboard-card {
+      background: #ffffff;
+      border: 1px solid #d0d5e8;
+      border-radius: 10px;
+      padding: 22px;
+      box-shadow: 0 4px 12px rgba(13, 20, 51, 0.06);
+    }
+
+    .dashboard-card .label {
+      color: #3d4670;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .dashboard-card .number {
+      color: #0d1433;
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .menu-card {
+      background: #ffffff;
+      border: 1px solid #d0d5e8;
+      border-radius: 10px;
+      padding: 24px;
+      text-decoration: none;
+      color: #0d1433;
+      transition: 0.2s;
+      display: block;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(13, 20, 51, 0.12);
+      border-color: #2b44cc;
+    }
+
+    .menu-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .menu-card p {
+      margin: 0;
+      color: #3d4670;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .menu-card.disabled {
+      opacity: 0.55;
+      pointer-events: none;
+      background: #f6f7fb;
+    }
+
+    .section-title {
+      margin: 0 0 18px;
+      font-size: 20px;
+      color: #0d1433;
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="logo">Petmily Admin</div>
+    <nav class="menu">
+      <a href="/admin" class="active">대시보드</a>
+      <a href="/admin/hospitals/">병원 관리</a>
+      <a href="/admin/hospital-managers">병원 관리자 신청</a>
+      <a href="/admin/reservations/">예약 관리</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div>
+        <h2>관리자 대시보드</h2>
+        <p>현재는 병원 관리 기능을 중심으로 관리합니다. 추후 회원, 게시판, 쇼핑몰 관리 기능을 확장할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dashboard-card">
+        <div class="label">전체 병원 수</div>
+        <div class="number" th:text="${dashboard.hospitalCount}">0</div>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="label">병원 관리자 승인 대기</div>
+        <div class="number" th:text="${dashboard.waitingHospitalManagerCount}">0</div>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="label">전체 예약 수</div>
+        <div class="number" th:text="${dashboard.reservationCount}">0</div>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="label">승인 대기 예약</div>
+        <div class="number" th:text="${dashboard.waitingReservationCount}">0</div>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="label">승인 완료 예약</div>
+        <div class="number" th:text="${dashboard.approvedReservationCount}">0</div>
+      </div>
+
+      <div class="dashboard-card">
+        <div class="label">취소 예약</div>
+        <div class="number" th:text="${dashboard.cancelReservationCount}">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">병원 관리 메뉴</h3>
+
+      <div class="menu-grid">
+        <a href="/admin/hospitals/" class="menu-card">
+          <h3>병원 관리</h3>
+          <p>메인 관리자가 병원의 기본정보를 등록, 수정, 삭제합니다.</p>
+        </a>
+
+        <a href="/admin/hospital-managers" class="menu-card">
+          <h3>병원 관리자 신청</h3>
+          <p>일반 회원이 신청한 병원 관리자 권한을 승인하거나 거절합니다.</p>
+        </a>
+
+        <a href="/admin/reservations/" class="menu-card">
+          <h3>예약 관리</h3>
+          <p>전체 병원의 예약 현황을 확인하고 관리합니다.</p>
+        </a>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 24px;">
+      <h3 class="section-title">추후 확장 메뉴</h3>
+
+      <div class="menu-grid">
+        <div class="menu-card disabled">
+          <h3>회원 관리</h3>
+          <p>추후 회원 목록, 권한, 상태 관리를 연결할 영역입니다.</p>
+        </div>
+
+        <div class="menu-card disabled">
+          <h3>게시판 관리</h3>
+          <p>추후 게시글, 댓글, 신고 게시글 관리를 연결할 영역입니다.</p>
+        </div>
+
+        <div class="menu-card disabled">
+          <h3>중고마켓 관리</h3>
+          <p>추후 중고거래 게시글과 거래 상태 관리를 연결할 영역입니다.</p>
+        </div>
+
+        <div class="menu-card disabled">
+          <h3>동물용품샵 관리</h3>
+          <p>추후 상품, 주문, 재고 관리를 연결할 영역입니다.</p>
+        </div>
+
+        <div class="menu-card disabled">
+          <h3>신고 관리</h3>
+          <p>추후 신고 내역과 처리 상태 관리를 연결할 영역입니다.</p>
+        </div>
+
+        <div class="menu-card disabled">
+          <h3>리뷰 관리</h3>
+          <p>추후 병원 리뷰 신고 및 삭제 관리를 연결할 영역입니다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 24px;">
+      <h3 class="section-title">권한 구조</h3>
+      <p style="line-height: 1.7; color: #3d4670;">
+        메인 관리자는 병원 기본정보와 병원관리자 신청, 전체 예약 현황을 관리합니다.
+        병원관리자는 승인된 병원의 세부정보, 운영시간, 예약 승인/거절, 진료기록 작성을 담당합니다.
+      </p>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

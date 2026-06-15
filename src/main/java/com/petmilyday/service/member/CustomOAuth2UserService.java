@@ -31,7 +31,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         log.info("=================================================================");
-        log.info("📢 [OAuth2] 소셜 로그인 인증 요청 수신 (loadUser 시작)");
+        log.info(" [OAuth2] 소셜 로그인 인증 요청 수신 (loadUser 시작)");
         log.info("=================================================================");
 
         // 1. 어떤 소셜 플랫폼인지 파악 (Kakao 또는 Google)
@@ -44,7 +44,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> paramMap = oAuth2User.getAttributes();
 
         // 개발자님 기존 코드: 원본 속성 데이터 싹 출력하기
-        log.info("--- 📥 [RAW DATA] 소셜 서버가 전달해준 원본 Attributes 목록 ---");
+        log.info("---  [RAW DATA] 소셜 서버가 전달해준 원본 Attributes 목록 ---");
         paramMap.forEach((k, v) -> {
             log.info("   ↳ " + k + " : " + v);
         });
@@ -80,7 +80,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         log.info("   • 매핑용 고유 ID 생성 결과 : " + generatedUsername);
         log.info("   • 대상 이메일 주소         : " + email);
 
-        // 4. ⭐ DB에 이미 등록된 회원인지 검사 및 콘솔 로그 분기 ⭐
+        // 4.  DB에 이미 등록된 회원인지 검사 및 콘솔 로그 분기
         String finalEmail = email;
         String finalName = name;
 
@@ -103,7 +103,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .build();
 
             Member saved = memberRepository.save(newMember);
-            log.info("✅ [INSERT SUCCESS] 신규 소셜 회원 DB 저장 완료 (회원 고유 식별번호: " + saved.getId() + ")");
+            log.info(" [INSERT SUCCESS] 신규 소셜 회원 DB 저장 완료 (회원 고유 식별번호: " + saved.getId() + ")");
             return saved;
         });
 
@@ -121,7 +121,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         log.info("=================================================================");
-        log.info("✅ [OAuth2 SUCCESS] 소셜 로그인 연동 최종 성공! 메인 페이지로 이동합니다.");
+        log.info(" [OAuth2 SUCCESS] 소셜 로그인 연동 최종 성공! 메인 페이지로 이동합니다.");
         log.info("=================================================================");
 
         // 시큐리티 권한 및 주머니 속성 설정

@@ -37,7 +37,7 @@ public class HospitalReviewServiceImpl implements HospitalReviewService {
             throw new RuntimeException("본인 예약만 리뷰를 작성할 수 있습니다.");
         }
         //권한 확인
-        if(!reservation.getStatus().equals("DONE")){
+        if (reservation.getStatus() != ReservationStatus.DONE) {
             throw new RuntimeException("진료 완료 후에만 리뷰를 작성할 수 있습니다.");
         }
         boolean exists =
@@ -117,7 +117,7 @@ public class HospitalReviewServiceImpl implements HospitalReviewService {
         List<Reservation> reservations = reservationRepository.findReviewableReservations(
                 hospitalId,
                 username,
-                "DONE"
+                ReservationStatus.DONE
         );
 
         //"DONE" 예약들을 하나씩 확인

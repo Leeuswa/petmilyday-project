@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>병원 정보 관리</title>
+  <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
+</head>
+<body>
+
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="logo">Hospital Admin</div>
+    <nav class="menu">
+      <a href="/hospitalAdmin/hospital" class="active">병원 정보 관리</a>
+      <a href="/hospitalAdmin/reservations">예약 관리</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div>
+        <h2>병원 정보 관리</h2>
+        <p>담당 병원의 세부정보와 운영시간을 관리합니다.</p>
+      </div>
+      <a href="/hospitalAdmin/hospital/modify" class="btn btn-primary">수정</a>
+    </div>
+
+    <div class="card">
+
+      <div th:if="${message}" class="alert">
+        <p th:text="${message}"></p>
+      </div>
+
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label class="form-label">병원명</label>
+          <input type="text" class="form-control" th:value="${hospitalDTO.name}" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">전화번호</label>
+          <input type="text" class="form-control" th:value="${hospitalDTO.phone}" readonly>
+        </div>
+
+        <div class="form-group full">
+          <label class="form-label">주소</label>
+          <input type="text" class="form-control" th:value="${hospitalDTO.address}" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">응급진료 여부</label>
+          <input type="text"
+                 class="form-control"
+                 th:value="${hospitalDTO.isEmergency ? '응급진료 가능' : '응급진료 불가'}"
+                 readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">진료과목</label>
+          <input type="text" class="form-control" th:value="${hospitalDTO.department}" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">예약 간격</label>
+          <input type="text"
+                 class="form-control"
+                 th:value="${hospitalDTO.slotIntervalMin + '분'}"
+                 readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">시간대별 최대 예약 수</label>
+          <input type="text"
+                 class="form-control"
+                 th:value="${hospitalDTO.maxPerSlot + '명'}"
+                 readonly>
+        </div>
+
+      </div>
+
+      <div class="form-group full" style="margin-top: 30px;">
+        <h3 style="margin-bottom: 16px;">운영시간</h3>
+
+        <table class="table">
+          <thead>
+          <tr>
+            <th>요일</th>
+            <th>오픈 시간</th>
+            <th>마감 시간</th>
+            <th>휴무 여부</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr th:each="hour : ${hospitalDTO.hours}">
+            <td>
+              <span th:switch="${hour.dayOfWeek}">
+                <span th:case="0">월요일</span>
+                <span th:case="1">화요일</span>
+                <span th:case="2">수요일</span>
+                <span th:case="3">목요일</span>
+                <span th:case="4">금요일</span>
+                <span th:case="5">토요일</span>
+                <span th:case="6">일요일</span>
+              </span>
+            </td>
+            <td th:text="${hour.openTime}">09:00</td>
+            <td th:text="${hour.closeTime}">18:00</td>
+            <td th:text="${hour.isClosed ? '휴무' : '운영'}">운영</td>
+          </tr>
+
+          <tr th:if="${hospitalDTO.hours == null or hospitalDTO.hours.isEmpty()}">
+            <td colspan="4">등록된 운영시간이 없습니다.</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
