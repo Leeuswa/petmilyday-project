@@ -47,4 +47,11 @@ public class HospitalManager {
         this.status = HospitalManagerStatus.REJECTED;
     }
 
+    public void reRequest(String managerName, String managerPhone, String businessNumber) {
+        this.managerName = managerName;
+        this.managerPhone = managerPhone;
+        this.businessNumber = businessNumber;
+        this.status = HospitalManagerStatus.WAITING;
+    }
+
 }
