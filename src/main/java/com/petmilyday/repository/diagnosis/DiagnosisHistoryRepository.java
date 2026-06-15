@@ -17,4 +17,6 @@ public interface DiagnosisHistoryRepository
             Long memberId,
             Pageable pageable
     );
+
+    List<DiagnosisHistory> findTop3ByMember_IdOrderByCreatedAtDesc(Long memberId);
 }
