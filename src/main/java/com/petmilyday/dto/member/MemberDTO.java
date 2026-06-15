@@ -6,8 +6,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 public class MemberDTO {
 
     @Getter
@@ -26,20 +24,25 @@ public class MemberDTO {
         @Pattern(
                 regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$",
                 message = "비밀번호는 8~20자 이내 영문 대소문자, 숫자, 특수문자 조합이어야 합니다."
-                )
+        )
         private String password;
+
+        @Size(max = 30, message = "닉네임은 30자 이내여야 합니다.")
+        private String nickname;
 
         @NotBlank(message = "이름은 필수 입력 사항입니다.")
         @Size(max = 30, message = "이름은 30자 이내여야 합니다.")
         private String name;
 
         @NotBlank(message = "이메일은 필수 입력 사항입니다.")
-        @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",
-                message = "올바른 이메일 형식이 아닙니다. (예: example@petmily.com)")
+        @Email(message = "올바른 이메일 형식이 아닙니다.")
         private String email;
 
-        @Size(max = 30, message = "닉네임은 30자 이내여야 합니다.")
-        private String nickname;
+        private String phoneNumber;
+
+        private String address;
+
+        private String detailAddress;
     }
 
     @Getter
@@ -47,27 +50,22 @@ public class MemberDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class RegisterResponse {
-        private Long id;
-        private String username;
-        private String name;
-        private String email;
-        private String nickname;
-        private LocalDateTime createdAt;
-    }
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class UpdateProfileRequest {
+    public static class UpdateRequest {
         @Size(max = 30, message = "닉네임은 30자 이내여야 합니다.")
         private String nickname;
 
         @NotBlank(message = "이메일은 필수 입력 사항입니다.")
         @Email(message = "올바른 이메일 형식이 아닙니다.")
         private String email;
+
+        private String phoneNumber;
+
+        private String address;
+
+        private String detailAddress;
+
+        @Size(max = 100, message = "한 줄 소개는 100자 이내여야 합니다.")
+        private String bio;
     }
 
     @Getter
@@ -101,10 +99,11 @@ public class MemberDTO {
     @Getter
     @Setter
     @Builder
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginResponse {
-        private String token;     // 발급된 JWT 문자열
-        private String username;  // 로그인한 유저 아이디
+        private String token;
+        private String username;
     }
 
     @Getter
@@ -117,5 +116,9 @@ public class MemberDTO {
         private String name;
         private String nickname;
         private String email;
+        private String phoneNumber;
+        private String address;
+        private String detailAddress;
+        private String bio;
     }
 }

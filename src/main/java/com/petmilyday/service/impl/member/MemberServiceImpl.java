@@ -22,7 +22,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public MemberDTO.RegisterResponse register(MemberDTO.RegisterRequest request) {
+    public void register(MemberDTO.RegisterRequest request) {
 
         // 아이디 및 이메일 중복 검증
         if (memberRepository.existsByUsername(request.getUsername())) {
@@ -35,55 +35,53 @@ public class MemberServiceImpl implements MemberService {
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        // 회원 엔티티 생성
         Member member = Member.builder()
                 .username(request.getUsername())
+                .nickname(request.getNickname())
                 .password(encodedPassword)
                 .name(request.getName())
                 .email(request.getEmail())
-                .nickname(request.getNickname() != null && !request.getNickname().isBlank() ? request.getNickname() : null)
+                .phoneNumber(request.getPhoneNumber())
+                .address(request.getAddress())
+                .detailAddress(request.getDetailAddress())
+                .profileImageUrl(null)
+                .bio("안녕하세요! 펫밀리데이에 오신 걸 환영합니다.")
                 .role(Role.USER)
                 .status(AccountStatus.ACTIVE)
                 .build();
 
-        // DB에 저장
-        Member savedMember = memberRepository.save(member);
+        memberRepository.save(member);
+    }
 
-        // 응답 DTO 반환
-        return MemberDTO.RegisterResponse.builder()
-                .id(savedMember.getId())
-                .username(savedMember.getUsername())
-                .name(savedMember.getName())
-                .email(savedMember.getEmail())
-                .nickname(savedMember.getNickname())
-                .createdAt(savedMember.getCreatedAt())
-                .build();
+    // 아이디 중복 확인
+    @Override
+    @Transactional(readOnly = true)
+    public boolean checkUsername(String username) {
+        return memberRepository.existsByUsername(username);
     }
 
     @Override
     @Transactional
-    public void updateProfile(String username, MemberDTO.UpdateProfileRequest request) {
+    public void updateProfile(String username, MemberDTO.UpdateRequest request) {
+        // 회원 조회
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        // 이메일이 변경되었는데, 그 이메일이 이미 존재하는 경우 중복 체크
-        if (!member.getEmail().equals(request.getEmail()) && memberRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
-        }
-
-        // 엔티티 값 변경 (JPA 더티 체킹으로 인해 DB에 자동 반영됨)
-        member.updateProfile(request.getNickname(), request.getEmail());
+        member.updateProfile(
+                request.getNickname(),
+                request.getEmail(),
+                request.getPhoneNumber(),
+                request.getAddress(),
+                request.getDetailAddress(),
+                request.getBio()
+        );
     }
 
     @Override
     @Transactional
     public void updatePassword(String username, MemberDTO.UpdatePasswordRequest request) {
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
-
-        if (member.getSocialType() != null) {
-            throw new IllegalArgumentException("소셜 로그인 회원은 비밀번호를 변경할 수 없습니다.");
-        }
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), member.getPassword())) {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
@@ -96,18 +94,17 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void withdraw(String username, String password) {
         Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        // 일반 회원인 경우 비밀번호 확인 (소셜 회원은 패스워드가 임의값이므로 비밀번호 검증 생략)
-        if (member.getSocialType() == null && !passwordEncoder.matches(password, member.getPassword())) {
+        if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 계정 상태를 WITHDRAWN으로 변경
-        member.withdraw();
+        memberRepository.delete(member);
     }
 
     @Override
+    @Transactional
     public MemberDTO.LoginResponse login(MemberDTO.LoginRequest request) {
         // 회원 조회
         Member member = memberRepository.findByUsername(request.getUsername())
@@ -136,6 +133,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional(readOnly = true)
     public MemberDTO.MyPageResponse getMyPageInfo(String username) {
+        // 회원 조회
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
@@ -144,6 +142,10 @@ public class MemberServiceImpl implements MemberService {
                 .name(member.getName())
                 .nickname(member.getNickname())
                 .email(member.getEmail())
+                .phoneNumber(member.getPhoneNumber())
+                .address(member.getAddress())
+                .detailAddress(member.getDetailAddress())
+                .bio(member.getBio())
                 .build();
     }
 }
