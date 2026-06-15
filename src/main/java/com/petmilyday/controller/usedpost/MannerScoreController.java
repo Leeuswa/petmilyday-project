@@ -16,6 +16,7 @@ public class MannerScoreController {
     private final MannerScoreService mannerScoreService;
     private final MemberRepository memberRepository;
 
+    // 매너평가 페이지
     @GetMapping("/manner/evaluate")
     public String evaluatePage(
             @RequestParam Long postId,
@@ -29,6 +30,7 @@ public class MannerScoreController {
         return "used/manner-evaluate";
     }
 
+    // 매너평가 등록
     @PostMapping("/manner/evaluate")
     public String evaluate(
             @RequestParam Long postId,

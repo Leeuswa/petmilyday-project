@@ -23,6 +23,7 @@ public class ChatController {
     private final UsedPostRepository usedPostRepository;
     private final MannerScoreRepository mannerScoreRepository;
 
+    // 채팅방 생성
     @PostMapping("/chat/room")
     public String createRoom(
             @RequestParam Long postId,
@@ -48,6 +49,7 @@ public class ChatController {
         return "redirect:/chat/room/" + room.getId();
     }
 
+    // 채팅방 목록 조회
     @GetMapping("/chat/list")
     public String roomList(
             Authentication authentication,
@@ -72,6 +74,7 @@ public class ChatController {
         return "used/chat-list";
     }
 
+    // 채팅방 입장
     @GetMapping("/chat/room/{roomId}")
     public String room(
             @PathVariable Long roomId,
@@ -166,6 +169,7 @@ public class ChatController {
         return "used/chat";
     }
 
+    // 채팅 메시지 전송
     @PostMapping("/chat/message")
     public String sendMessage(
             @RequestParam Long roomId,

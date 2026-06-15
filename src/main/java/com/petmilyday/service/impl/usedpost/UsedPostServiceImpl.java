@@ -10,6 +10,7 @@ import com.petmilyday.repository.used.UsedPostImgRepository;
 import com.petmilyday.repository.used.UsedPostReportRepository;
 import com.petmilyday.repository.used.UsedPostRepository;
 import com.petmilyday.repository.wishlist.WishlistRepository;
+import com.petmilyday.service.product.S3UploadService;
 import com.petmilyday.service.usedpost.UsedPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ public class UsedPostServiceImpl implements UsedPostService {
     private final WishlistRepository wishlistRepository;
     private final MemberRepository memberRepository;
     private final UsedPostReportRepository usedPostReportRepository;
+    private final S3UploadService s3UploadService;
 
     // =========================
     // 전체 목록
@@ -83,9 +85,7 @@ public class UsedPostServiceImpl implements UsedPostService {
         );
     }
 
-    // =========================
     // 글 작성
-    // =========================
     @Override
     @Transactional
     public void write(
@@ -111,25 +111,13 @@ public class UsedPostServiceImpl implements UsedPostService {
         );
 
         post.setCreatedAt(LocalDateTime.now());
-
-        // 추가
         post.setIsHidden(false);
 
         UsedPost savedPost =
                 usedPostRepository.save(post);
 
-        // 이미지 저장
+        // 이미지 S3 저장
         if (files != null && !files.isEmpty()) {
-
-            String uploadDir =
-                    System.getProperty("user.dir")
-                            + "/uploads/";
-
-            File dir = new File(uploadDir);
-
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
 
             for (MultipartFile file : files) {
 
@@ -137,22 +125,14 @@ public class UsedPostServiceImpl implements UsedPostService {
                     continue;
                 }
 
-                String uuid =
-                        UUID.randomUUID().toString();
+                String imageUrl =
+                        s3UploadService.uploadFile(file);
 
-                String fileName =
-                        uuid + "_"
-                                + file.getOriginalFilename();
-
-                File saveFile =
-                        new File(uploadDir + fileName);
-
-                file.transferTo(saveFile);
-
-                UsedPostImg img = UsedPostImg.builder()
-                        .imgUrl("/uploads/" + fileName)
-                        .usedPost(savedPost)
-                        .build();
+                UsedPostImg img =
+                        UsedPostImg.builder()
+                                .imgUrl(imageUrl)
+                                .usedPost(savedPost)
+                                .build();
 
                 imgRepository.save(img);
             }
