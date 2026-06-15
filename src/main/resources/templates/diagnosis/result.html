@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>petmilyday - AI 진단 결과</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+            font-family:'Sora',sans-serif;
+        }
+
+        body{
+            background:#f0f2f7;
+            color:#0d1433;
+        }
+
+        .main-container{
+            max-width:1000px;
+            margin:40px auto;
+        }
+
+        .page-title{
+            font-size:26px;
+            font-weight:700;
+            margin-bottom:20px;
+        }
+
+        .result-card{
+            background:white;
+            border:1px solid #d0d5e8;
+            border-radius:14px;
+            padding:30px;
+        }
+
+        .result-box{
+            margin-bottom:24px;
+            padding:18px;
+            background:#f8fafc;
+            border-radius:10px;
+            border:1px solid #e2e8f0;
+        }
+
+        .result-title{
+            font-size:15px;
+            font-weight:700;
+            margin-bottom:10px;
+            color:#2b44cc;
+        }
+
+        .severity-low{
+            color:#16a34a;
+            font-weight:700;
+        }
+
+        .severity-medium{
+            color:#f59e0b;
+            font-weight:700;
+        }
+
+        .severity-high{
+            color:#dc2626;
+            font-weight:700;
+        }
+
+        .btn-group{
+            display:flex;
+            gap:10px;
+            margin-top:20px;
+        }
+
+        .btn{
+            text-decoration:none;
+            padding:12px 20px;
+            border-radius:10px;
+            font-weight:600;
+        }
+
+        .btn-primary{
+            background:#3d58e0;
+            color:white;
+        }
+
+        .btn-secondary{
+            background:white;
+            color:#0d1433;
+            border:1px solid #d0d5e8;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="main-container">
+
+    <h2 class="page-title">AI 진단 결과</h2>
+
+    <div class="result-card">
+
+        <div class="result-box">
+            <div class="result-title">의심 질환</div>
+
+            <div th:text="${result.resultDisease}">
+            </div>
+        </div>
+
+        <div class="result-box">
+            <div class="result-title">심각도</div>
+
+            <div th:classappend="
+                ${result.resultSeverity == 'LOW'} ? 'severity-low' :
+                (${result.resultSeverity == 'MEDIUM'} ? 'severity-medium' : 'severity-high')"
+                 th:text="${result.resultSeverity}">
+            </div>
+        </div>
+
+        <div class="result-box">
+            <div class="result-title">권고사항</div>
+
+            <div th:text="${result.resultRecommend}">
+            </div>
+        </div>
+
+        <div class="result-box"
+             th:if="${result.imageUrl != null}">
+            <div class="result-title">업로드 사진</div>
+
+            <img th:src="${result.imageUrl}"
+                 style="width:220px; height:160px; object-fit:cover; border-radius:10px;">
+        </div>
+
+        <div class="btn-group">
+
+            <a href="/diagnosis/history"
+               class="btn btn-primary">
+                진단 이력
+            </a>
+
+            <a th:if="${result.resultSeverity == 'HIGH' || result.resultSeverity == 'MEDIUM'}"
+               href="/hospital/list"
+               class="btn btn-primary">
+                병원 예약
+            </a>
+
+            <a href="/diagnosis"
+               class="btn btn-secondary">
+                다시 진단하기
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

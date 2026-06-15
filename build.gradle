@@ -76,6 +76,9 @@ dependencies {
 
     // AWS S3 제어용 공식 만능 리모컨 라이브러리
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0")
+    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
 }
 
 // QueryDSL Q클래스 생성 경로
