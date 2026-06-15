@@ -20,6 +20,7 @@ public class S3UploadService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    // 업로드된 파일을 고유한 UUID 파일명으로 변경하여 AWS S3 버킷에 영구 저장
     public String uploadFile(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String ext = originalFilename.substring(originalFilename.lastIndexOf("."));

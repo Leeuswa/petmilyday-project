@@ -14,6 +14,8 @@ public class ImageApiController {
 
     private final S3UploadService s3UploadService;
 
+
+    // 리뷰 이미지 S3 업로드
     @PostMapping("/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {

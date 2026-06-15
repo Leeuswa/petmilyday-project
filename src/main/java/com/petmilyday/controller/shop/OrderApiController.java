@@ -15,6 +15,8 @@ public class OrderApiController {
 
     private final OrderService orderService;
 
+
+    // 일반 상품 주문 접수
     @PostMapping("/create")
     public ResponseEntity<?> createOrder(@RequestBody OrderRequestDto requestDto, Principal principal) {
         if (principal == null) {

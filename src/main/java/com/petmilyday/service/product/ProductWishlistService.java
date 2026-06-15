@@ -21,6 +21,7 @@ public class ProductWishlistService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
 
+    // 위시리스트(찜) 토글 처리 (등록되어 있으면 삭제, 없으면 추가)
     @Transactional
     public boolean toggleWishlist(Long productId, String username) {
         Member member = memberRepository.findByUsername(username)

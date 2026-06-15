@@ -26,9 +26,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
 
-    /**
-     * 회원의 활성화된 정기구독 내역 조회
-     */
+    // 회원의 활성화된 정기구독 내역 조회
     @Override
     public List<SubscriptionResponseDto> getActiveSubscriptions(String username) {
         return subscriptionRepository.findByMemberUsernameAndStatus(username, SubscriptionStatus.ACTIVE)
@@ -37,9 +35,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 정기구독 신청 정보 등록
-     */
+    // 정기구독 신청 정보 등록
     @Override
     @Transactional
     public Long createSubscription(SubscriptionRequestDto requestDto, String username) {
@@ -64,9 +60,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriptionRepository.save(subscription).getId();
     }
 
-    /**
-     * 정기구독 배송 주기 변경
-     */
+    //정기배송 주기 변경
     @Override
     @Transactional
     public void changeCycle(Long id, int newCycle) {
@@ -77,9 +71,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscription.setNextDeliveryDate(LocalDate.now().plusDays(newCycle));
     }
 
-    /**
-     * 정기구독 해지 처리
-     */
+    //정기배송 해제 처리
     @Override
     @Transactional
     public void cancelSubscription(Long id) {

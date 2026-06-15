@@ -22,7 +22,6 @@ public class ProductQna {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // 작성자 식별용 (단순하게 nickname 뽑아 쓰기 위함)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
@@ -34,7 +33,7 @@ public class ProductQna {
     private String answer;
 
     @Column(nullable = false)
-    private String status; // PENDING(답변대기), ANSWERED(답변완료)
+    private String status;
 
     private LocalDateTime createdAt;
 

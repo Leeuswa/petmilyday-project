@@ -14,6 +14,7 @@ public class CartViewController {
 
     private final CartService cartService;
 
+    // 장바구니 페이지 이동 및 등록된 상품 목록 조회
     @GetMapping("/cart")
     public String cartPage(Model model) {
         Long mockUserId = 1L;

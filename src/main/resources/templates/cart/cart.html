@@ -76,7 +76,6 @@
               </div>
             </div>
 
-            <!-- 🟢 [버그 해결] 너비 유연하게 확보하고 nowrap 적용해서 일렬 정렬 정돈 -->
             <div class="col-auto text-end price-display-box">
               <strong class="text-primary item-total-display" th:text="${#numbers.formatInteger(item.price * item.quantity, 3, 'COMMA') + '원'}">0원</strong>
             </div>
@@ -127,11 +126,13 @@
 
 <script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
 <script th:inline="javascript">
+  // 페이지 로드 즉시 수량 카운트 및 금액 요약 정보 최신화
   document.addEventListener("DOMContentLoaded", () => {
     updateTotalCount();
     updateSummary();
   });
 
+  // 비동기 통신 기반 특정 장바구니 아이템 수량 변경 및 화면 표시 업데이트
   function changeCartQty(btn, amount, basePrice, cartItemId) {
     const box = btn.parentElement;
     const input = box.querySelector('.qty-input');
@@ -156,6 +157,7 @@
     });
   }
 
+  // 전체 선택 체크박스 상태에 따른 목록 일괄 체크/해제
   function toggleAll() {
     const checkAll = document.getElementById('checkAll').checked;
     const items = document.querySelectorAll('.item-check');
@@ -163,6 +165,7 @@
     updateSummary();
   }
 
+  // 특정 상품 항목 단건 삭제 처리
   function deleteItem(btn, cartItemId) {
     if(confirm('이 상품을 삭제하시겠습니까?')) {
       fetch('/api/cart/delete', {
@@ -179,6 +182,7 @@
     }
   }
 
+  // 체크박스에 의해 선택된 다건 상품 항목 일괄 비동기 삭제 처리
   function deleteSelected() {
     const checkedItems = document.querySelectorAll('.item-check:checked');
     if (checkedItems.length === 0) return alert('삭제할 상품을 선택해주세요.');
@@ -200,6 +204,7 @@
     }
   }
 
+  // 현재 노출 중인 장바구니 총 상품 종류 개수 갱신 및 빈 화면 예외 분기 처리
   function updateTotalCount() {
     const totalItems = document.querySelectorAll('.cart-item').length;
     const totalSpan = document.getElementById('totalCount');
@@ -212,6 +217,7 @@
     }
   }
 
+  // 체크 항목 계산을 통한 총 상품 금액, 배송비 할증 조건 및 최종 결제액 실시간 갱신
   function updateSummary() {
     const items = document.querySelectorAll('.cart-item');
     let totalProductPrice = 0;
@@ -250,6 +256,7 @@
     }
   }
 
+  // 선택된 상품 데이터 파싱 후 주문 결제서 작성을 위해 세션 스토리지 저장 및 이주 처리
   function proceedToCheckout() {
     const checkedItems = [];
     const checkedBoxes = document.querySelectorAll('.item-check:checked');
