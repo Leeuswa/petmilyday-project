@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>petmilyday - AI 자가진단</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+            font-family:'Sora',sans-serif;
+        }
+
+        body{
+            background:#f0f2f7;
+            color:#0d1433;
+        }
+
+        .main-container{
+            max-width:1100px;
+            margin:40px auto;
+        }
+
+        .page-title{
+            font-size:26px;
+            font-weight:700;
+            margin-bottom:10px;
+        }
+
+        .page-desc{
+            color:#64748b;
+            margin-bottom:30px;
+        }
+
+        .card-grid{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:18px;
+            margin-bottom:40px;
+        }
+
+        .menu-card{
+            background:white;
+            border-radius:18px;
+            padding:28px;
+            text-decoration:none;
+            color:#0d1433;
+            border:1px solid #d7dced;
+            min-height:200px;
+            transition:0.2s;
+        }
+
+        .menu-card:hover{
+            transform:translateY(-3px);
+            box-shadow:0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .menu-card.blue{
+            border-top:4px solid #4f5df3;
+        }
+
+        .menu-card.orange{
+            border-top:4px solid #f59e0b;
+        }
+
+        .menu-card.green{
+            border-top:4px solid #22c55e;
+        }
+
+        .icon{
+            font-size:34px;
+            margin-bottom:20px;
+        }
+
+        .card-title{
+            font-size:18px;
+            font-weight:700;
+            margin-bottom:12px;
+        }
+
+        .card-desc{
+            color:#64748b;
+            line-height:1.8;
+        }
+
+        .section-title{
+            font-size:20px;
+            font-weight:700;
+            margin-bottom:15px;
+        }
+
+        .history-box{
+            background:white;
+            border:1px solid #d7dced;
+            border-radius:16px;
+            padding:20px;
+            margin-bottom:30px;
+        }
+
+        .history-item{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:14px 0;
+            border-bottom:1px solid #eef2f7;
+        }
+
+        .history-item:last-child{
+            border-bottom:none;
+        }
+
+        .history-left{
+            display:flex;
+            flex-direction:column;
+            gap:5px;
+        }
+
+        .history-pet{
+            font-weight:600;
+        }
+
+        .history-disease{
+            color:#4f5df3;
+            font-size:14px;
+        }
+
+        .history-date{
+            color:#94a3b8;
+            font-size:13px;
+        }
+
+        .history-link{
+            text-decoration:none;
+            color:#4f5df3;
+            font-weight:600;
+        }
+
+        .guide-box{
+            background:white;
+            border:1px solid #d7dced;
+            border-radius:16px;
+            padding:22px;
+        }
+
+        .guide-box ul{
+            margin-left:18px;
+            margin-top:10px;
+            line-height:2;
+            color:#475569;
+        }
+
+        .empty-text{
+            color:#94a3b8;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="main-container">
+
+    <h2 class="page-title">AI 자가진단</h2>
+
+    <p class="page-desc">
+        반려동물 증상 진단, 진단 이력 확인, 동물 관리 가이드를 이용할 수 있습니다.
+    </p>
+
+    <!-- 상단 메뉴 -->
+    <div class="card-grid">
+
+        <a href="/diagnosis"
+           class="menu-card blue">
+
+            <div class="icon">🤖</div>
+
+            <div class="card-title">
+                AI 자가진단 시작
+            </div>
+
+            <div class="card-desc">
+                반려동물의 증상을 입력하고
+                AI 기반 참고 진단 결과를 확인합니다.
+            </div>
+
+        </a>
+
+        <a href="/diagnosis/history"
+           class="menu-card orange">
+
+            <div class="icon">📋</div>
+
+            <div class="card-title">
+                진단 이력
+            </div>
+
+            <div class="card-desc">
+                이전에 진행한 자가진단 결과와
+                입력 증상을 다시 확인합니다.
+            </div>
+
+        </a>
+
+        <a href="/ai-guide"
+           class="menu-card green">
+
+            <div class="icon">🐾</div>
+
+            <div class="card-title">
+                AI 동물 가이드
+            </div>
+
+            <div class="card-desc">
+                품종, 건강 관리, 생활 습관 등
+                반려동물 관련 정보를 안내받습니다.
+            </div>
+
+        </a>
+
+    </div>
+
+    <!-- 최근 진단 이력 -->
+    <div class="section-title">
+        최근 진단 이력
+    </div>
+
+    <div class="history-box">
+
+        <div th:if="${recentHistories == null or #lists.isEmpty(recentHistories)}"
+             class="empty-text">
+            아직 진단 이력이 없습니다.
+        </div>
+
+        <div th:each="history : ${recentHistories}"
+             class="history-item">
+
+            <div class="history-left">
+
+                <div class="history-pet"
+                     th:text="${history.pet.name}">
+                </div>
+
+                <div class="history-disease"
+                     th:text="${history.resultDisease}">
+                </div>
+
+                <div class="history-date"
+                     th:text="${#temporals.format(history.createdAt,'yyyy-MM-dd HH:mm')}">
+                </div>
+
+            </div>
+
+        </div>
+
+        <div style="margin-top:15px;">
+            <a href="/diagnosis/history"
+               class="history-link">
+                전체 이력 보기 →
+            </a>
+        </div>
+
+    </div>
+
+    <!-- 안내사항 -->
+    <div class="section-title">
+        AI 자가진단 안내
+    </div>
+
+    <div class="guide-box">
+
+        <ul>
+            <li>AI 진단 결과는 참고용이며 실제 수의사의 진료를 대체하지 않습니다.</li>
+            <li>심각도 HIGH 또는 증상이 지속될 경우 동물병원 방문을 권장합니다.</li>
+            <li>증상을 구체적으로 입력할수록 정확도가 향상됩니다.</li>
+            <li>피부, 귀, 눈 등 증상 부위 사진을 함께 업로드하면 도움이 됩니다.</li>
+        </ul>
+
+    </div>
+
+</div>
+
+</body>
+</html>

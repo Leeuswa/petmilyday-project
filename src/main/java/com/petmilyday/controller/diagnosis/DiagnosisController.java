@@ -2,6 +2,7 @@ package com.petmilyday.controller.diagnosis;
 
 import com.petmilyday.entity.diagnosis.DiagnosisHistory;
 import com.petmilyday.entity.member.Member;
+import com.petmilyday.repository.diagnosis.DiagnosisHistoryRepository;
 import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.repository.member.PetProfileRepository;
 import com.petmilyday.service.diagnosis.DiagnosisService;
@@ -22,11 +23,29 @@ public class DiagnosisController {
     private final DiagnosisService diagnosisService;
     private final MemberRepository memberRepository;
     private final PetProfileRepository petProfileRepository;
+    private final DiagnosisHistoryRepository diagnosisHistoryRepository;
 
-    // ai자가진단이동
+    // AI 자가진단 메인
     @GetMapping("/ai-diagnosis")
-    public String usedRedirect() {
-        return "redirect:/diagnosis";
+    public String diagnosisMain(
+            Authentication authentication,
+            Model model
+    ) {
+
+        if (authentication != null) {
+
+            Member member =
+                    memberRepository.findByUsername(authentication.getName())
+                            .orElseThrow();
+
+            model.addAttribute(
+                    "recentHistories",
+                    diagnosisHistoryRepository
+                            .findTop3ByMember_IdOrderByCreatedAtDesc(member.getId())
+            );
+        }
+
+        return "diagnosis/main";
     }
 
     // AI 자가진단 화면
