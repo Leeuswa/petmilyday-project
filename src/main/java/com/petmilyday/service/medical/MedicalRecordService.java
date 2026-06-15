@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface MedicalRecordService {
     List<MedicalRecordResponseDTO> medicalRecordList(Long petId);
+
+    void register(MedicalRecordResponseDTO dto);
 }

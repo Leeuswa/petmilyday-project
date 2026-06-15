@@ -40,7 +40,7 @@ public class QReservation extends EntityPathBase<Reservation> {
 
     public final TimePath<java.time.LocalTime> reserveTime = createTime("reserveTime", java.time.LocalTime.class);
 
-    public final StringPath status = createString("status");
+    public final EnumPath<ReservationStatus> status = createEnum("status", ReservationStatus.class);
 
     public final NumberPath<Integer> waitNumber = createNumber("waitNumber", Integer.class);
 

@@ -43,15 +43,19 @@ public class Hospital {
     @Column(nullable = false, length = 20)
     private String phone;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean isEmergency = false;
 
+    @Builder.Default
     @Column(length = 255)
-    private String department;
+    private String department = "미입력";
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer slotIntervalMin = 30;
 
+    @Builder.Default
     @Column(nullable = false)
     private Integer maxPerSlot = 3;
 
@@ -61,12 +65,36 @@ public class Hospital {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "hospital",cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HospitalHours> hours = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL)
     private List<HospitalImg> images = new ArrayList<>();
 
+    // 메인 관리자: 병원 기본정보 수정
+    public void updateBasicInfo(String name,
+                                String address,
+                                BigDecimal latitude,
+                                BigDecimal longitude,
+                                String phone) {
+        this.name = name;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.phone = phone;
+    }
 
+    // 병원 관리자: 병원 세부정보 수정
+    public void updateDetailInfo(Boolean isEmergency,
+                                 String department,
+                                 Integer slotIntervalMin,
+                                 Integer maxPerSlot) {
+        this.isEmergency = isEmergency;
+        this.department = department;
+        this.slotIntervalMin = slotIntervalMin;
+        this.maxPerSlot = maxPerSlot;
+    }
 
 }
