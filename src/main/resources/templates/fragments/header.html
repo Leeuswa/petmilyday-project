@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       lang="ko">
@@ -19,6 +20,7 @@
       --bg2: #f0f2f7;
       --r: 8px;
     }
+
 
     .gnb {
       display: flex;
@@ -219,14 +221,111 @@
     .logout-btn:hover {
       background: #fff1f4;
     }
+
+    .notification-wrap {
+      position: relative;
+    }
+
+    .notification-btn {
+      position: relative;
+      border: 1px solid var(--border2);
+      background: #fff;
+      border-radius: var(--r);
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--text2);
+    }
+
+    .notification-btn:hover {
+      background: var(--bg2);
+    }
+
+    .notification-count {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: #e03131;
+      color: #fff;
+      font-size: 11px;
+      line-height: 18px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .notification-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      width: 280px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      box-shadow: 0 8px 24px rgba(13, 20, 51, 0.12);
+      overflow: hidden;
+      z-index: 9999;
+    }
+
+    .notification-wrap:hover .notification-dropdown {
+      display: block;
+    }
+
+    .notification-title {
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .notification-list {
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .notification-empty {
+      padding: 14px;
+      font-size: 13px;
+      color: var(--text2);
+      text-align: center;
+    }
+
+    .notification-item {
+      display: block;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text2);
+      text-decoration: none;
+      border-bottom: 1px solid var(--bg2);
+    }
+
+    .notification-item:hover {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .notification-time {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: #777;
+    }
+
+
   </style>
 
-  <a th:href="@{/}" class="logo">petmily<span>day</span></a>
-  <a th:href="@{/}" class="nav-link">홈</a>
+  <a th:href="@{/}" class="logo">petmily<span>day</span></a> <a th:href="@{/}" class="nav-link">홈</a>
 
   <div class="dropdown">
     <span class="nav-link dropbtn">동물병원 예약</span>
     <div class="dropdown-content">
+
 
       <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
          th:href="@{/hospitalAdmin/hospital}">
@@ -265,10 +364,11 @@
       </a>
 
     </div>
+
+
   </div>
 
-  <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a>
-  <a th:href="@{/shop}" class="nav-link">동물용품샵</a>
+  <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a> <a th:href="@{/shop}" class="nav-link">동물용품샵</a>
 
   <div class="dropdown">
     <span class="nav-link dropbtn">게시판</span>
@@ -287,10 +387,25 @@
       <a th:href="@{/member/register}" class="btn btn-accent btn-sm">회원가입</a>
     </th:block>
 
+
     <th:block sec:authorize="isAuthenticated()">
-      <span style="font-size: 14px; font-weight: 500; color: var(--text2);">
-        <span sec:authentication="name"></span>님
-      </span>
+  <span style="font-size: 14px; font-weight: 500; color: var(--text2);">
+    <span sec:authentication="name"></span>님
+  </span>
+
+      <div class="notification-wrap">
+        <button type="button" class="notification-btn">
+          🔔
+          <span id="notification-count" class="notification-count" style="display:none;">0</span>
+        </button>
+
+        <div class="notification-dropdown">
+          <div class="notification-title">알림</div>
+          <div id="notification-list" class="notification-list">
+            <div class="notification-empty">새 알림이 없습니다.</div>
+          </div>
+        </div>
+      </div>
 
       <div class="mypage-wrap">
         <a th:href="@{/member/mypage}" class="btn btn-outline btn-sm">마이페이지 ▾</a>
@@ -315,7 +430,16 @@
 
       <a th:href="@{/member/logout}" class="btn btn-outline btn-sm logout-btn">로그아웃</a>
     </th:block>
+
+
   </div>
+
+  <!-- 로그인한 사용자만 SSE 알림 구독 -->
+
+  <th:block sec:authorize="isAuthenticated()">
+    <th:block th:replace="~{fragments/sseNotification :: sseNotification}"></th:block>
+  </th:block>
+
 </nav>
 </body>
 </html>

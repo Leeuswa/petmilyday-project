@@ -3,23 +3,36 @@
 <body>
 
 <aside class="sidebar" th:fragment="adminSidebar(activeMenu)">
-  <div class="logo">Petmily Admin</div>
+
+  <div class="logo">
+    <a th:href="@{/hospital/list}"
+       style="text-decoration: none; color: inherit;">
+      Petmily Admin
+    </a>
+  </div>
 
   <nav class="menu">
+
+    <a th:href="@{/admin}"
+       th:classappend="${activeMenu == 'dashboard'} ? ' active' : ''">
+      대시보드
+    </a>
+
     <a th:href="@{/admin/hospitals/}"
-       th:classappend="${activeMenu == 'hospitals'} ? 'active'">
+       th:classappend="${activeMenu == 'hospitals'} ? ' active' : ''">
       병원 관리
     </a>
 
-    <a th:href="@{/templates/admin/reservation/}"
-       th:classappend="${activeMenu == 'reservations'} ? 'active'">
+    <a th:href="@{/admin/hospital-managers}"
+       th:classappend="${activeMenu == 'hospitalManagers'} ? ' active' : ''">
+      병원 관리자 신청
+    </a>
+
+    <a th:href="@{/admin/reservations/}"
+       th:classappend="${activeMenu == 'reservations'} ? ' active' : ''">
       예약 관리
     </a>
 
-    <a th:href="@{/admin/hospital-managers}"
-       th:classappend="${activeMenu == 'hospitalManagers'} ? 'active'">
-      병원 관리자 신청
-    </a>
   </nav>
 </aside>
 

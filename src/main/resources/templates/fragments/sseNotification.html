@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+
+<th:block th:fragment="sseNotification">
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+      // 이미 SSE가 연결되어 있으면 중복 연결 방지
+      if (window.petmilySseConnected) {
+        return;
+      }
+
+      // 브라우저가 SSE를 지원하지 않으면 중단
+      if (!window.EventSource) {
+        console.log("이 브라우저는 SSE를 지원하지 않습니다.");
+        return;
+      }
+
+      // SSE 연결 상태 저장
+      window.petmilySseConnected = true;
+
+      // SSE 구독 주소 연결
+      const eventSource = new EventSource("/notifications/subscribe");
+
+      // SSE 연결 성공 시 실행
+      eventSource.addEventListener("connect", function (event) {
+        console.log("SSE 연결됨:", event.data);
+      });
+
+      // 서버에서 notification 이벤트를 보내면 실행
+      eventSource.addEventListener("notification", function (event) {
+        const data = JSON.parse(event.data);
+
+        // 알림을 헤더 알림 목록에 추가
+        addNotificationToHeader(data);
+      });
+
+      // 연결 오류 또는 재연결 시 실행
+      eventSource.onerror = function () {
+        console.log("SSE 연결 오류 또는 재연결 중");
+      };
+
+      // 페이지를 벗어나면 SSE 연결 종료
+      window.addEventListener("beforeunload", function () {
+        eventSource.close();
+        window.petmilySseConnected = false;
+      });
+
+      // 브라우저가 페이지를 숨기거나 이동할 때 SSE 연결 종료
+      window.addEventListener("pagehide", function () {
+        eventSource.close();
+        window.petmilySseConnected = false;
+      });
+
+      // 헤더 알림 영역에 알림 추가
+      function addNotificationToHeader(data) {
+        const countEl = document.getElementById("notification-count");
+        const listEl = document.getElementById("notification-list");
+
+        // 헤더 알림 영역이 없는 페이지면 콘솔로만 확인
+        if (!countEl || !listEl) {
+          console.log("알림:", data.message);
+          return;
+        }
+
+        // "새 알림이 없습니다." 문구 제거
+        const emptyEl = listEl.querySelector(".notification-empty");
+        if (emptyEl) {
+          emptyEl.remove();
+        }
+
+        // 알림 개수 증가
+        let count = Number(countEl.textContent || 0);
+        count++;
+        countEl.textContent = count;
+        countEl.style.display = "inline-block";
+
+        // 알림 항목 생성
+        const item = document.createElement("a");
+        item.className = "notification-item";
+        item.href = data.url || "#";
+
+        item.innerHTML = `
+          <span>${data.message}</span>
+          <span class="notification-time">방금 전</span>
+        `;
+
+        // 최신 알림이 위로 오게 추가
+        listEl.prepend(item);
+      }
+    });
+  </script>
+</th:block>
+
+</body>
+</html>

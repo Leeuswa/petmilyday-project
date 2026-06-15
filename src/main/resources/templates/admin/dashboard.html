@@ -84,15 +84,8 @@
 <body>
 
 <div class="admin-layout">
-  <aside class="sidebar">
-    <div class="logo">Petmily Admin</div>
-    <nav class="menu">
-      <a href="/admin" class="active">대시보드</a>
-      <a href="/admin/hospitals/">병원 관리</a>
-      <a href="/admin/hospital-managers">병원 관리자 신청</a>
-      <a href="/admin/reservations/">예약 관리</a>
-    </nav>
-  </aside>
+
+  <div th:replace="~{fragments/adminSidebar :: adminSidebar('dashboard')}"></div>
 
   <main class="content">
     <div class="topbar">

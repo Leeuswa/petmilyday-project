@@ -1,19 +1,24 @@
 package com.petmilyday.service.impl.reservation;
 
+import com.petmilyday.dto.notification.NotificationDTO;
 import com.petmilyday.dto.reservation.ReservationRequestDTO;
 import com.petmilyday.dto.reservation.ReservationResponseDTO;
 import com.petmilyday.dto.reservation.ReservationSlotDto;
 import com.petmilyday.entity.hospital.Hospital;
 import com.petmilyday.entity.hospital.HospitalHours;
+import com.petmilyday.entity.hospital.HospitalManager;
+import com.petmilyday.entity.hospital.HospitalManagerStatus;
 import com.petmilyday.entity.member.Member;
 import com.petmilyday.entity.member.PetProfile;
 import com.petmilyday.entity.reservation.Reservation;
 import com.petmilyday.entity.reservation.ReservationStatus;
 import com.petmilyday.repository.hospital.HospitalHoursRepository;
+import com.petmilyday.repository.hospital.HospitalManagerRepository;
 import com.petmilyday.repository.hospital.HospitalRepository;
 import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.repository.member.PetProfileRepository;
 import com.petmilyday.repository.reservation.ReservationRepository;
+import com.petmilyday.service.notification.NotificationService;
 import com.petmilyday.service.reservation.ReservationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,22 +45,22 @@ public class ReservationServiceImpl implements ReservationService {
     private final HospitalHoursRepository hospitalHoursRepository;
     private final ModelMapper modelMapper;
 
+    private final NotificationService notificationService;
+    private final HospitalManagerRepository hospitalManagerRepository;
+
     @Override
+    @Transactional
     public void reservationRegister(ReservationRequestDTO dto, String loginId) {
 
-        // 병원 조회
         Hospital hospital = hospitalRepository.findById(dto.getHospitalId())
                 .orElseThrow(() -> new RuntimeException("병원을 찾을 수 없습니다."));
 
-        // 멤버 조회
         Member member = memberRepository.findByUsername(loginId)
                 .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
 
-        // 반려동물 조회
         PetProfile pet = petProfileRepository.findById(dto.getPetId())
                 .orElseThrow(() -> new RuntimeException("반려 동물을 찾을 수 없습니다."));
 
-        // 슬롯 중복 체크
         long currentCount = reservationRepository.countAvailableSlot(
                 dto.getHospitalId(),
                 dto.getReserveDate(),
@@ -63,7 +69,6 @@ public class ReservationServiceImpl implements ReservationService {
 
         log.info("슬롯 현재 예약 수: {}, 최대: {}", currentCount, hospital.getMaxPerSlot());
 
-        // 같은 시간 중복 예약 체크
         boolean exists = reservationRepository
                 .existsByMemberAndReserveDateAndReserveTimeAndStatusNot(
                         member,
@@ -80,10 +85,8 @@ public class ReservationServiceImpl implements ReservationService {
             throw new RuntimeException("해당 시간대 예약이 마감되었습니다.");
         }
 
-        // 대기 번호 부여
         int waitNumber = (int) currentCount + 1;
 
-        // 예약 저장
         Reservation reservation = Reservation.builder()
                 .member(member)
                 .hospital(hospital)
@@ -97,6 +100,28 @@ public class ReservationServiceImpl implements ReservationService {
 
         reservationRepository.save(reservation);
 
+        List<HospitalManager> managers =
+                hospitalManagerRepository.findManagersByHospitalIdAndStatus(
+                        hospital.getId(),
+                        HospitalManagerStatus.APPROVED
+                );
+
+        List<String> managerUsernames = managers.stream()
+                .map(manager -> manager.getMember().getUsername())
+                .toList();
+
+        log.info("SSE 알림 대상 병원 관리자 username 목록: {}", managerUsernames);
+
+        notificationService.sendToUsers(
+                managerUsernames,
+                NotificationDTO.builder()
+                        .type("NEW_RESERVATION")
+                        .message(hospital.getName() + "에 새 예약이 들어왔습니다.")
+                        .url("/hospitalAdmin/reservations")
+                        .createdAt(LocalDateTime.now())
+                        .build()
+        );
+
         log.info("예약 완료 - 병원: {}, 날짜: {}, 시간: {}, 대기번호: {}",
                 hospital.getName(),
                 dto.getReserveDate(),
@@ -105,6 +130,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> reservationList(String username) {
 
         Member member = memberRepository.findByUsername(username)
@@ -152,16 +178,14 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReservationSlotDto> getAvailableSlots(Long hospitalId, LocalDate date) {
 
-        // 병원 조회
         Hospital hospital = hospitalRepository.findById(hospitalId)
                 .orElseThrow(() -> new RuntimeException("병원을 찾을 수 없습니다."));
 
-        // 요일 계산
         int dayOfWeek = date.getDayOfWeek().getValue() - 1;
 
-        // 운영시간 조회
         HospitalHours hospitalHours = hospitalHoursRepository
                 .findByHospitalAndDayOfWeek(hospital, dayOfWeek)
                 .orElseThrow(() -> new RuntimeException("운영시간이 없습니다."));
@@ -173,10 +197,8 @@ public class ReservationServiceImpl implements ReservationService {
 
         LocalTime currentTime = openTime;
 
-        // 슬롯 생성
         while (currentTime.isBefore(closeTime)) {
 
-            // 현재 예약 수
             long currentCount = reservationRepository
                     .countByHospitalAndReserveDateAndReserveTimeAndStatusNot(
                             hospital,
@@ -185,7 +207,6 @@ public class ReservationServiceImpl implements ReservationService {
                             ReservationStatus.CANCEL
                     );
 
-            // 예약 가능 여부
             boolean available = currentCount < hospital.getMaxPerSlot();
 
             ReservationSlotDto slot = ReservationSlotDto.builder()
@@ -204,6 +225,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> myMedicalRecords(String username) {
 
         List<Reservation> medicalRecords = reservationRepository.findMedicalRecords(
