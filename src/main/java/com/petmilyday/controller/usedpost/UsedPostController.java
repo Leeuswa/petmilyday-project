@@ -70,12 +70,13 @@ public class UsedPostController {
         }
     }
 
+    // 중고거래 목록 이동
     @GetMapping("/used")
     public String usedRedirect() {
         return "redirect:/used/list";
     }
 
-    // LIST
+    // 중고거래 목록 조회
     @GetMapping("/used/list")
     public String list(
             @RequestParam(required = false) String keyword,
@@ -205,7 +206,7 @@ public class UsedPostController {
         return "used/list";
     }
 
-    // WRITE FORM
+    // 게시글 작성 페이지
     @GetMapping("/used/write")
     public String writeForm(
             Authentication authentication,
@@ -238,6 +239,7 @@ public class UsedPostController {
         return "used/write";
     }
 
+    // 게시글 작성
     @PostMapping("/used/write")
     public String write(
             @ModelAttribute UsedPostDTO dto,
@@ -257,7 +259,7 @@ public class UsedPostController {
         return "redirect:/used/list";
     }
 
-    // DETAIL
+    // 게시글 상세 조회
     @GetMapping("/used/detail/{id}")
     public String detail(
 
@@ -323,7 +325,7 @@ public class UsedPostController {
         return "used/detail";
     }
 
-    // REPORT
+    // 게시글 신고
     @PostMapping("/used/report/{id}")
     public String report(
             @PathVariable Long id,
@@ -361,7 +363,7 @@ public class UsedPostController {
                 + "?reportSuccess=true";
     }
 
-    // EDIT FORM
+    // 게시글 수정 페이지
     @GetMapping("/used/edit/{id}")
     public String editForm(
 
@@ -398,7 +400,7 @@ public class UsedPostController {
         return "used/edit";
     }
 
-    // EDIT
+    // 게시글 수정
     @PostMapping("/used/edit/{id}")
     public String edit(
 
@@ -429,7 +431,7 @@ public class UsedPostController {
         return "redirect:/used/detail/" + id;
     }
 
-    // STATUS 변경
+    // 판매 상태 변경
     @PostMapping("/used/status/{id}")
     public String changeStatus(
 
@@ -469,7 +471,7 @@ public class UsedPostController {
         return "redirect:/used/detail/" + id;
     }
 
-    // 판매 완료
+    // 판매 완료 처리
     @PostMapping("/used/complete/{id}")
     public String completeSale(
             @PathVariable Long id,
@@ -498,7 +500,7 @@ public class UsedPostController {
         return "redirect:/used/detail/" + id;
     }
 
-    // 찜 목록
+    // 찜 목록 조회
     @GetMapping("/wishlist/list")
     public String wishList(
 
@@ -529,6 +531,7 @@ public class UsedPostController {
         return "wishlist/list";
     }
 
+    // 게시글 삭제
     @PostMapping("/used/delete/{id}")
     public String deletePost(
             @PathVariable Long id,

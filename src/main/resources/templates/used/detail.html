@@ -186,11 +186,8 @@
 
             <img id="mainImage"
                  th:if="${post.imageUrlList != null and !post.imageUrlList.isEmpty()}"
-                 th:src="${post.imageUrlList[0].startsWith('/uploads/')
-                    ? post.imageUrlList[0]
-                    : '/uploads/' + post.imageUrlList[0]}"
-                 class="main-image"
-                 onclick="resetMainImage()">
+                 th:src="${post.imageUrlList[0]}"
+                 class="main-image">
 
             <div th:if="${post.imageUrlList == null or post.imageUrlList.isEmpty()}"
                  class="main-image d-flex justify-content-center align-items-center text-muted">
@@ -203,12 +200,8 @@
              th:if="${post.imageUrlList != null and !post.imageUrlList.isEmpty()}">
 
             <img th:each="img, stat : ${post.imageUrlList}"
-                 th:src="${img.startsWith('/uploads/')
-                    ? img
-                    : '/uploads/' + img}"
-                 th:attr="data-img=${img.startsWith('/uploads/')
-                    ? img
-                    : '/uploads/' + img}"
+                 th:src="${img}"
+                 th:attr="data-img=${img}"
                  th:classappend="${stat.index == 0} ? 'active-thumb'"
                  onclick="changeMainImage(this)">
 
@@ -240,7 +233,9 @@
 
                     <div class="mt-3 d-flex gap-2 justify-content-end flex-wrap">
 
-                        <form th:action="@{/wishlist/toggle}" method="post">
+                        <form th:if="${!isWriter}"
+                              th:action="@{/wishlist/toggle}"
+                              method="post">
                             <input type="hidden" name="usedPostId" th:value="${post.id}">
 
                             <div class="d-flex align-items-center gap-2">
@@ -274,7 +269,7 @@
 
                         </form>
 
-                        <div th:if="${post.status.name() == 'SELLING'}">
+                        <div th:if="${!isWriter and post.status.name() == 'SELLING'}">
 
                             <a th:href="@{/payment/confirm(postId=${post.id})}"
                                class="btn btn-success action-btn">
@@ -291,7 +286,7 @@
 
                         </div>
 
-                        <button th:if="${!alreadyReported}"
+                        <button th:if="${!isWriter and !alreadyReported}"
                                 class="btn btn-outline-danger action-btn"
                                 data-bs-toggle="modal"
                                 data-bs-target="#reportModal">
