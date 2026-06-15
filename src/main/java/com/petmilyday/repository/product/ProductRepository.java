@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    // JpaRepository를 상속받았기에 기본 CRUD가 자동 생성
 
     List<Product> findByCategory(String category);
 }

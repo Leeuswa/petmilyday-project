@@ -15,12 +15,19 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "chat_room_id")
     private Long roomId;
+
+    @Column(name = "sender_id")
     private Long senderId;
 
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    @Column(nullable = false)
+    private String type = "TEXT";
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "is_read")

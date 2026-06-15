@@ -10,6 +10,5 @@ public interface MemberService {
     void updatePassword(String username, MemberDTO.UpdatePasswordRequest request);
     void withdraw(String username, String password);
     MemberDTO.LoginResponse login(MemberDTO.LoginRequest request);
-
-
+    MemberDTO.MyPageResponse getMyPageInfo(String username);
 }

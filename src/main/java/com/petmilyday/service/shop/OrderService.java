@@ -2,6 +2,7 @@ package com.petmilyday.service.shop;
 
 import com.petmilyday.dto.shop.OrderItemDto;
 import com.petmilyday.dto.shop.OrderRequestDto;
+import com.petmilyday.dto.shop.OrderResponseDto;
 import com.petmilyday.entity.member.Member;
 import com.petmilyday.entity.product.Product;
 import com.petmilyday.entity.shop.OrderItem;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,48 @@ public class OrderService {
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
 
+    /**
+     * 회원별 주문 내역 조회
+     */
+    public List<OrderResponseDto> getOrderHistory(String username) {
+        List<Orders> ordersList = ordersRepository.findByMemberUsernameOrderByCreatedAtDesc(username);
+        List<OrderResponseDto> responseList = new ArrayList<>();
+
+        for (int i = 0; i < ordersList.size(); i++) {
+            Orders orders = ordersList.get(i);
+
+            if (orders.getOrderName() != null && orders.getOrderName().contains("(1회")) {
+                continue;
+            }
+
+            OrderResponseDto dto = new OrderResponseDto();
+            dto.setOrderId(orders.getId());
+            dto.setProductName(orders.getOrderName());
+            dto.setTotalPrice(orders.getTotalPrice());
+
+            if ("ORDERED".equals(orders.getStatus()) || "PAID".equals(orders.getStatus())) {
+                dto.setOrderStatus("결제완료");
+            } else {
+                dto.setOrderStatus(orders.getStatus());
+            }
+
+            dto.setOrderDate(orders.getCreatedAt());
+
+            if (orders.getOrderItems() != null && !orders.getOrderItems().isEmpty()) {
+                dto.setQuantity(orders.getOrderItems().get(0).getQuantity());
+            } else {
+                dto.setQuantity(1);
+            }
+
+            responseList.add(dto);
+        }
+
+        return responseList;
+    }
+
+    /**
+     * 신규 상품 주문 생성
+     */
     @Transactional
     public Long createOrder(OrderRequestDto requestDto, String username) {
         Member member = memberRepository.findByUsername(username)

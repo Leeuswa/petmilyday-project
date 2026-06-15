@@ -24,7 +24,6 @@ public class CartApiController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    // ... 기존 addCart 메서드 유지 ...
 
     @PutMapping("/update/{cartItemId}")
     public ResponseEntity<String> updateQuantity(@PathVariable Long cartItemId, @RequestBody java.util.Map<String, Integer> request) {
@@ -39,7 +38,7 @@ public class CartApiController {
     }
     @GetMapping("/count")
     public ResponseEntity<Integer> getCartCount() {
-        Long mockUserId = 1L; // 캡스톤 데모용 유저
+        Long mockUserId = 1L;
         int count = cartService.getCartItemCount(mockUserId);
         return ResponseEntity.ok(count);
     }

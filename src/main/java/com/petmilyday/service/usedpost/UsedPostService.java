@@ -20,7 +20,7 @@ public interface UsedPostService {
     void write(
             UsedPostDTO dto,
             List<MultipartFile> files,
-            Long memberId
+            String username
     ) throws IOException;
 
     // 검색 + 필터
@@ -33,7 +33,12 @@ public interface UsedPostService {
             Pageable pageable
     );
 
-    void reportPost(Long postId);
+    void reportPost(
+            Long postId,
+            Long memberId,
+            String reason,
+            String content
+    );
 
     void update(Long id, UsedPostDTO dto);
 
@@ -49,4 +54,6 @@ public interface UsedPostService {
             Long memberId,
             Pageable pageable
     );
+
+
 }

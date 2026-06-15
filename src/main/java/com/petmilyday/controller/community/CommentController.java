@@ -7,7 +7,9 @@ import com.petmilyday.service.community.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -67,6 +69,20 @@ public class CommentController {
 
         Map<String, Long> resultMap = new HashMap<>();
         resultMap.put("id", id);
+        return resultMap;
+    }
+
+    @PostMapping("/{id}/like")
+    public java.util.Map<String, Object> toggleLike(@PathVariable("id") Long id) {
+        org.springframework.security.core.Authentication auth =
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        // 좋아요 토글 실행 후 최신 개수 획득
+        int latestLikeCount = commentService.toggleLike(username, id);
+
+        java.util.Map<String, Object> resultMap = new java.util.HashMap<>();
+        resultMap.put("likeCount", latestLikeCount);
         return resultMap;
     }
 }

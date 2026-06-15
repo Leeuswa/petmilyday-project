@@ -1,7 +1,9 @@
 package com.petmilyday.controller.member;
 
 import com.petmilyday.dto.member.MemberDTO;
+import com.petmilyday.dto.member.PetProFileDTO;
 import com.petmilyday.service.member.MemberService;
+import com.petmilyday.service.member.PetProfileService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -12,6 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/member")
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+    private final PetProfileService petProfileService;
 
     // 1. 회원가입 화면 요청 (GET /member/register)
     @GetMapping("/register")
@@ -136,22 +142,138 @@ public class MemberController {
     // 7. 로그아웃 처리 (GET /member/logout)
     @GetMapping("/logout")
     public String logout(HttpServletResponse response) {
-        // 1. JWT_TOKEN 이라는 이름의 쿠키를 텅 빈 값(null)으로 만듭니다.
         Cookie jwtCookie = new Cookie("JWT_TOKEN", null);
-
-        // 2. 쿠키의 수명을 0초로 설정하여 브라우저가 즉시 삭제하도록 명령합니다.
-        jwtCookie.setMaxAge(0);
-
-        // 3. 쿠키가 적용되었던 전체 경로("/")를 명시해야 정확히 지워집니다.
+        jwtCookie.setMaxAge(0); // 쿠키 0초로 설정
         jwtCookie.setPath("/");
-
-        // 4. 삭제 명령을 응답(Response)에 담아 브라우저로 보냅니다.
         response.addCookie(jwtCookie);
-
-        // 5. 서버에 남아있을지도 모르는 시큐리티 인증 정보도 초기화합니다.
         SecurityContextHolder.clearContext();
-
-        // 6. 메인 페이지로 이동시킵니다.
         return "redirect:/";
+    }
+
+    @GetMapping("/mypage")
+    public String myPage(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+            return "redirect:/member/login";
+        }
+
+        String username = auth.getName();
+        MemberDTO.MyPageResponse myPageResponse = memberService.getMyPageInfo(username);
+
+        model.addAttribute("member", myPageResponse);
+        return "member/mypage";
+    }
+
+    @GetMapping("/modify-profile")
+    public String modifyProfileForm(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        MemberDTO.MyPageResponse myInfo = memberService.getMyPageInfo(username);
+
+        MemberDTO.UpdateProfileRequest updateRequest = new MemberDTO.UpdateProfileRequest();
+        updateRequest.setNickname(myInfo.getNickname());
+        updateRequest.setEmail(myInfo.getEmail());
+
+        model.addAttribute("updateRequest", updateRequest);
+        return "member/modify-profile";
+    }
+
+    @PostMapping("/modify-profile")
+    public String modifyProfile(@Valid @ModelAttribute("updateRequest") MemberDTO.UpdateProfileRequest request,
+                                BindingResult bindingResult,
+                                RedirectAttributes redirectAttributes,
+                                Model model) {
+
+        if (bindingResult.hasErrors()) {
+            return "member/modify-profile";
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        memberService.updateProfile(username, request);
+
+        redirectAttributes.addFlashAttribute("successMsg", "회원정보가 성공적으로 수정되었습니다.");
+        return "redirect:/member/mypage";
+    }
+
+    @GetMapping("/modify-password")
+    public String modifyPasswordForm(Model model) {
+        model.addAttribute("passwordRequest", new MemberDTO.UpdatePasswordRequest());
+        return "member/modify-password";
+    }
+
+    // [데이터 처리] 비밀번호 변경 완료
+    @PostMapping("/modify-password")
+    public String modifyPassword(@Valid @ModelAttribute("passwordRequest") MemberDTO.UpdatePasswordRequest request,
+                                 BindingResult bindingResult,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            return "member/modify-password";
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        try {
+            memberService.updatePassword(username, request);
+
+            redirectAttributes.addFlashAttribute("successMsg", "비밀번호가 성공적으로 변경되었습니다.");
+            return "redirect:/member/mypage";
+
+        } catch (IllegalArgumentException e) { // 기존 비번 틀릴 경우 통제
+            model.addAttribute("globalError", e.getMessage());
+            return "member/modify-password";
+        }
+    }
+
+    @GetMapping("/pet-profile")
+    public String petProfilePage(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        List<PetProFileDTO> petList = petProfileService.petList(username);
+        model.addAttribute("petList", petList);
+        model.addAttribute("newPet", new PetProFileDTO());
+
+        return "member/pet-profile";
+    }
+
+    @PostMapping("/pet-profile/register")
+    public String registerPet(@Valid @ModelAttribute("newPet") PetProFileDTO dto,
+                              BindingResult bindingResult,
+                              RedirectAttributes redirectAttributes,
+                              Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        if (bindingResult.hasErrors()) {
+            List<PetProFileDTO> petList = petProfileService.petList(username);
+            model.addAttribute("petList", petList);
+            return "member/pet-profile";
+        }
+
+        petProfileService.registerPet(username, dto);
+        redirectAttributes.addFlashAttribute("successMsg", "반려동물이 성공적으로 등록되었습니다.");
+        return "redirect:/member/pet-profile";
+    }
+
+    @PostMapping("/pet-profile/delete/{id}")
+    public String deletePet(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        try {
+            petProfileService.deletePet(id, username);
+            redirectAttributes.addFlashAttribute("successMsg", "프로필이 삭제되었습니다.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+        }
+
+        return "redirect:/member/pet-profile";
     }
 }

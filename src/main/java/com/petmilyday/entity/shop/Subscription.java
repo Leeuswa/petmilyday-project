@@ -69,4 +69,20 @@ public class Subscription {
     public void updateStatus(SubscriptionStatus status) {
         this.status = status;
     }
+
+    // 정기구독에서 결제했다는 것을 orders 테이블에 명시하기
+    public com.petmilyday.entity.shop.Orders createOrder(String itemName, int totalPrice, String pgToken, int round) {
+        String dynamicOrderName = (itemName != null ? itemName : "정기구독 상품") + " (" + round + "회차 결제)";
+
+        return com.petmilyday.entity.shop.Orders.builder()
+                .member(this.member)
+                .orderName(dynamicOrderName) // ⚡ 동적 이름 매핑
+                .totalPrice(totalPrice)
+                .deliveryAddress("배송지 미입력(정기구독)")
+                .status("PAID")
+                .paymentMethod("KAKAO_PAY")
+                .paymentKey(pgToken)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
 }

@@ -34,12 +34,12 @@ public class MemberDTO {
         private String name;
 
         @NotBlank(message = "이메일은 필수 입력 사항입니다.")
-        @Email(message = "올바른 이메일 형식이 아닙니다.")
-        @Size(max = 100, message = "이메일은 100자 이내여야 합니다.")
+        @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",
+                message = "올바른 이메일 형식이 아닙니다. (예: example@petmily.com)")
         private String email;
 
         @Size(max = 30, message = "닉네임은 30자 이내여야 합니다.")
-        private String nickname; // 전달되지 않거나 비어있으면 서비스단에서 처리 (NULL 허용) [cite: 1, 7]
+        private String nickname;
     }
 
     @Getter
@@ -105,5 +105,17 @@ public class MemberDTO {
     public static class LoginResponse {
         private String token;     // 발급된 JWT 문자열
         private String username;  // 로그인한 유저 아이디
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MyPageResponse {
+        private String username;
+        private String name;
+        private String nickname;
+        private String email;
     }
 }

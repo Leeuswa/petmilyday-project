@@ -1,0 +1,16 @@
+body { margin: 0; padding: 0; font-family: 'Sora', 'Noto Sans KR', sans-serif; background-color: #f0f2f7; }
+.container { max-width: 800px; margin: 40px auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.page-title { font-size: 24px; font-weight: bold; margin-bottom: 30px; color: #0d1433; border-bottom: 2px solid #0d1433; padding-bottom: 15px; }
+.info-section { margin-bottom: 40px; }
+.section-title { font-size: 18px; font-weight: 600; color: #2b44cc; margin-bottom: 20px; }
+.info-row { display: flex; border-bottom: 1px solid #eaedfa; padding: 15px 0; align-items: center; }
+.info-label { width: 120px; font-weight: bold; color: #3d4670; }
+.info-value { flex: 1; color: #0d1433; }
+.btn-wrap { display: flex; gap: 10px; margin-top: 20px; }
+.btn { padding: 10px 20px; font-size: 14px; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; text-decoration: none; text-align: center; display: inline-block; }
+.btn-edit { background-color: #e6e9f2; color: #0d1433; }
+.btn-edit:hover { background-color: #d0d5e8; }
+.btn-pet { background-color: #2b44cc; color: white; }
+.btn-pet:hover { background-color: #3d58e0; }
+.btn-danger { background-color: #fff; color: #b52844; border: 1px solid #fabcc5; margin-left: auto; }
+.btn-danger:hover { background-color: #fceef0; }

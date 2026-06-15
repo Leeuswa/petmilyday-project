@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>펫밀리데이 - 회원정보 수정</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" th:href="@{/css/member/modify-profile.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+  <h2 class="page-title">회원정보 수정</h2>
+
+  <form th:action="@{/member/modify-profile}" method="post" th:object="${updateRequest}" onsubmit="return validateModifyForm()">
+
+    <div class="form-group">
+      <label for="nickname">닉네임</label>
+      <input type="text" id="nickname" th:field="*{nickname}" class="form-control" placeholder="사용하실 닉네임을 입력하세요">
+      <span class="error-msg" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
+    </div>
+
+    <div class="form-group">
+      <label for="email">이메일</label>
+      <input type="text" id="email" th:field="*{email}" class="form-control" placeholder="example@petmily.com">
+      <span class="error-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+    </div>
+
+    <div class="btn-wrap">
+      <a th:href="@{/member/mypage}" class="btn btn-cancel">취소</a>
+      <button type="submit" class="btn btn-submit">수정 완료</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function validateModifyForm() {
+    const email = document.getElementById("email").value.trim();
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/;
+
+    if (!emailRegex.test(email)) {
+      alert("올바른 이메일 형식이 아닙니다. (예: example@petmily.com)");
+      document.getElementById("email").focus();
+      return false;
+    }
+    return true;
+  }
+</script>
+</body>
+</html>

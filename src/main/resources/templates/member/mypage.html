@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>펫밀리데이 - 마이페이지</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" th:href="@{/css/member/mypage.css}">
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+  <h2 class="page-title">마이페이지</h2>
+
+  <div class="info-section">
+    <div class="section-title">내 정보</div>
+
+    <div class="info-row">
+      <div class="info-label">아이디</div>
+      <div class="info-value" th:text="${member.username}"></div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">이름</div>
+      <div class="info-value" th:text="${member.name}"></div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">닉네임</div>
+      <div class="info-value" th:text="${member.nickname != null && member.nickname != '' ? member.nickname : '미설정'}"></div>
+    </div>
+    <div class="info-row">
+      <div class="info-label">이메일</div>
+      <div class="info-value" th:text="${member.email}"></div>
+    </div>
+
+    <div class="btn-wrap">
+      <a th:href="@{/member/modify-profile}" class="btn btn-edit">회원정보 수정</a>
+
+      <a th:href="@{/member/modify-password}" class="btn btn-edit">비밀번호 변경</a>
+
+      <a th:href="@{/member/pet-profile}" class="btn btn-pet">🐾 반려동물 관리</a>
+
+      <form th:action="@{/member/me/withdraw}" method="post" onsubmit="return confirm('정말 탈퇴하시겠습니까?');" style="margin-left: auto;">
+        <button type="submit" class="btn btn-danger">회원 탈퇴</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

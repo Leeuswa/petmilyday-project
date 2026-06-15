@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
     <meta charset="UTF-8">
     <title>petmilyday - 채팅</title>
 
@@ -8,31 +10,9 @@
           rel="stylesheet">
 
     <style>
-
         body {
             background-color: #f4f6fa;
             font-family: 'Pretendard', sans-serif;
-        }
-
-        .navbar-custom {
-            background-color: #0f172a;
-            padding: 15px 0;
-            color: white;
-        }
-
-        .nav-link {
-            color: #cbd5e1 !important;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 0.95rem;
-        }
-
-        .nav-link.active {
-            color: white !important;
-            font-weight: bold;
-            background: #3b82f6;
-            padding: 5px 15px;
-            border-radius: 8px;
         }
 
         .main-container {
@@ -47,7 +27,7 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-            height: 75vh;
+            max-height: 720px;
         }
 
         .chat-header {
@@ -57,34 +37,69 @@
         }
 
         .chat-box {
-            flex: 1;
+            height: 500px;
             overflow-y: auto;
-            padding: 10px;
+            padding: 15px;
             background: #f8fafc;
             border-radius: 12px;
         }
 
+        .date-divider {
+            text-align: center;
+            margin: 15px 0;
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        .date-divider span {
+            background: #e2e8f0;
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+
+        .msg-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .msg-row.me {
+            justify-content: flex-end;
+        }
+
+        .msg-row.other {
+            justify-content: flex-start;
+        }
+
         .msg {
-            max-width: 70%;
-            padding: 10px 14px;
+            display: inline-block;
+            max-width: 55%;
+            padding: 8px 12px;
             border-radius: 14px;
-            margin-bottom: 10px;
             font-size: 0.95rem;
             line-height: 1.4;
+            word-break: break-word;
+            white-space: pre-wrap;
         }
 
         .msg.me {
             background: #3b82f6;
             color: white;
-            margin-left: auto;
             border-bottom-right-radius: 4px;
         }
 
         .msg.other {
             background: #e2e8f0;
             color: #111827;
-            margin-right: auto;
             border-bottom-left-radius: 4px;
+        }
+
+        .msg-time {
+            font-size: 0.72rem;
+            color: #64748b;
+            margin-bottom: 3px;
+            white-space: nowrap;
         }
 
         .chat-input {
@@ -100,50 +115,96 @@
             padding: 10px;
         }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sora', sans-serif;
+        }
+
+        body {
+            background: #f0f2f7;
+            color: #0d1433;
+            font-size: 14px;
+            line-height: 1.5;
+        }
     </style>
 </head>
 
 <body>
 
-<nav class="navbar-custom">
-    <div class="container d-flex align-items-center">
-
-        <h4 class="fw-bold mb-0 me-5">petmilyday</h4>
-
-        <div class="d-flex flex-grow-1">
-            <a href="/used/list" class="nav-link">중고거래</a>
-            <a href="/chat/list" class="nav-link active">채팅</a>
-        </div>
-
-    </div>
-</nav>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <div class="main-container">
 
     <div class="chat-card">
 
-        <!-- 헤더 -->
         <div class="chat-header">
-            <h5 class="fw-bold mb-0">💬 채팅</h5>
-        </div>
 
-        <!-- 메시지 영역 -->
-        <div id="chatBox" class="chat-box">
+            <h5 class="fw-bold mb-1"
+                th:text="${postTitle}">
+            </h5>
 
-            <div th:each="msg : ${messages}">
-
-                <div th:classappend="${msg.senderId == 1} ? 'msg me' : 'msg other'"
-                     class="msg">
-
-                    <span th:text="${msg.message}"></span>
-
-                </div>
-
+            <div class="text-muted">
+                상대방 :
+                <span th:text="${opponentName}"></span>
             </div>
 
         </div>
 
-        <!-- 입력 -->
+        <div class="mt-2 mb-2">
+
+            <a th:href="@{'/used/detail/' + ${postId}}"
+               class="btn btn-sm btn-secondary">
+                ⬅ 게시글로 돌아가기
+            </a>
+
+        </div>
+
+        <div id="chatBox" class="chat-box">
+
+            <th:block th:each="msg, stat : ${messages}">
+
+                <div class="date-divider"
+                     th:if="${msg.createdAt != null and (stat.first or #temporals.format(msg.createdAt, 'yyyy-MM-dd') != #temporals.format(messages[stat.index - 1].createdAt, 'yyyy-MM-dd'))}">
+                    <span th:text="${#temporals.format(msg.createdAt, 'yyyy년 MM월 dd일')}"></span>
+                </div>
+
+                <div th:class="${msg.senderId == senderId} ? 'msg-row me' : 'msg-row other'">
+
+                    <div th:if="${msg.senderId == senderId}"
+                         class="msg-time"
+                         th:text="${msg.createdAt != null ? #temporals.format(msg.createdAt, 'HH:mm') : ''}">
+                    </div>
+
+                    <div th:class="${msg.senderId == senderId} ? 'msg me' : 'msg other'"
+                         th:text="${msg.message}">
+                    </div>
+
+                    <div th:if="${msg.senderId != senderId}"
+                         class="msg-time"
+                         th:text="${msg.createdAt != null ? #temporals.format(msg.createdAt, 'HH:mm') : ''}">
+                    </div>
+
+                </div>
+
+            </th:block>
+
+        </div>
+
+        <div th:if="${canEvaluate}"
+             class="mb-3 text-end mt-2">
+
+            <a th:href="@{/manner/evaluate(
+                    postId=${postId},
+                    targetMemberId=${targetMemberId}
+                )}"
+               class="btn btn-warning">
+                ⭐ 거래 평가하기
+            </a>
+
+        </div>
+
         <div class="chat-input">
 
             <input type="text"
@@ -163,17 +224,28 @@
 
 </div>
 
-<!-- WebSocket -->
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 <script th:inline="javascript">
 
-    let roomId = [[${roomId}]];
-    let senderId = 1; // TODO: session으로 변경
+    let roomId = /*[[${roomId}]]*/ 0;
+    let senderId = /*[[${senderId}]]*/ 0;
 
     let sock = new SockJS("/ws-chat");
     let stomp = Stomp.over(sock);
+
+    let lastDateKey = null;
+
+    window.onload = function () {
+        const box = document.getElementById("chatBox");
+        box.scrollTop = box.scrollHeight;
+
+        const dividers = document.querySelectorAll(".date-divider span");
+        if (dividers.length > 0) {
+            lastDateKey = dividers[dividers.length - 1].innerText;
+        }
+    };
 
     stomp.connect({}, function () {
 
@@ -181,24 +253,93 @@
 
             let msg = JSON.parse(res.body);
 
-            let box = document.getElementById("chatBox");
+            let createdAt = msg.createdAt ? new Date(msg.createdAt) : new Date();
 
-            let div = document.createElement("div");
-
-            div.classList.add("msg");
-
-            if (msg.senderId === senderId) {
-                div.classList.add("me");
-            } else {
-                div.classList.add("other");
-            }
-
-            div.innerText = msg.message;
-
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
+            appendDateDividerIfNeeded(createdAt);
+            appendMessage(msg.message, msg.senderId, createdAt);
         });
     });
+
+    function appendDateDividerIfNeeded(date) {
+
+        let label = formatDateLabel(date);
+
+        if (lastDateKey !== label) {
+
+            let box = document.getElementById("chatBox");
+
+            let divider = document.createElement("div");
+            divider.className = "date-divider";
+
+            let span = document.createElement("span");
+            span.innerText = label;
+
+            divider.appendChild(span);
+            box.appendChild(divider);
+
+            lastDateKey = label;
+        }
+    }
+
+    function appendMessage(message, msgSenderId, date) {
+
+        let box = document.getElementById("chatBox");
+
+        let row = document.createElement("div");
+        row.classList.add("msg-row");
+
+        let bubble = document.createElement("div");
+        bubble.classList.add("msg");
+        bubble.innerText = message;
+
+        let time = document.createElement("div");
+        time.classList.add("msg-time");
+        time.innerText = formatTime(date);
+
+        if (Number(msgSenderId) === Number(senderId)) {
+            row.classList.add("me");
+            bubble.classList.add("me");
+
+            row.appendChild(time);
+            row.appendChild(bubble);
+        } else {
+            row.classList.add("other");
+            bubble.classList.add("other");
+
+            row.appendChild(bubble);
+            row.appendChild(time);
+        }
+
+        box.appendChild(row);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function formatTime(date) {
+
+        let h = String(date.getHours()).padStart(2, "0");
+        let m = String(date.getMinutes()).padStart(2, "0");
+
+        return h + ":" + m;
+    }
+
+    function formatDateLabel(date) {
+
+        let y = date.getFullYear();
+        let m = String(date.getMonth() + 1).padStart(2, "0");
+        let d = String(date.getDate()).padStart(2, "0");
+
+        return y + "년 " + m + "월 " + d + "일";
+    }
+
+    document.getElementById("msgInput")
+        .addEventListener("keydown", function (e) {
+
+            if (e.key === "Enter") {
+                e.preventDefault();
+                sendMessage();
+            }
+
+        });
 
     function sendMessage() {
 
@@ -214,53 +355,10 @@
         }));
 
         input.value = "";
+        input.focus();
     }
 
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-
-<script>
-    let stompClient = null;
-    let roomId = [[${roomId}]];
-    let senderId = 1; // 임시
-
-    function connect() {
-        let socket = new SockJS('/ws');
-        stompClient = Stomp.over(socket);
-
-        stompClient.connect({}, function () {
-
-            stompClient.subscribe('/topic/chat/' + roomId, function (msg) {
-                let data = JSON.parse(msg.body);
-                showMessage(data);
-            });
-        });
-    }
-
-    function sendMessage() {
-        let message = document.getElementById("msg").value;
-
-        stompClient.send("/app/chat/send", {}, JSON.stringify({
-            roomId: roomId,
-            senderId: senderId,
-            message: message
-        }));
-
-        document.getElementById("msg").value = "";
-    }
-
-    function showMessage(data) {
-        let box = document.getElementById("chatBox");
-
-        let div = document.createElement("div");
-        div.innerText = data.senderId + " : " + data.message;
-
-        box.appendChild(div);
-    }
-
-    connect();
-</script>
 </body>
 </html>

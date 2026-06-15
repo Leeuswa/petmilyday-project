@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>petmilyday - 채팅목록</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+
+        body {
+            background-color: #f4f6fa;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .main-container {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+
+        .room-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: 0.2s;
+        }
+
+        .room-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .room-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .empty-box {
+            background: white;
+            border-radius: 12px;
+            padding: 50px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sora', sans-serif;
+        }
+
+        body {
+            background: #f0f2f7;
+            color: #0d1433;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="main-container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h3 class="fw-bold">
+            내 채팅 목록
+        </h3>
+
+    </div>
+
+    <!-- 채팅방 없을 때 -->
+    <div th:if="${#lists.isEmpty(rooms)}"
+         class="empty-box">
+
+        <h5 class="text-muted">
+            진행중인 채팅이 없습니다.
+        </h5>
+
+    </div>
+
+    <!-- 채팅방 목록 -->
+    <div th:unless="${#lists.isEmpty(rooms)}">
+
+        <a th:each="room : ${rooms}"
+           th:href="@{/chat/room/{id}(id=${room.roomId})}"
+           class="room-link">
+
+            <div class="room-card">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <h5 class="fw-bold"
+                            th:text="${room.postTitle}">
+                        </h5>
+
+                        <div class="text-muted small">
+
+                            상대방 :
+                            <span th:text="${room.opponentName}">
+                        </span>
+
+                        </div>
+
+                        <div class="mt-2 text-secondary"
+                             th:text="${room.lastMessage}">
+                        </div>
+
+                        <div class="text-muted small mt-1"
+                             th:if="${room.lastMessageTime != null}"
+                             th:text="${#temporals.format(room.lastMessageTime,'MM-dd HH:mm')}">
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+
+                        <div class="text-end">
+
+                            <span th:if="${room.unreadCount > 0}"
+                                  class="badge bg-danger"
+                                  th:text="${room.unreadCount}">
+                            </span>
+
+                            <div class="badge bg-primary">
+                                입장
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -27,4 +27,10 @@ public class PetProfile {
 
     @Column(nullable = false, length = 50)
     private String species;
+
+    @Column(nullable = false)
+    private int age;
+
+    @Column(nullable = false, length = 50)
+    private String breed;
 }

@@ -1,10 +1,15 @@
 package com.petmilyday.dto.usedpost;
 
-import com.petmilyday.entity.used.*;
 import com.petmilyday.entity.used.ItemCondition;
 import com.petmilyday.entity.used.UsedPost;
+import com.petmilyday.entity.used.UsedPostImg;
 import com.petmilyday.entity.used.UsedPostStatus;
-import lombok.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,13 +22,18 @@ import java.util.stream.Collectors;
 public class UsedPostDTO {
 
     private Long id;
+
     private Long memberId;
 
     private String title;
+
     private String content;
+
     private String category;
 
-    private int price;
+    @Min(0)
+    @Max(1000000000)
+    private Integer price;
 
     private String region;
 
@@ -35,63 +45,90 @@ public class UsedPostDTO {
 
     private Integer reportCount;
 
-    // 가격제안가능
+    // 가격제안 가능 여부
     private Boolean offerAccepted;
 
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
 
     private List<String> imageUrlList;
 
     private String writerName;
 
+    private Double mannerAverage;
+
+    // =========================
+    // Entity -> DTO
+    // =========================
     public UsedPostDTO(UsedPost post) {
 
         this.id = post.getId();
 
+        // 작성자
         if (post.getMember() != null) {
 
             this.memberId = post.getMember().getId();
 
-            this.writerName = post.getMember().getNickname();
+            // 닉네임 우선
+            if (post.getMember().getNickname() != null
+                    && !post.getMember().getNickname().isBlank()) {
+
+                this.writerName =
+                        post.getMember().getNickname();
+
+            } else {
+
+                this.writerName =
+                        post.getMember().getUsername();
+            }
 
         } else {
 
-            this.writerName = "관리자";
+            this.writerName = "알수없음";
         }
 
         this.title = post.getTitle();
-        this.content = post.getContent();
-        this.category = post.getCategory();
-        this.price = post.getPrice();
-        this.region = post.getRegion();
 
-        this.offerAccepted =
-                post.getOfferAccepted() != null
-                        ? post.getOfferAccepted()
-                        : false;
+        this.content = post.getContent();
+
+        this.category = post.getCategory();
+
+        this.price = post.getPrice();
+
+        this.region = post.getRegion();
 
         this.itemCondition = post.getItemCondition();
 
-        // enum 기본값
+        // 상태 기본값
         this.status =
                 post.getStatus() != null
                         ? post.getStatus()
                         : UsedPostStatus.SELLING;
 
+        // 숨김 기본값
         this.isHidden =
                 post.getIsHidden() != null
                         ? post.getIsHidden()
                         : false;
 
+        // 신고수 기본값
         this.reportCount =
                 post.getReportCount() != null
                         ? post.getReportCount()
                         : 0;
 
+        // 가격제안 기본값
+        this.offerAccepted =
+                post.getOfferAccepted() != null
+                        ? post.getOfferAccepted()
+                        : false;
+
         this.createdAt = post.getCreatedAt();
+
         this.updatedAt = post.getUpdatedAt();
 
+        // 이미지
         if (post.getImages() != null) {
 
             this.imageUrlList =
@@ -102,36 +139,47 @@ public class UsedPostDTO {
         }
     }
 
+    // =========================
+    // DTO -> Entity
+    // =========================
     public UsedPost toEntity() {
 
         return UsedPost.builder()
+
                 .title(this.title)
+
                 .content(this.content)
-                .itemCondition(this.itemCondition)
-                .price(this.price)
+
                 .category(this.category)
+
+                .price(this.price)
+
                 .region(this.region)
 
-                // 가격제안가능
+                .itemCondition(this.itemCondition)
+
+                // 가격제안 가능
                 .offerAccepted(
                         this.offerAccepted != null
                                 ? this.offerAccepted
                                 : false
                 )
 
-                // enum 기본값
+                // 상태 기본값
                 .status(
                         this.status != null
                                 ? this.status
                                 : UsedPostStatus.SELLING
                 )
 
+                // 숨김 기본값
                 .isHidden(
                         this.isHidden != null
                                 ? this.isHidden
                                 : false
                 )
 
+                // 신고수 기본값
                 .reportCount(
                         this.reportCount != null
                                 ? this.reportCount
@@ -141,7 +189,9 @@ public class UsedPostDTO {
                 .build();
     }
 
+    // =========================
     // 상태 한글 변환
+    // =========================
     public String getStatusLabel() {
 
         if (status == null) {

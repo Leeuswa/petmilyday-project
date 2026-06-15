@@ -44,4 +44,16 @@ public class Comment {
         this.member = member;
         this.post = post;
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private java.util.List<Comment> children = new java.util.ArrayList<>();
+
+    public void assignParent(Comment parent) {
+        this.parent = parent;
+    }
 }
