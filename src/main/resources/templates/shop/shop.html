@@ -32,6 +32,14 @@
     .category-item.on { background-color: #eaedfa; color: #2b44cc; font-weight: 600; }
     .stars { color: #ffa502; }
     .info-label { color: #636e72; font-size: 0.85rem; }
+
+    /* 위시리스트 하트 효과 */
+    .wish-btn {
+      transition: transform 0.2s;
+    }
+    .wish-btn:hover {
+      transform: scale(1.2);
+    }
   </style>
 </head>
 <body>
@@ -57,10 +65,20 @@
           <a th:href="@{/shop?category=의류}" class="list-group-item list-group-item-action category-item" th:classappend="${#strings.equals(param.category, '의류')} ? 'on' : ''">의류 / 액세서리</a>
         </div>
         <hr class="opacity-25 my-3">
+
         <p class="info-label fw-bold mb-2 px-2 text-uppercase">맞춤 필터</p>
-        <div class="list-group list-group-flush gap-1">
-          <button class="list-group-item list-group-item-action category-item text-start">초코 맞춤</button>
-          <button class="list-group-item list-group-item-action category-item text-start">두부 맞춤</button>
+        <div class="list-group list-group-flush gap-1" id="petFilterGroup">
+          <div th:if="${petList == null or petList.isEmpty()}" class="px-2 text-muted small" style="font-size: 11px;">
+            반려동물을 등록해 주세요.
+          </div>
+
+          <button th:each="pet : ${petList}"
+                  class="list-group-item list-group-item-action category-item text-start pet-filter-btn"
+                  th:data-species="${pet.species}"
+                  th:data-age="${pet.age}"
+                  onclick="filterByPetProfile(this)">
+            <span th:text="${pet.name} + ' 맞춤'"></span>
+          </button>
         </div>
       </div>
     </div>
@@ -70,8 +88,8 @@
         <span class="fw-bold text-secondary small" th:text="'상품 ' + ${productList.size()} + '개'"></span>
         <div class="d-flex gap-2 align-items-center">
           <button class="btn btn-outline-secondary btn-sm" onclick="location.href='/shop/order_history'"><i class="bi bi-receipt"></i> 주문내역</button>
-          <button id="cartNavBtn" class="btn btn-outline-secondary btn-sm" onclick="location.href='/cart'"><i class="bi bi-cart3"></i> 장바구니 (0)</button>
-          <button class="btn btn-outline-secondary btn-sm"><i class="bi bi-heart"></i> 위시리스트</button>
+          <button id="cartNavBtn" class="btn btn-outline-secondary btn-sm" onclick="location.href='/cart'"><i class="bi bi-cart3"></i>장바구니 (0)</button>
+          <button id="wishlistFilterBtn" class="btn btn-outline-secondary btn-sm" onclick="toggleWishlistFilter()"><i class="bi bi-heart"></i> 위시리스트</button>
           <select id="shopSortSelect" onchange="sortProducts()" class="form-select form-select-sm" style="width: auto;">
             <option value="popular">인기순</option>
             <option value="name">가나다순</option>
@@ -82,16 +100,27 @@
       </div>
 
       <div id="productGrid" class="row row-cols-2 row-cols-xl-4 row-cols-xxl-5 g-3">
-        <div class="col prod" th:each="product : ${productList}" th:data-name="${product.name}" th:data-price="${product.price}">
+        <div class="col prod" th:each="product : ${productList}" th:data-name="${product.name}" th:data-price="${product.price}" th:data-prod-id="${product.id}" th:data-species="${product.petSpecies}">
           <div class="card shop-card p-3 bg-white h-100 d-flex flex-column justify-content-between" th:onclick="|location.href='/shop/detail/' + ${product.id}|" style="cursor: pointer;">
             <div>
               <div class="ratio ratio-1x1 bg-light rounded-3 overflow-hidden border mb-3">
-                <img th:if="${product.imgUrl != null}" th:src="${product.imgUrl} + '?w=500&h=500&fit=crop'" class="img-fluid" style="object-fit: cover;" alt="상품 이미지" loading="lazy">
-                <div th:if="${product.imgUrl == null}" class="d-flex align-items-center justify-content-center text-muted small">No Image</div>
+                <img th:src="${product.imgUrl}"
+                     class="img-fluid"
+                     style="object-fit: cover;"
+                     alt="상품 이미지"
+                     loading="lazy"
+                     onerror="this.src='https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=500'">
               </div>
               <div class="px-1">
                 <span class="text-muted d-block small mb-1 fw-bold" style="font-size: 10px;">PETMILYDAY</span>
-                <h6 class="card-title text-dark fw-bold text-truncate" th:text="${product.name}"></h6>
+
+                <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+                  <h6 class="card-title text-dark fw-bold text-truncate mb-0" th:text="${product.name}" style="max-width: 85%;"></h6>
+                  <button class="btn p-0 border-0 text-danger wish-btn" th:data-prod-id="${product.id}" onclick="toggleWishlist(event, this)">
+                    <i class="bi bi-heart" style="font-size: 1.15rem;"></i>
+                  </button>
+                </div>
+
                 <div class="stars mb-3">★★★★★</div>
               </div>
             </div>
@@ -136,8 +165,15 @@
 
 <script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
 <script th:inline="javascript">
-  document.addEventListener('DOMContentLoaded', () => { updateCartCount(); });
+  let isWishlistFilterOn = false; // 필터 플래그
+  let myLikedProducts = []; // 찜 상품 ID 저장소
 
+  document.addEventListener('DOMContentLoaded', () => {
+    updateCartCount();
+    loadMyWishlistStatus();
+  });
+
+  /* 장바구니 수량 갱신 */
   function updateCartCount() {
     fetch('/api/cart/count')
             .then(res => res.json())
@@ -147,6 +183,7 @@
             }).catch(err => console.error(err));
   }
 
+  /* 장바구니 담기 */
   function addToCart(event, productId) {
     event.stopPropagation(); event.preventDefault();
     fetch('/api/cart/add', {
@@ -161,6 +198,122 @@
     });
   }
 
+  /* 위시리스트 토글 및 실시간 배열 반영 */
+  function toggleWishlist(event, element) {
+    event.stopPropagation();
+    const productId = element.getAttribute('data-prod-id');
+    const pId = parseInt(productId);
+
+    fetch('/api/wishlist/toggle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId: pId })
+    })
+            .then(res => {
+              if(res.status === 401) {
+                alert('로그인이 필요한 기능입니다.');
+                return;
+              }
+              return res.json();
+            })
+            .then(data => {
+              if (data && data.success) {
+                const icon = element.querySelector('i');
+                if (data.isLiked) {
+                  icon.className = 'bi bi-heart-fill';
+                  icon.style.color = '#ff4757';
+
+                  if (!myLikedProducts.includes(pId)) myLikedProducts.push(pId);
+                } else {
+                  icon.className = 'bi bi-heart';
+                  icon.style.color = '';
+
+                  myLikedProducts = myLikedProducts.filter(id => id !== pId);
+
+                  if (isWishlistFilterOn) {
+                    const card = element.closest('.prod');
+                    if (card) card.style.display = 'none';
+                  }
+                }
+              }
+            })
+            .catch(err => console.error('위시리스트 통신 에러:', err));
+  }
+
+  /* 찜 목록 로드 및 하트 활성화 */
+  function loadMyWishlistStatus() {
+    fetch('/api/wishlist/my')
+            .then(res => res.ok ? res.json() : [])
+            .then(likedProductIds => {
+              myLikedProducts = likedProductIds;
+              if (!Array.isArray(likedProductIds)) return;
+
+              const wishBtns = document.querySelectorAll('.wish-btn');
+              wishBtns.forEach(btn => {
+                const pId = parseInt(btn.getAttribute('data-prod-id'));
+                if (likedProductIds.includes(pId)) {
+                  const icon = btn.querySelector('i');
+                  icon.className = 'bi bi-heart-fill';
+                  icon.style.color = '#ff4757';
+                }
+              });
+            }).catch(err => console.log('위시리스트 데이터 로드 실패'));
+  }
+
+  /* 위시리스트 필터 토글 */
+  function toggleWishlistFilter() {
+    const btn = document.getElementById('wishlistFilterBtn');
+    const products = document.querySelectorAll('.prod');
+
+    isWishlistFilterOn = !isWishlistFilterOn;
+
+    if (isWishlistFilterOn) {
+      btn.classList.replace('btn-outline-secondary', 'btn-danger');
+      btn.style.color = '#fff';
+
+      products.forEach(p => {
+        const pId = parseInt(p.getAttribute('data-prod-id'));
+        if (myLikedProducts.includes(pId)) {
+          p.style.display = '';
+        } else {
+          p.style.display = 'none';
+        }
+      });
+    } else {
+      btn.classList.replace('btn-danger', 'btn-outline-secondary');
+      btn.style.color = '';
+
+      products.forEach(p => {
+        p.style.display = '';
+      });
+    }
+  }
+
+  /* 반려동물 프로필 기반 필터링 */
+  function filterByPetProfile(element) {
+    const products = document.querySelectorAll('.prod');
+    const targetSpecies = element.getAttribute('data-species');
+    const allPetBtns = document.querySelectorAll('.pet-filter-btn');
+
+    if (element.classList.contains('on')) {
+      element.classList.remove('on');
+      products.forEach(p => p.style.display = '');
+    } else {
+      allPetBtns.forEach(btn => btn.classList.remove('on'));
+      element.classList.add('on');
+
+      products.forEach(p => {
+        const prodSpecies = p.getAttribute('data-species') || '';
+        if (prodSpecies.includes(targetSpecies) || targetSpecies.includes(prodSpecies)) {
+          p.style.display = '';
+        } else {
+          p.style.display = 'none';
+        }
+      });
+    }
+  }
+
+  /* 상품 정렬 */
   function sortProducts() {
     const grid = document.getElementById('productGrid');
     const select = document.getElementById('shopSortSelect');
