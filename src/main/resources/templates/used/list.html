@@ -312,9 +312,7 @@
                     <div class="img-box">
 
                         <img th:if="${post.imageUrlList != null and !post.imageUrlList.isEmpty()}"
-                             th:src="${post.imageUrlList[0].startsWith('/uploads/')
-                            ? post.imageUrlList[0]
-                            : '/uploads/' + post.imageUrlList[0]}">
+                             th:src="${post.imageUrlList[0]}">
 
                         <span th:if="${post.imageUrlList == null or post.imageUrlList.isEmpty()}">
                             이미지 없음

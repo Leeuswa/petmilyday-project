@@ -22,6 +22,10 @@ public class QPetProfile extends EntityPathBase<PetProfile> {
 
     public static final QPetProfile petProfile = new QPetProfile("petProfile");
 
+    public final NumberPath<Integer> age = createNumber("age", Integer.class);
+
+    public final StringPath breed = createString("breed");
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final QMember member;

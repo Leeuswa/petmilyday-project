@@ -22,6 +22,7 @@ public class KakaoPayController {
     private final MemberRepository memberRepository;
     private final UsedPostRepository usedPostRepository;
 
+    // 결제 확인 페이지
     @GetMapping("/payment/confirm")
     public String confirm(
             @RequestParam Long postId,
@@ -37,7 +38,7 @@ public class KakaoPayController {
         return "used/payment-confirm";
     }
 
-    // 결제 시작
+    // 카카오페이 결제 요청
     @PostMapping("/payment/ready")
     public String ready(
             @RequestParam Long postId,
@@ -74,6 +75,7 @@ public class KakaoPayController {
         return "redirect:/used/list";
     }
 
+    // 테스트 결제 완료
     @GetMapping("/payment/test-success")
     public String testSuccess(
             @RequestParam Long postId,
@@ -103,6 +105,22 @@ public class KakaoPayController {
         }
 
         usedPostRepository.save(post);
+
+        model.addAttribute("post", post);
+
+        return "used/payment-success";
+    }
+
+    // 결제 승인 처리
+    @GetMapping("/payment/success")
+    public String success(
+            @RequestParam Long postId,
+            @RequestParam("pg_token") String pgToken,
+            Model model
+    ) {
+
+        UsedPost post =
+                kakaoPayService.approve(postId, pgToken);
 
         model.addAttribute("post", post);
 

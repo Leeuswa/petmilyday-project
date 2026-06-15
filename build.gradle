@@ -10,6 +10,7 @@ description = 'petmilyday'
 
 java {
     toolchain {
+
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
@@ -72,6 +73,12 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+
+    // AWS S3 제어용 공식 만능 리모컨 라이브러리
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0")
+    implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
 }
 
 // QueryDSL Q클래스 생성 경로
@@ -93,3 +100,4 @@ clean {
 tasks.named('test') {
     enabled = false
 }
+

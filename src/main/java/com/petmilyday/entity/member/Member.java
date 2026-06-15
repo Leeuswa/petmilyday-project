@@ -112,4 +112,10 @@ public class Member {
         }
         return this.username;
     }
+
+    //권한 변경(일반 회원 -> 관리자)
+    public void changeRole(Role role){
+        this.role = role;
+    }
+
 }
