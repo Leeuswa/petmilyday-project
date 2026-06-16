@@ -152,6 +152,4 @@ public class DiagnosisController {
 
         return "diagnosis/history";
     }
-
-
 }
