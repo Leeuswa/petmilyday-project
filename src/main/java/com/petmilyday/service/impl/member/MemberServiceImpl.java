@@ -45,7 +45,7 @@ public class MemberServiceImpl implements MemberService {
                 .address(request.getAddress())
                 .detailAddress(request.getDetailAddress())
                 .profileImageUrl(null)
-                .bio("안녕하세요! 펫밀리데이에 오신 걸 환영합니다.")
+                .bio("소개글이 없습니다.")
                 .role(Role.USER)
                 .status(AccountStatus.ACTIVE)
                 .build();

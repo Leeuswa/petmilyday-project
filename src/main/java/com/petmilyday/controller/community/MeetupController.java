@@ -1,6 +1,8 @@
 package com.petmilyday.controller.community;
 
 import com.petmilyday.dto.community.MeetupPostDTO;
+import com.petmilyday.dto.community.PageRequestDTO;
+import com.petmilyday.dto.community.PageResponseDTO;
 import com.petmilyday.service.community.MeetupService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,11 +29,16 @@ public class MeetupController {
 
     private final MeetupService meetupService;
 
+    @GetMapping({"", "/"})
+    public String meetupIndex() {
+        return "redirect:/community/meetup/list";
+    }
+
     // 모임 목록 조회
     @GetMapping("/list")
-    public String list(Model model) {
-        List<MeetupPostDTO> list = meetupService.getList();
-        model.addAttribute("responseDTO", Map.of("dtoList", list));
+    public String list(PageRequestDTO pageRequestDTO, Model model) {
+        PageResponseDTO<MeetupPostDTO> responseDTO = meetupService.getList(pageRequestDTO);
+        model.addAttribute("responseDTO", responseDTO);
         return "community/meetup_list";
     }
 

@@ -1,13 +1,16 @@
 package com.petmilyday.service.community;
 
 import com.petmilyday.dto.community.MeetupPostDTO;
+import com.petmilyday.dto.community.PageRequestDTO;
+import com.petmilyday.dto.community.PageResponseDTO;
+
 import java.util.List;
 
 public interface MeetupService {
 
     Long registerMeetup(String username, MeetupPostDTO dto);
 
-    List<MeetupPostDTO> getList();
+    PageResponseDTO<MeetupPostDTO> getList(PageRequestDTO pageRequestDTO);
 
     // 모임 상세 조회
     MeetupPostDTO read(Long id, String username);

@@ -29,7 +29,7 @@ public class MeetupPostDTO {
     @Min(value = 2, message = "모임 인원은 최소 2명 이상이어야 합니다.")
     private int maxParticipants;
 
-    // 아래는 서버에서 채워서 화면으로 보낼 때 사용하는 필드들 (작성 시에는 안 받아도 됨)
+    // 작성 시에는 안 받아도 됨
     private int currentParticipants;
     private String status; // RECRUITING, CLOSED 등
     private String hostName; // 방장 닉네임 또는 이름

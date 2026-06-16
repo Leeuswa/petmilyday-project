@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query("select c from Comment c where c.post.id = :postId")
+    @Query(value = "select c from Comment c join fetch c.member where c.post.id = :postId",
+            countQuery = "select count(c) from Comment c where c.post.id = :postId")
     Page<Comment> listOfPost(@Param("postId") Long postId, Pageable pageable);
 }
