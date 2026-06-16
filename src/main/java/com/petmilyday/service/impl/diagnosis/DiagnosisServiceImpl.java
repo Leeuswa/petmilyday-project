@@ -29,6 +29,7 @@ public class DiagnosisServiceImpl implements DiagnosisService {
     private final PetProfileRepository petProfileRepository;
     private final S3UploadService s3UploadService;
 
+    // AI 자가진단 수행 및 이력 저장
     @Override
     public DiagnosisHistory diagnose(
             Long memberId,
@@ -48,7 +49,15 @@ public class DiagnosisServiceImpl implements DiagnosisService {
         String imageUrl = null;
 
         if (image != null && !image.isEmpty()) {
-            imageUrl = s3UploadService.uploadFile(image);
+            try {
+                imageUrl = s3UploadService.uploadFile(image);
+            } catch (Exception e) {
+                System.out.println("===== S3 이미지 업로드 오류 =====");
+                e.printStackTrace();
+                System.out.println("==============================");
+
+                imageUrl = null;
+            }
         }
 
         if (symptomText == null) {
@@ -97,28 +106,50 @@ public class DiagnosisServiceImpl implements DiagnosisService {
                 symptomText
         );
 
-        String aiResult =
-                chatClientBuilder.build()
-                        .prompt()
-                        .user(prompt)
-                        .call()
-                        .content();
+        String aiResult;
+        boolean aiError = false;
 
-        System.out.println("===== AI 응답 =====");
-        System.out.println(aiResult);
-        System.out.println("==================");
+        try {
+            aiResult =
+                    chatClientBuilder.build()
+                            .prompt()
+                            .user(prompt)
+                            .call()
+                            .content();
+
+            System.out.println("===== AI 응답 =====");
+            System.out.println(aiResult);
+            System.out.println("==================");
+
+        } catch (Exception e) {
+
+            System.out.println("===== AI 자가진단 오류 =====");
+            e.printStackTrace();
+            System.out.println("==========================");
+
+            aiError = true;
+            aiResult = "";
+        }
 
         String disease = parseValue(aiResult, "질환:");
         String severity = parseValue(aiResult, "심각도:");
 
-        disease = normalizeDisease(disease, symptomText);
-        severity = normalizeSeverity(severity, symptomText);
+        String recommend;
 
-        if ("판단불가".equals(disease)) {
+        if (aiError) {
+            disease = "판단불가";
             severity = "LOW";
-        }
+            recommend = "AI 진단 응답을 불러오는 중 문제가 발생했습니다. Ollama 실행 상태를 확인하거나 잠시 후 다시 시도해주세요.";
+        } else {
+            disease = normalizeDisease(disease, symptomText);
+            severity = normalizeSeverity(severity, symptomText);
 
-        String recommend = normalizeRecommend(disease);
+            if ("판단불가".equals(disease)) {
+                severity = "LOW";
+            }
+
+            recommend = normalizeRecommend(disease);
+        }
 
         DiagnosisHistory history =
                 DiagnosisHistory.builder()
@@ -135,6 +166,7 @@ public class DiagnosisServiceImpl implements DiagnosisService {
         return diagnosisHistoryRepository.save(history);
     }
 
+    // 진단 이력 페이징 조회
     @Override
     public Page<DiagnosisHistory> getHistory(Long memberId, Pageable pageable) {
 
@@ -190,18 +222,6 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             return "판단불가";
         }
 
-        if (text.contains("피부")
-                || text.contains("빨갛")
-                || text.contains("붉")
-                || text.contains("긁")
-                || text.contains("가려")
-                || text.contains("핥")
-                || text.contains("각질")
-                || text.contains("털이 빠")) {
-
-            return "알레르기성 피부염";
-        }
-
         if (text.contains("귀를 긁")
                 || text.contains("귀가")
                 || text.contains("귀에서")
@@ -212,6 +232,18 @@ public class DiagnosisServiceImpl implements DiagnosisService {
                 || text.contains("귀를 자주")) {
 
             return "외이염";
+        }
+
+        if (text.contains("피부")
+                || text.contains("빨갛")
+                || text.contains("붉")
+                || text.contains("긁")
+                || text.contains("가려")
+                || text.contains("핥")
+                || text.contains("각질")
+                || text.contains("털이 빠")) {
+
+            return "알레르기성 피부염";
         }
 
         if (text.contains("눈")

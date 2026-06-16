@@ -160,4 +160,15 @@
 </div>
 
 </body>
+<script>
+    const form = document.querySelector("form");
+    const button = document.querySelector("button[type='submit']");
+
+    if (form && button) {
+        form.addEventListener("submit", function () {
+            button.disabled = true;
+            button.innerText = "처리 중...";
+        });
+    }
+</script>
 </html>
