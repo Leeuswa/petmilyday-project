@@ -158,6 +158,36 @@ public class MemberController {
         return "redirect:/member/mypage";
     }
 
+    // 비밀번호 변경 요청
+    @GetMapping("/modify-password")
+    public String modifyPasswordForm(Model model) {
+        model.addAttribute("passwordRequest", new MemberDTO.UpdatePasswordRequest());
+        return "member/modify-password";
+    }
+
+    // 비밀번호 변경 처리
+    @PostMapping("/modify-password")
+    public String modifyPassword(@Valid @ModelAttribute("passwordRequest") MemberDTO.UpdatePasswordRequest request,
+                                 BindingResult bindingResult,
+                                 Model model,
+                                 RedirectAttributes redirectAttributes) {
+        if (bindingResult.hasErrors()) {
+            return "member/modify-password";
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        try {
+            memberService.updatePassword(username, request);
+            redirectAttributes.addFlashAttribute("successMsg", "비밀번호가 성공적으로 변경되었습니다. 다시 로그인해 주세요.");
+            return "redirect:/member/logout"; // 변경 후 안전하게 자동 로그아웃 처리
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("globalError", e.getMessage());
+            return "member/modify-password";
+        }
+    }
+
     @GetMapping("/pet-profile")
     public String petProfileForm(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

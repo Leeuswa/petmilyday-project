@@ -5,10 +5,12 @@ import com.petmilyday.config.jwt.JwtTokenProvider;
 import com.petmilyday.config.jwt.OAuth2SuccessHandler;
 import com.petmilyday.service.member.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -62,7 +64,7 @@ public class SecurityConfig {
                         .requestMatchers("/shop/**", "/api/subscription/**","/shop/subscription").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/", "/error").permitAll()
                         .requestMatchers("/member/register", "/member/login", "/member/reissue", "/member/check-username").permitAll()
-                        .requestMatchers("/community/list", "/hospital/list", "/shop/list", "/ai/diagnosis").permitAll()
+                        .requestMatchers("/community/meetup/**","/community/list", "/hospital/list", "/shop/list", "/ai/diagnosis").permitAll()
 
                         // 메인 관리자 페이지는 ADMIN 권한만 접근 가능
                         .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -84,5 +86,12 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**", "/favicon.ico", "/error"); // 로컬 파일 업로드 경로도 추가
     }
 }

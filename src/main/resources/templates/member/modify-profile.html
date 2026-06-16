@@ -29,13 +29,13 @@
     </div>
 
     <div class="form-group">
-      <label for="phoneNumber">전화번호 <span style="color:red;">*</span></label>
+      <label for="phoneNumber">전화번호</label>
       <input type="text" id="phoneNumber" th:field="*{phoneNumber}" class="form-control">
       <span class="error-msg" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
     </div>
 
     <div class="form-group">
-      <label for="address">주소 <span style="color:red;">*</span></label>
+      <label for="address">주소</label>
       <input type="text" id="address" th:field="*{address}" class="form-control">
       <span class="error-msg" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
     </div>

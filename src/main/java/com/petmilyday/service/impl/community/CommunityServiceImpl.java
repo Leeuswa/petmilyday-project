@@ -87,12 +87,24 @@ public class CommunityServiceImpl implements CommunityService {
 
         List<CommunityPostDTO> dtoList = result.getContent().stream()
                 .map(post -> {
-                    CommunityPostDTO dto = modelMapper.map(post, CommunityPostDTO.class);
+                    CommunityPostDTO dto = CommunityPostDTO.builder()
+                            .id(post.getId())
+                            .title(post.getTitle())
+                            .content(post.getContent())
+                            .viewCount(post.getViewCount())
+                            .createdAt(post.getCreatedAt())
+                            .updatedAt(post.getUpdatedAt())
+                            .anonymous(post.isAnonymous())
+                            .build();
+
                     if (post.getMember() != null) {
                         if (post.isAnonymous()) {
                             dto.setWriterName("익명");
                         } else {
-                            dto.setWriterName(post.getMember().getDisplayName());
+                            String writerName = (post.getMember().getNickname() != null && !post.getMember().getNickname().isEmpty())
+                                    ? post.getMember().getNickname()
+                                    : post.getMember().getName();
+                            dto.setWriterName(writerName);
                         }
                         dto.setWriterUsername(post.getMember().getUsername());
                     }

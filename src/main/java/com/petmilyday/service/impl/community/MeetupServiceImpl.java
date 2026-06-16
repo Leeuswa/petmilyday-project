@@ -1,6 +1,8 @@
 package com.petmilyday.service.impl.community;
 
 import com.petmilyday.dto.community.MeetupPostDTO;
+import com.petmilyday.dto.community.PageRequestDTO;
+import com.petmilyday.dto.community.PageResponseDTO;
 import com.petmilyday.entity.community.MeetupParticipant;
 import com.petmilyday.entity.community.MeetupPost;
 import com.petmilyday.entity.community.MeetupStatus;
@@ -54,27 +56,41 @@ public class MeetupServiceImpl implements MeetupService {
     // 목록 조회 시 마감 상태 실시간 검증 반영
     @Override
     @Transactional(readOnly = true)
-    public List<MeetupPostDTO> getList() {
-        return meetupPostRepository.findAll().stream()
-                .map(post -> {
-                    // 인원 충족 시 마감 상태 강제 적용
-                    String calculatedStatus = post.getCurrentParticipants() >= post.getMaxParticipants()
-                            ? MeetupStatus.CLOSED.name()
-                            : post.getStatus().name();
+    public PageResponseDTO<MeetupPostDTO> getList(PageRequestDTO pageRequestDTO) {
 
-                    return MeetupPostDTO.builder()
+        org.springframework.data.domain.Pageable pageable = pageRequestDTO.getPageable("id");
+
+        org.springframework.data.domain.Page<MeetupPost> result = meetupPostRepository.findAllWithHost(pageable);
+
+        java.util.List<MeetupPostDTO> dtoList = result.getContent().stream()
+                .map(post -> {
+                    MeetupPostDTO dto = MeetupPostDTO.builder()
                             .id(post.getId())
                             .title(post.getTitle())
+                            .content(post.getContent())
                             .location(post.getLocation())
                             .meetupDate(post.getMeetupDate())
-                            .currentParticipants(post.getCurrentParticipants())
                             .maxParticipants(post.getMaxParticipants())
-                            .status(calculatedStatus)
-                            .hostName(post.getHost().getNickname() != null ? post.getHost().getNickname() : post.getHost().getName())
                             .viewCount(post.getViewCount())
+                            .createdAt(post.getCreatedAt())
                             .build();
+
+                    if (post.getHost() != null) {
+                        String hostName = (post.getHost().getNickname() != null && !post.getHost().getNickname().isEmpty())
+                                ? post.getHost().getNickname()
+                                : post.getHost().getName();
+                        dto.setHostName(hostName);
+                        dto.setHostUsername(post.getHost().getUsername());
+                    }
+                    return dto;
                 })
-                .collect(Collectors.toList());
+                .collect(java.util.stream.Collectors.toList());
+
+        return PageResponseDTO.<MeetupPostDTO>withAll()
+                .pageRequestDTO(pageRequestDTO)
+                .dtoList(dtoList)
+                .total((int) result.getTotalElements())
+                .build();
     }
 
     @Override

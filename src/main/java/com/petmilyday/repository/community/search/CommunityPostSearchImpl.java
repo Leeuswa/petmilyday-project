@@ -24,11 +24,9 @@ public class CommunityPostSearchImpl extends QuerydslRepositorySupport implement
         QCommunityPost post = QCommunityPost.communityPost;
         QMember member = QMember.member;
 
-        JPQLQuery<CommunityPost> query = from(post);
-        query.leftJoin(post.member, member);
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         if (types != null && types.length > 0) {
-            BooleanBuilder booleanBuilder = new BooleanBuilder();
             for (String type : types) {
                 switch (type) {
                     case "t":
@@ -50,14 +48,23 @@ public class CommunityPostSearchImpl extends QuerydslRepositorySupport implement
                         break;
                 }
             }
-            query.where(booleanBuilder);
         }
 
-        query.where(post.id.gt(0L));
+        booleanBuilder.and(post.id.gt(0L));
 
-        long count = query.fetchCount();
+        // 데이터 조회
+        JPQLQuery<CommunityPost> query = from(post);
+        query.leftJoin(post.member, member).fetchJoin();
+        query.where(booleanBuilder);
+
         this.getQuerydsl().applyPagination(pageable, query);
         List<CommunityPost> list = query.fetch();
+
+        // 전체 개수 조회
+        JPQLQuery<CommunityPost> countQuery = from(post);
+        countQuery.leftJoin(post.member, member); // 카운트에는 일반 조인만 사용
+        countQuery.where(booleanBuilder);
+        long count = countQuery.fetchCount();
 
         return new PageImpl<>(list, pageable, count);
     }
