@@ -3,20 +3,15 @@ package com.petmilyday.repository.diagnosis;
 import com.petmilyday.entity.diagnosis.DiagnosisHistory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
 
 public interface DiagnosisHistoryRepository
         extends JpaRepository<DiagnosisHistory, Long> {
 
-    List<DiagnosisHistory>
-    findByMember_IdOrderByCreatedAtDesc(Long memberId);
-
+    @EntityGraph(attributePaths = {"pet"})
     Page<DiagnosisHistory> findByMember_IdOrderByCreatedAtDesc(
             Long memberId,
             Pageable pageable
     );
-
-    List<DiagnosisHistory> findTop3ByMember_IdOrderByCreatedAtDesc(Long memberId);
 }
