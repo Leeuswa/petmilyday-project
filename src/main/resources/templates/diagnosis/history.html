@@ -188,14 +188,13 @@
         진단 이력이 없습니다.
     </div>
 
-    <div th:if="${histories != null and !histories.content.isEmpty()}">
+    <div th:if="${histories != null and not histories.content.isEmpty()}">
 
         <div th:each="history : ${histories.content}"
              class="history-card">
 
             <div class="pet-name">
-                <span th:text="${history.pet.name}"></span>
-                <span th:text="' (' + ${history.pet.species} + ')'"></span>
+                <span th:text="${history.pet.name + ' (' + history.pet.species + ')'}"></span>
             </div>
 
             <div class="date"

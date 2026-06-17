@@ -114,6 +114,12 @@
 
         .btn-filter:hover {
             background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        .btn-filter.active:hover {
+            background-color: #0d6efd;
+            color: white;
         }
     </style>
 </head>
@@ -216,13 +222,9 @@
 
         <div class="filter-btn-group">
 
-            <a th:href="@{/used/list(
-                keyword=${keyword},
-                category=${category},
-                region=${region}
-            )}"
+            <a th:href="@{/used/list}"
                class="btn-filter"
-               th:classappend="${condition == null and (offerAccepted == null or offerAccepted == false) and onlyWish != true} ? 'active'">
+               th:classappend="${condition == null and (offerAccepted == null or offerAccepted == false) and onlyWish != true} ? ' active'">
                 전체
             </a>
 
@@ -233,7 +235,7 @@
                 condition='NEW'
             )}"
                class="btn-filter"
-               th:classappend="${condition != null and condition.name() == 'NEW'} ? 'active'">
+               th:classappend="${condition != null and condition.name() == 'NEW'} ? ' active'">
                 새제품
             </a>
 
@@ -244,7 +246,7 @@
                 condition='LIKE_NEW'
             )}"
                class="btn-filter"
-               th:classappend="${condition != null and condition.name() == 'LIKE_NEW'} ? 'active'">
+               th:classappend="${condition != null and condition.name() == 'LIKE_NEW'} ? ' active'">
                 거의새것
             </a>
 
@@ -255,7 +257,7 @@
                 condition='USED'
             )}"
                class="btn-filter"
-               th:classappend="${condition != null and condition.name() == 'USED'} ? 'active'">
+               th:classappend="${condition != null and condition.name() == 'USED'} ? ' active'">
                 중고
             </a>
 
@@ -266,24 +268,18 @@
                 offerAccepted=true
             )}"
                class="btn-filter"
-               th:classappend="${offerAccepted == true} ? 'active'">
+               th:classappend="${offerAccepted == true} ? ' active'">
                 가격제안가능
             </a>
 
-            <a th:href="@{/used/list(
-                keyword=${keyword},
-                category=${category},
-                region=${region},
-                condition=${condition},
-                offerAccepted=${offerAccepted},
-                onlyWish=true
-            )}"
+            <a th:href="@{/used/list(onlyWish=true)}"
                class="btn-filter"
-               th:classappend="${onlyWish == true} ? 'active'">
+               th:classappend="${onlyWish == true} ? ' active'">
                 찜한 게시글
             </a>
 
         </div>
+
     </div>
 
     <div id="post-list">
@@ -311,7 +307,7 @@
 
                     <div class="img-box">
 
-                        <img th:if="${post.imageUrlList != null and !post.imageUrlList.isEmpty()}"
+                        <img th:if="${post.imageUrlList != null and not post.imageUrlList.isEmpty()}"
                              th:src="${post.imageUrlList[0]}">
 
                         <span th:if="${post.imageUrlList == null or post.imageUrlList.isEmpty()}">
@@ -347,7 +343,7 @@
                         </p>
 
                         <small class="text-muted"
-                               th:text="${post.region} + ' · ' + ${post.itemCondition}">
+                               th:text="${post.region + ' · ' + post.itemCondition}">
                             지역 · 상태
                         </small>
 
@@ -380,7 +376,8 @@
                            category=${category},
                            region=${region},
                            condition=${condition},
-                           offerAccepted=${offerAccepted}
+                           offerAccepted=${offerAccepted},
+                           onlyWish=${onlyWish}
                        )}">
                         이전
                     </a>
@@ -398,7 +395,8 @@
                            category=${category},
                            region=${region},
                            condition=${condition},
-                           offerAccepted=${offerAccepted}
+                           offerAccepted=${offerAccepted},
+                           onlyWish=${onlyWish}
                        )}"
                        th:text="${i + 1}">
                     </a>
@@ -415,7 +413,8 @@
                            category=${category},
                            region=${region},
                            condition=${condition},
-                           offerAccepted=${offerAccepted}
+                           offerAccepted=${offerAccepted},
+                           onlyWish=${onlyWish}
                        )}">
                         다음
                     </a>

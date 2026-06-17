@@ -5,6 +5,7 @@ import com.petmilyday.entity.used.UsedPost;
 import com.petmilyday.entity.used.UsedPostStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,11 +16,10 @@ import java.util.Optional;
 
 public interface UsedPostRepository extends JpaRepository<UsedPost, Long> {
 
-    // =========================
     // LIST + SEARCH
-    // =========================
+    @EntityGraph(attributePaths = {"member"})
     @Query("""
-        SELECT u FROM UsedPost u
+        SELECT DISTINCT u FROM UsedPost u
         WHERE (:keyword IS NULL OR u.title LIKE %:keyword% OR u.content LIKE %:keyword%)
           AND (:category IS NULL OR u.category = :category)
           AND (:region IS NULL OR u.region LIKE %:region%)
@@ -40,23 +40,21 @@ public interface UsedPostRepository extends JpaRepository<UsedPost, Long> {
             Pageable pageable
     );
 
-    // =========================
-    // 찜 목록 (페이징)
-    // =========================
+    // 찜 목록 페이징
+    @EntityGraph(attributePaths = {"member", "images"})
     @Query("""
-        SELECT u FROM UsedPost u
-        WHERE u.id IN :ids
-          AND u.isHidden = false
-        ORDER BY u.createdAt DESC
-    """)
+    SELECT DISTINCT u FROM UsedPost u
+    WHERE u.id IN :ids
+      AND u.isHidden = false
+    ORDER BY u.createdAt DESC
+""")
     Page<UsedPost> findWishPosts(
             @Param("ids") List<Long> ids,
             Pageable pageable
     );
 
-    // =========================
     // DETAIL
-    // =========================
+    @EntityGraph(attributePaths = {"member", "images"})
     @Query("""
         SELECT u FROM UsedPost u
         WHERE u.id = :id
@@ -64,9 +62,7 @@ public interface UsedPostRepository extends JpaRepository<UsedPost, Long> {
     """)
     UsedPost findDetail(@Param("id") Long id);
 
-    // =========================
     // STATUS UPDATE
-    // =========================
     @Modifying
     @Query("""
         UPDATE UsedPost u
@@ -76,9 +72,7 @@ public interface UsedPostRepository extends JpaRepository<UsedPost, Long> {
     void updateStatus(@Param("id") Long id,
                       @Param("status") UsedPostStatus status);
 
-    // =========================
     // SOFT DELETE
-    // =========================
     @Modifying
     @Query("""
         UPDATE UsedPost u
@@ -90,4 +84,16 @@ public interface UsedPostRepository extends JpaRepository<UsedPost, Long> {
     Optional<UsedPost> findByPaymentKey(String paymentKey);
 
     Optional<UsedPost> findTopByOrderByIdDesc();
+
+    // 찜 목록 DTO용
+    @EntityGraph(attributePaths = {"member", "images"})
+    @Query("""
+    SELECT DISTINCT u FROM UsedPost u
+    WHERE u.id IN :ids
+      AND u.isHidden = false
+    ORDER BY u.createdAt DESC
+""")
+    List<UsedPost> findWishPostsForDto(
+            @Param("ids") List<Long> ids
+    );
 }
