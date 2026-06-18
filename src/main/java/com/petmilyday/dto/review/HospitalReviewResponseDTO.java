@@ -17,5 +17,6 @@ public class HospitalReviewResponseDTO {
     private String memberNickname;
     private Integer rating;
     private String content;
+    private Boolean isReported;
     private LocalDateTime createdAt;
 }

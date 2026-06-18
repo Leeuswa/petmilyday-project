@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -21,12 +22,15 @@ public class HospitalAdminReservationController {
     // 병원 관리자 예약 목록
     @GetMapping
     public String reservationList(Authentication authentication,
+                                  @RequestParam(defaultValue = "0") int page,
                                   Model model) {
 
         String username = authentication.getName();
 
-        model.addAttribute("reservationList",
-                hospitalAdminReservationService.reservationList(username));
+        model.addAttribute("reservationPage",
+                hospitalAdminReservationService.reservationList(username, page));
+
+        model.addAttribute("currentPage", page);
 
         return "hospitalAdmin/reservation/reservationList";
     }

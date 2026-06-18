@@ -113,9 +113,22 @@ public class Member {
         return this.username;
     }
 
-    //권한 변경(일반 회원 -> 관리자)
+    //권한 변경
     public void changeRole(Role role){
         this.role = role;
+    }
+
+
+    // 회원 정지
+    public void ban() {
+        this.status = AccountStatus.BANNED;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // 회원 정지 해제
+    public void activate() {
+        this.status = AccountStatus.ACTIVE;
+        this.updatedAt = LocalDateTime.now();
     }
 
 }

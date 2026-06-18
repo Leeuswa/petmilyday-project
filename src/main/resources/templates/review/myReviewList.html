@@ -9,107 +9,218 @@
 
   <style>
     body {
-      background-color: #f8f9fa;
+      background: #f4f6fb;
+      color: #111827;
     }
 
     .page-wrap {
-      max-width: 1000px;
+      max-width: 1040px;
       margin: 0 auto;
     }
 
     .page-title-card {
       background: #ffffff;
-      border: none;
-      border-radius: 18px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border: 1px solid #e5e7eb;
+      border-radius: 22px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
       padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .title-area h3 {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.7px;
+      color: #111827;
+    }
+
+    .title-area p {
+      margin: 8px 0 0;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .summary-card {
+      min-width: 145px;
+      padding: 15px 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      text-align: right;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
+    }
+
+    .summary-card span {
+      display: block;
+      font-size: 13px;
+      opacity: 0.85;
+      margin-bottom: 4px;
+    }
+
+    .summary-card strong {
+      font-size: 25px;
+      font-weight: 900;
     }
 
     .review-card {
       background: #ffffff;
-      border: none;
-      border-radius: 16px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
       padding: 24px;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .review-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 26px rgba(0,0,0,0.11);
+      transform: translateY(-4px);
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
     }
 
     .review-top {
       display: flex;
       justify-content: space-between;
-      align-items: start;
+      align-items: flex-start;
       gap: 12px;
     }
 
     .hospital-name {
-      font-weight: 700;
-      color: #212529;
-      font-size: 1.1rem;
+      font-weight: 900;
+      color: #111827;
+      font-size: 18px;
+      line-height: 1.35;
     }
 
     .review-writer-small {
-      color: #868e96;
-      font-size: 0.85rem;
-      margin-top: 4px;
+      color: #6b7280;
+      font-size: 13px;
+      margin-top: 5px;
+      font-weight: 700;
     }
 
     .review-date {
-      font-size: 0.9rem;
-      color: #868e96;
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      color: #4b5563;
+      font-size: 13px;
+      font-weight: 800;
       white-space: nowrap;
     }
 
     .star-rating {
-      color: #ffa502;
-      font-size: 1.1rem;
-      margin: 10px 0 12px;
+      color: #f59e0b;
+      font-size: 18px;
+      margin: 12px 0 14px;
+    }
+
+    .score-text {
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 800;
+      margin-left: 8px;
     }
 
     .review-content {
-      color: #343a40;
-      line-height: 1.6;
+      color: #374151;
+      line-height: 1.7;
       margin-bottom: 18px;
       white-space: pre-line;
+      font-size: 14px;
+      font-weight: 600;
     }
 
     .empty-card {
       background: #ffffff;
-      border: none;
-      border-radius: 16px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.07);
-      padding: 50px 20px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 22px;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+      padding: 58px 20px;
       text-align: center;
-      color: #868e96;
+      color: #6b7280;
     }
 
     .empty-icon {
-      font-size: 42px;
-      color: #adb5bd;
+      font-size: 46px;
+      color: #9ca3af;
       margin-bottom: 12px;
     }
 
-    .badge-review {
-      background-color: #eef3ff;
-      color: #2b44cc;
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
+    .review-meta {
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 800;
     }
 
     .btn-detail {
-      border-radius: 10px;
-      font-weight: 600;
+      border-radius: 11px;
+      font-weight: 800;
     }
 
-    .review-meta {
-      color: #868e96;
-      font-size: 0.85rem;
+    .pagination-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 7px;
+      margin-top: 30px;
+    }
+
+    .page-btn {
+      min-width: 40px;
+      height: 40px;
+      padding: 0 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      background: #ffffff;
+      color: #374151;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .page-btn:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    .page-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+    }
+
+    .page-btn.disabled {
+      pointer-events: none;
+      opacity: 0.4;
+      background: #f9fafb;
+    }
+
+    @media (max-width: 768px) {
+      .page-title-card > div {
+        flex-direction: column;
+        align-items: stretch !important;
+      }
+
+      .summary-card {
+        text-align: left;
+      }
+
+      .review-top {
+        flex-direction: column;
+      }
+
+      .review-date {
+        width: fit-content;
+      }
     }
   </style>
 </head>
@@ -122,26 +233,30 @@
   <div class="page-wrap">
 
     <!-- 상단 제목 -->
-    <div class="page-title-card mb-4">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h3 class="fw-bold mb-2">
+    <div class="page-title-card">
+      <div class="d-flex justify-content-between align-items-center gap-3">
+        <div class="title-area">
+          <h3>
             <i class="bi bi-chat-square-heart"></i>
             내가 작성한 병원 리뷰
           </h3>
-          <p class="text-muted mb-0">
+
+          <p>
             동물병원 진료 후 작성한 리뷰를 한눈에 확인할 수 있습니다.
           </p>
         </div>
 
-        <span class="badge-review">
-          총 <span th:text="${#lists.size(reviewList)}">0</span>개
-        </span>
+        <div class="summary-card">
+          <span>전체 리뷰</span>
+          <strong>
+            <span th:text="${reviewPage.totalElements}">0</span>개
+          </strong>
+        </div>
       </div>
     </div>
 
     <!-- 작성한 리뷰가 없을 때 -->
-    <div th:if="${#lists.isEmpty(reviewList)}"
+    <div th:if="${#lists.isEmpty(reviewPage.content)}"
          class="empty-card">
 
       <div class="empty-icon">
@@ -163,50 +278,45 @@
     </div>
 
     <!-- 리뷰 목록 -->
-    <div th:each="review : ${reviewList}"
+    <div th:each="review : ${reviewPage.content}"
          class="review-card mb-3">
 
       <div class="review-top">
         <div>
-          <!-- 병원명 -->
           <div class="hospital-name">
             <i class="bi bi-hospital"></i>
             <span th:text="${review.hospitalName}">병원명</span>
           </div>
 
-          <!-- 작성자 -->
           <div class="review-writer-small">
             작성자:
             <span th:text="${review.memberNickname}">닉네임</span>
           </div>
         </div>
 
-        <!-- 작성일 -->
         <div class="review-date"
              th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd')}">
           2026-06-02
         </div>
       </div>
 
-      <!-- 별점 -->
       <div class="star-rating">
         <i th:each="i : ${#numbers.sequence(1, 5)}"
            th:class="${i <= review.rating} ? 'bi bi-star-fill' : 'bi bi-star'">
         </i>
 
-        <span class="text-muted ms-2"
+        <span class="score-text"
               th:text="${review.rating + '점'}">
           5점
         </span>
       </div>
 
-      <!-- 리뷰 내용 -->
       <p class="review-content"
          th:text="${review.content}">
         리뷰 내용
       </p>
 
-      <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <span class="review-meta">
           리뷰 번호:
           <span th:text="${review.id}">1</span>
@@ -218,6 +328,31 @@
           병원 상세 보기
         </a>
       </div>
+    </div>
+
+    <!-- 페이징 -->
+    <div class="pagination-wrap" th:if="${reviewPage.totalPages > 1}">
+
+      <a class="page-btn"
+         th:classappend="${reviewPage.first} ? ' disabled' : ''"
+         th:href="${reviewPage.first} ? '#' : @{/review/myReview(page=${currentPage - 1})}">
+        이전
+      </a>
+
+      <a class="page-btn"
+         th:each="pageNum : ${#numbers.sequence(0, reviewPage.totalPages - 1)}"
+         th:href="@{/review/myReview(page=${pageNum})}"
+         th:classappend="${pageNum == currentPage} ? ' active' : ''"
+         th:text="${pageNum + 1}">
+        1
+      </a>
+
+      <a class="page-btn"
+         th:classappend="${reviewPage.last} ? ' disabled' : ''"
+         th:href="${reviewPage.last} ? '#' : @{/review/myReview(page=${currentPage + 1})}">
+        다음
+      </a>
+
     </div>
 
   </div>

@@ -9,99 +9,214 @@
 
     <style>
         body {
-            background-color: #f8f9fa;
+            background: #f4f6fb;
+            color: #111827;
         }
 
         .page-wrap {
-            max-width: 1000px;
+            max-width: 1040px;
             margin: 0 auto;
         }
 
         .title-card {
             background: #ffffff;
-            border: none;
-            border-radius: 18px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+            border-radius: 22px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
             padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .title-card h3 {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: -0.7px;
+            color: #111827;
+        }
+
+        .title-card p {
+            margin: 8px 0 0;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .summary-card {
+            min-width: 160px;
+            padding: 16px 20px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            text-align: right;
+            box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
+        }
+
+        .summary-card span {
+            display: block;
+            font-size: 13px;
+            opacity: 0.85;
+            margin-bottom: 4px;
+        }
+
+        .summary-card strong {
+            font-size: 26px;
+            font-weight: 900;
         }
 
         .vaccination-card {
             background: #ffffff;
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            border: 1px solid #e5e7eb;
+            border-radius: 22px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
             padding: 24px;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            transition: transform 0.16s ease, box-shadow 0.16s ease;
         }
 
         .vaccination-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 26px rgba(0,0,0,0.11);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
         }
 
-        .badge-count {
-            background-color: #eef3ff;
-            color: #2b44cc;
-            border-radius: 20px;
-            padding: 6px 12px;
-            font-size: 0.85rem;
+        .vaccine-title {
+            margin: 0;
+            color: #111827;
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .pet-name {
+            color: #2563eb;
+            font-weight: 900;
+        }
+
+        .species-text {
+            color: #6b7280;
             font-weight: 700;
         }
 
         .badge-vaccine {
-            background-color: #e8f7ee;
-            color: #1f8f4d;
-            border-radius: 20px;
-            padding: 6px 12px;
-            font-size: 0.85rem;
-            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #15803d;
+            font-size: 13px;
+            font-weight: 900;
         }
 
-        .pet-name {
-            color: #2b44cc;
-            font-weight: 700;
+        .badge-vaccine::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .info-box {
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 16px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
         }
 
         .info-label {
-            color: #868e96;
-            font-size: 0.85rem;
-            margin-bottom: 4px;
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 5px;
+            font-weight: 800;
         }
 
         .info-value {
-            color: #212529;
-            font-weight: 700;
+            color: #111827;
+            font-weight: 900;
+        }
+
+        .record-number {
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .btn-detail {
+            border-radius: 12px;
+            font-weight: 800;
+            padding: 8px 13px;
         }
 
         .empty-card {
             background: #ffffff;
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
-            padding: 50px 20px;
+            border: 1px dashed #cbd5e1;
+            border-radius: 22px;
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+            padding: 58px 20px;
             text-align: center;
-            color: #868e96;
+            color: #6b7280;
         }
 
         .empty-icon {
-            font-size: 42px;
-            color: #adb5bd;
+            font-size: 48px;
+            color: #9ca3af;
             margin-bottom: 12px;
         }
 
-        .btn-detail {
-            border-radius: 10px;
-            font-weight: 600;
+        .pagination-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            margin-top: 30px;
         }
 
-        .date-warning {
-            color: #b52844;
-            font-weight: 700;
+        .page-btn {
+            min-width: 40px;
+            height: 40px;
+            padding: 0 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #374151;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 900;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
         }
 
-        .date-normal {
-            color: #1f8f4d;
-            font-weight: 700;
+        .page-btn:hover {
+            background: #eff6ff;
+            border-color: #2563eb;
+            color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .page-btn.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+        }
+
+        .page-btn.disabled {
+            pointer-events: none;
+            opacity: 0.4;
+            background: #f9fafb;
+        }
+
+        @media (max-width: 768px) {
+            .title-card > div {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            .summary-card {
+                text-align: left;
+            }
         }
     </style>
 </head>
@@ -114,27 +229,30 @@
     <div class="page-wrap">
 
         <!-- 상단 제목 -->
-        <div class="title-card mb-4">
-            <div class="d-flex justify-content-between align-items-center">
+        <div class="title-card">
+            <div class="d-flex justify-content-between align-items-center gap-3">
                 <div>
-                    <h3 class="fw-bold mb-2">
+                    <h3>
                         <i class="bi bi-shield-plus"></i>
                         내 동물 예방접종
                     </h3>
 
-                    <p class="text-muted mb-0">
+                    <p>
                         등록된 반려동물의 예방접종 기록과 다음 접종 예정일을 확인할 수 있습니다.
                     </p>
                 </div>
 
-                <span class="badge-count">
-                    총 <span th:text="${#lists.size(vaccinationList)}">0</span>건
-                </span>
+                <div class="summary-card">
+                    <span>전체 접종 기록</span>
+                    <strong>
+                        <span th:text="${vaccinationPage.totalElements}">0</span>건
+                    </strong>
+                </div>
             </div>
         </div>
 
         <!-- 예방접종 기록이 없을 때 -->
-        <div th:if="${#lists.isEmpty(vaccinationList)}"
+        <div th:if="${#lists.isEmpty(vaccinationPage.content)}"
              class="empty-card">
 
             <div class="empty-icon">
@@ -156,25 +274,28 @@
         </div>
 
         <!-- 예방접종 목록 -->
-        <div th:each="vaccination : ${vaccinationList}"
+        <div th:each="vaccination : ${vaccinationPage.content}"
              class="vaccination-card mb-3">
 
-            <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                 <div>
-                    <h5 class="fw-bold mb-1">
+                    <h5 class="vaccine-title">
                         <i class="bi bi-shield-check"></i>
-                        <span th:text="${vaccination.vaccineName}">종합백신</span>
+                        <span th:text="${vaccination.vaccineName}">
+                            종합백신
+                        </span>
                     </h5>
 
-                    <div class="text-muted">
+                    <div class="mt-2">
                         반려동물:
                         <span class="pet-name"
                               th:text="${vaccination.petName}">
                             초코
                         </span>
 
-                        <span th:if="${vaccination.species != null}">
-                            (<span th:text="${vaccination.species}">푸들</span>)
+                        <span class="species-text"
+                              th:if="${vaccination.species != null}">
+                            (<span th:text="${vaccination.species}">강아지</span>)
                         </span>
                     </div>
                 </div>
@@ -184,36 +305,36 @@
                 </span>
             </div>
 
-            <hr>
+            <div class="info-box">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="info-label">
+                            <i class="bi bi-calendar-check"></i>
+                            접종일
+                        </div>
 
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <div class="info-label">
-                        <i class="bi bi-calendar-check"></i>
-                        접종일
+                        <div class="info-value"
+                             th:text="${#temporals.format(vaccination.vaccinatedDate, 'yyyy-MM-dd')}">
+                            2026-05-10
+                        </div>
                     </div>
 
-                    <div class="info-value"
-                         th:text="${#temporals.format(vaccination.vaccinatedDate, 'yyyy-MM-dd')}">
-                        2026-05-10
-                    </div>
-                </div>
+                    <div class="col-md-6">
+                        <div class="info-label">
+                            <i class="bi bi-calendar-plus"></i>
+                            다음 접종 예정일
+                        </div>
 
-                <div class="col-md-6">
-                    <div class="info-label">
-                        <i class="bi bi-calendar-plus"></i>
-                        다음 접종 예정일
-                    </div>
-
-                    <div class="info-value"
-                         th:text="${#temporals.format(vaccination.nextDate, 'yyyy-MM-dd')}">
-                        2027-05-10
+                        <div class="info-value"
+                             th:text="${#temporals.format(vaccination.nextDate, 'yyyy-MM-dd')}">
+                            2027-05-10
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <span class="text-muted small">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+                <span class="record-number">
                     접종 기록 번호:
                     <span th:text="${vaccination.id}">1</span>
                 </span>
@@ -224,6 +345,31 @@
                     마이페이지
                 </a>
             </div>
+        </div>
+
+        <!-- 페이징 -->
+        <div class="pagination-wrap" th:if="${vaccinationPage.totalPages > 1}">
+
+            <a class="page-btn"
+               th:classappend="${vaccinationPage.first} ? ' disabled' : ''"
+               th:href="${vaccinationPage.first} ? '#' : @{/vaccination/myVaccination(page=${currentPage - 1})}">
+                이전
+            </a>
+
+            <a class="page-btn"
+               th:each="pageNum : ${#numbers.sequence(0, vaccinationPage.totalPages - 1)}"
+               th:href="@{/vaccination/myVaccination(page=${pageNum})}"
+               th:classappend="${pageNum == currentPage} ? ' active' : ''"
+               th:text="${pageNum + 1}">
+                1
+            </a>
+
+            <a class="page-btn"
+               th:classappend="${vaccinationPage.last} ? ' disabled' : ''"
+               th:href="${vaccinationPage.last} ? '#' : @{/vaccination/myVaccination(page=${currentPage + 1})}">
+                다음
+            </a>
+
         </div>
 
         <!-- 하단 버튼 -->

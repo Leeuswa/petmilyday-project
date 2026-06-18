@@ -1,6 +1,7 @@
 package com.petmilyday.service.admin;
 
 import com.petmilyday.dto.admin.AdminHospitalDTO;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -12,6 +13,9 @@ public interface AdminHospitalService {
     //병원 전체 목록
     List<AdminHospitalDTO> findAll();
 
+    //병원 전체 목록 페이징
+    Page<AdminHospitalDTO> findAllPage(int page);
+
     //병원 1개 조회
     AdminHospitalDTO findById(Long hospitalId);
 
@@ -20,6 +24,4 @@ public interface AdminHospitalService {
 
     //병원 데이터 삭제
     void remove(Long hospitalId);
-
-
 }

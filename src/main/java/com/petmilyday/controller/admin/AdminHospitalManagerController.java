@@ -16,9 +16,11 @@ public class AdminHospitalManagerController {
 
     // 병원 관리자 신청 목록
     @GetMapping
-    public String waitingList(Model model) {
+    public String waitingList(@RequestParam(defaultValue = "0") int page,
+                              Model model) {
 
-        model.addAttribute("managerList", hospitalManagerService.waitingList());
+        model.addAttribute("managerPage", hospitalManagerService.waitingListPage(page));
+        model.addAttribute("currentPage", page);
 
         return "admin/hospitalManager/hospitalManagerList";
     }

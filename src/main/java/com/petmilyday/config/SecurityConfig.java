@@ -37,10 +37,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .logout(logout -> logout
-                        .logoutUrl("/member/logout") // 우리가 지정한 로그아웃 URL 주소
-                        .logoutSuccessUrl("/")       // 성공 시 리다이렉트할 주소
-                        .deleteCookies("Authorization", "JSESSIONID") // 🌟 브라우저 쿠키 강제 파기 명시
-                        .invalidateHttpSession(true) // 기존 세션 무효화
+                        .logoutUrl("/member/logout")
+                        .logoutSuccessUrl("/")
+                        .deleteCookies("Authorization", "JSESSIONID")
+                        .invalidateHttpSession(true)
                 )
 
                 // 폼 로그인 화면이나 기존 세션 기반 로그아웃 메커니즘을 사용하지 않으므로 비활성화
@@ -60,30 +60,76 @@ public class SecurityConfig {
 
                 // API별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        // 회원가입, 로그인, 토큰 재발급 등 인증이 필요 없는 경로 허용
-                        .requestMatchers("/shop/**", "/api/subscription/**","/shop/subscription").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/", "/error").permitAll()
-                        .requestMatchers("/member/register", "/member/login", "/member/reissue", "/member/check-username").permitAll()
-                        .requestMatchers("/community/meetup/**","/community/list", "/hospital/list", "/shop/list", "/ai/diagnosis").permitAll()
+
+                        // 정적 리소스 허용
+                        .requestMatchers(
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/img/**",
+                                "/webjars/**",
+                                "/favicon.ico",
+                                "/",
+                                "/error"
+                        ).permitAll()
+
+                        // 회원가입, 로그인, 토큰 재발급, 아이디 중복체크 허용
+                        .requestMatchers(
+                                "/member/register",
+                                "/member/login",
+                                "/member/reissue",
+                                "/member/check-username"
+                        ).permitAll()
+
+                        // 공개 페이지 허용
+                        .requestMatchers(
+                                "/community/list",
+                                "/community/meetup/**",
+                                "/hospital/list",
+                                "/shop/list",
+                                "/ai/diagnosis"
+                        ).permitAll()
+
+                        // 쇼핑/구독 관련 공개 API
+                        .requestMatchers(
+                                "/shop/**",
+                                "/api/subscription/**",
+                                "/shop/subscription"
+                        ).permitAll()
+
+                        // SSE 알림 구독 경로 허용
+                        .requestMatchers(
+                                "/notifications/**",
+                                "/api/notifications/**",
+                                "/notification/**",
+                                "/api/notification/**"
+                        ).permitAll()
 
                         // 메인 관리자 페이지는 ADMIN 권한만 접근 가능
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // 병원 관리자 페이지는 HOSPITAL_ADMIN 권한만 접근 가능
-                        .requestMatchers("/hospitalAdmin/**").hasRole("HOSPITAL_ADMIN")
+                        .requestMatchers(
+                                "/hospitalAdmin/**",
+                                "/hospital-admin/**"
+                        ).hasRole("HOSPITAL_ADMIN")
 
-                        // 나머지 모든 회원 수정, 탈퇴, 반려동물 프로필 등 API는 JWT 인증 필수
+                        // 나머지 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
 
-                // OAuth2 소셜 로그인도 JWT에 맞춰서 설정 (성공 핸들러 추가 필요)
+                // OAuth2 소셜 로그인도 JWT에 맞춰서 설정
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
-                        .successHandler(oAuth2SuccessHandler) // 성공 핸들러 명시적 등록
+                        .successHandler(oAuth2SuccessHandler)
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(jwtTokenProvider),
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
@@ -92,6 +138,13 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/img/**", "/favicon.ico", "/error"); // 로컬 파일 업로드 경로도 추가
+                .requestMatchers(
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/img/**",
+                        "/favicon.ico",
+                        "/error"
+                );
     }
 }

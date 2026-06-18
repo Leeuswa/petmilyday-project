@@ -82,4 +82,8 @@ public class Reservation {
     public void done() {
         this.status = ReservationStatus.DONE;
     }
+
+    public void changeWaitNumber(int waitNumber) {
+        this.waitNumber = waitNumber;
+    }
 }

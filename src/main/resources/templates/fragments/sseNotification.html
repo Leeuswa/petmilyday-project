@@ -32,6 +32,14 @@
       eventSource.addEventListener("notification", function (event) {
         const data = JSON.parse(event.data);
 
+        // 현재 페이지에서도 알림 데이터를 사용할 수 있게 이벤트 전달
+        // reservationList.html에서 대기번호 실시간 변경할 때 사용
+        window.dispatchEvent(
+                new CustomEvent("petmily-notification", {
+                  detail: data
+                })
+        );
+
         // 알림을 헤더 알림 목록에 추가
         addNotificationToHeader(data);
       });

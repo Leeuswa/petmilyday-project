@@ -1,13 +1,12 @@
 package com.petmilyday.service.admin;
 
 import com.petmilyday.dto.admin.AdminReservationDTO;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface AdminReservationService {
 
-    // 예약 리스트
-    List<AdminReservationDTO> reservationList();
+    // 예약 리스트 페이징
+    Page<AdminReservationDTO> reservationList(int page);
 
     // 예약 상세보기
     AdminReservationDTO reservationDetail(Long reservationId);

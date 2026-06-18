@@ -245,3 +245,39 @@ body {
 .modal-box h3 {
     margin-top: 0;
 }
+
+.menu-section {
+    margin-bottom: 22px;
+}
+
+.menu-title {
+    padding: 0 18px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #8b95a7;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.menu a {
+    display: block;
+    padding: 12px 18px;
+    margin: 4px 10px;
+    border-radius: 10px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.menu a:hover {
+    background-color: #f1f4ff;
+    color: #2b44cc;
+}
+
+.menu a.active {
+    background-color: #2b44cc;
+    color: white;
+    font-weight: 700;
+}

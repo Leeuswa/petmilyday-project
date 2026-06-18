@@ -8,6 +8,9 @@ import com.petmilyday.repository.hospital.HospitalRepository;
 import com.petmilyday.service.hospital.HospitalService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,17 @@ public class HospitalServiceImpl implements HospitalService {
         return hospitals.stream()
                 .map(hospital -> modelMapper.map(hospital, HospitalResponseDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    // 병원 목록 조회 + 페이징
+    @Override
+    @Transactional(readOnly = true)
+    public Page<HospitalResponseDTO> hospitalListPage(HospitalRequestDTO requestDTO, int page) {
+
+        Pageable pageable = PageRequest.of(page, 9);
+
+        return hospitalRepository.searchHospitalsPage(requestDTO, pageable)
+                .map(hospital -> modelMapper.map(hospital, HospitalResponseDTO.class));
     }
 
     // 병원 1개만 조회
