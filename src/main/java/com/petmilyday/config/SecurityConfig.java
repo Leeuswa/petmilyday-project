@@ -5,10 +5,12 @@ import com.petmilyday.config.jwt.JwtTokenProvider;
 import com.petmilyday.config.jwt.OAuth2SuccessHandler;
 import com.petmilyday.service.member.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -34,6 +36,13 @@ public class SecurityConfig {
                 // 무상태 환경이므로 CSRF 공격 보호를 비활성화
                 .csrf(csrf -> csrf.disable())
 
+                .logout(logout -> logout
+                        .logoutUrl("/member/logout")
+                        .logoutSuccessUrl("/")
+                        .deleteCookies("Authorization", "JSESSIONID")
+                        .invalidateHttpSession(true)
+                )
+
                 // 폼 로그인 화면이나 기존 세션 기반 로그아웃 메커니즘을 사용하지 않으므로 비활성화
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
@@ -51,26 +60,31 @@ public class SecurityConfig {
 
                 // API별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
+
                         // 정적 리소스 허용
                         .requestMatchers(
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
+                                "/img/**",
                                 "/webjars/**",
+                                "/favicon.ico",
                                 "/",
                                 "/error"
                         ).permitAll()
 
-                        // 회원가입, 로그인, 토큰 재발급 등 인증이 필요 없는 경로 허용
+                        // 회원가입, 로그인, 토큰 재발급, 아이디 중복체크 허용
                         .requestMatchers(
                                 "/member/register",
                                 "/member/login",
-                                "/member/reissue"
+                                "/member/reissue",
+                                "/member/check-username"
                         ).permitAll()
 
                         // 공개 페이지 허용
                         .requestMatchers(
                                 "/community/list",
+                                "/community/meetup/**",
                                 "/hospital/list",
                                 "/shop/list",
                                 "/ai/diagnosis"
@@ -95,7 +109,10 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // 병원 관리자 페이지는 HOSPITAL_ADMIN 권한만 접근 가능
-                        .requestMatchers("/hospitalAdmin/**").hasRole("HOSPITAL_ADMIN")
+                        .requestMatchers(
+                                "/hospitalAdmin/**",
+                                "/hospital-admin/**"
+                        ).hasRole("HOSPITAL_ADMIN")
 
                         // 나머지 모든 요청은 인증 필요
                         .anyRequest().authenticated()
@@ -117,5 +134,17 @@ public class SecurityConfig {
         return http.build();
     }
 
-
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                .requestMatchers(
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/img/**",
+                        "/favicon.ico",
+                        "/error"
+                );
+    }
 }

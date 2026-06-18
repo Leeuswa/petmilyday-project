@@ -7,12 +7,17 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 @Log4j2
 @Component
@@ -34,11 +39,11 @@ public class JwtTokenProvider {
 
     @PostConstruct
     protected void init() {
-        // 문자열을 가반으로 안전한 HMAC-SHA 비밀키 생성
+        // 문자열 가반 HMAC-SHA 비밀키 생성
         this.secretKey = Keys.hmacShaKeyFor(secretKeyString.getBytes());
     }
 
-    // 1. JWT 토큰 생성
+    // JWT 토큰 생성
     public String createToken(String username, String role) {
         Claims claims = Jwts.claims().subject(username).build();
         Date now = new Date();
@@ -53,14 +58,36 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // 2. 토큰에서 인증 정보 조회 (SecurityContextHolder에 담을 객체 생성)
+    // 토큰에서 인증 정보 조회
     public Authentication getAuthentication(String token) {
-        String username = getUsername(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            String username = claims.getSubject();
+            String role = claims.get("role", String.class);
+
+            List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+
+            User principal = new User(username, "", authorities);
+
+            return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+
+        } catch (ExpiredJwtException e) {
+            // 토큰 유효기간이 지났을 때
+            log.error("만료된 JWT 토큰입니다: {}", e.getMessage());
+
+        } catch (JwtException | IllegalArgumentException e) {
+            // 토큰이 조작되었거나 깨졌을 때
+            log.error("유효하지 않은 JWT 토큰입니다: {}", e.getMessage());
+        }
+        return null;
     }
 
-    // 3. 토큰에서 회원 아이디(username) 추출
+    // 토큰에서 회원 아이디 추출
     public String getUsername(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
@@ -70,7 +97,7 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
-    // 4. 토큰의 유효성 + 만료일자 확인 검증 검사
+    // 토큰의 유효성 + 만료일자 확인 검증 검사
     public boolean validateToken(String token) {
         try {
             Jws<Claims> claims = Jwts.parser()
@@ -79,7 +106,7 @@ public class JwtTokenProvider {
                     .parseSignedClaims(token);
             return !claims.getPayload().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("❌ 잘못되거나 만료된 JWT 토큰입니다: {}", e.getMessage());
+            log.error("잘못되거나 만료된 JWT 토큰입니다: {}", e.getMessage());
             return false;
         }
     }

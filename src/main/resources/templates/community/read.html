@@ -161,7 +161,7 @@
             method: "POST",
             headers: getAuthHeaders(),
             credentials: "include",
-            body: JSON.stringify({}) // ★ 빈 데이터를 명시적으로 보내어 서버 에러를 방지합니다.
+            body: JSON.stringify({}) // 빈 데이터를 명시적으로 보내어 서버 에러를 방지합니다.
         })
             .then(response => {
                 if(response.ok) loadComments();

@@ -47,21 +47,18 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    // 🎯 [신규 추가] 리뷰 삭제 (본인인증 또는 관리자 권한 프리패스)
+    // 리뷰 삭제
     @Transactional
     public void deleteReview(Long reviewId, Long currentMemberId, boolean isAdmin) {
-        // 1. 리뷰가 존재하는지 확인
         ProductReview review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 리뷰입니다."));
 
-        // 2. 권한 검증: 관리자(ADMIN)가 아니고, 리뷰 작성자 본인도 아니라면 무조건 차단!
         boolean isOwner = review.getMemberId().equals(currentMemberId);
 
         if (!isAdmin && !isOwner) {
             throw new IllegalArgumentException("이 리뷰를 삭제할 권한이 없습니다.");
         }
 
-        // 3. 검증 통과하면 DB에서 시원하게 삭제 슛!
         reviewRepository.delete(review);
     }
 }

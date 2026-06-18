@@ -12,6 +12,7 @@ public class CartItemResponseDto {
     private String imgUrl;
     private Integer quantity;
 
+    // 장바구니 엔티티 데이터를 화면 반환용 DTO로 변환
     public CartItemResponseDto(CartItem entity) {
         this.cartItemId = entity.getId();
         this.productId = entity.getProduct().getId();

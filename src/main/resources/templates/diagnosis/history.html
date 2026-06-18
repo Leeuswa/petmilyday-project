@@ -131,6 +131,40 @@
             color:#3d4670;
             line-height:1.6;
         }
+
+        .severity-low{
+            color:#16a34a;
+        }
+
+        .severity-medium{
+            color:#f59e0b;
+        }
+
+        .severity-high{
+            color:#dc2626;
+        }
+
+        .result-summary{
+            display:flex;
+            align-items:center;
+            gap:10px;
+            margin-top:15px;
+            margin-bottom:15px;
+        }
+
+        .disease-label{
+            color:#64748b;
+            font-size:14px;
+        }
+
+        .severity-badge{
+            background:#eef2ff;
+            color:#3d58e0;
+            padding:4px 10px;
+            border-radius:20px;
+            font-size:13px;
+            font-weight:700;
+        }
     </style>
 </head>
 
@@ -145,7 +179,7 @@
 
         <a href="/diagnosis"
            class="btn-diagnosis">
-            AI 진단하기
+            다시 진단
         </a>
     </div>
 
@@ -154,13 +188,17 @@
         진단 이력이 없습니다.
     </div>
 
-    <div th:if="${histories != null and !histories.content.isEmpty()}">
+    <div th:if="${histories != null and not histories.content.isEmpty()}">
 
         <div th:each="history : ${histories.content}"
              class="history-card">
 
-            <div class="pet-name"
-                 th:text="${history.pet.name}">
+            <div class="pet-name">
+                <span th:text="${history.pet.name + ' (' + history.pet.species + ')'}"></span>
+            </div>
+
+            <div class="date"
+                 th:text="${#temporals.format(history.createdAt,'yyyy-MM-dd HH:mm')}">
             </div>
 
             <div class="symptom">
@@ -169,24 +207,28 @@
                 </div>
             </div>
 
-            <div class="disease"
-                 th:text="${history.resultDisease}">
-            </div>
+            <img th:if="${history.imageUrl != null}"
+                 th:src="${history.imageUrl}"
+                 style="width:120px;
+                height:90px;
+                object-fit:cover;
+                border-radius:10px;
+                margin-top:10px;
+                border:1px solid #e2e8f0;">
 
-            <div class="severity"
-                 th:text="${history.resultSeverity}">
+            <div class="result-summary">
+
+                <span class="disease-label">의심 질환</span>
+                <span th:text="${history.resultDisease}"></span>
+
+                <span class="severity-badge"
+                      th:text="${history.resultSeverity}">
+                </span>
+
             </div>
 
             <div class="recommend"
                  th:text="${history.resultRecommend}">
-            </div>
-
-            <img th:if="${history.imageUrl != null}"
-                 th:src="${history.imageUrl}"
-                 style="width:120px; height:90px; object-fit:cover; border-radius:10px; margin-bottom:10px;">
-
-            <div class="date"
-                 th:text="${#temporals.format(history.createdAt,'yyyy-MM-dd HH:mm')}">
             </div>
 
         </div>

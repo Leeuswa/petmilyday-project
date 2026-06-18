@@ -24,17 +24,14 @@ public class MannerScoreServiceImpl implements MannerScoreService {
     @Override
     public Double getAverageScore(Long memberId) {
 
-        List<MannerScore> scores =
-                mannerScoreRepository.findByToMember_Id(memberId);
-
-        if (scores.isEmpty()) {
+        if (memberId == null) {
             return 0.0;
         }
 
-        return scores.stream()
-                .mapToInt(MannerScore::getScore)
-                .average()
-                .orElse(0.0);
+        Double average =
+                mannerScoreRepository.findAverageByToMemberId(memberId);
+
+        return average != null ? average : 0.0;
     }
 
     @Override
@@ -92,5 +89,12 @@ public class MannerScoreServiceImpl implements MannerScoreService {
                         .build();
 
         mannerScoreRepository.save(mannerScore);
+
+        Double average =
+                mannerScoreRepository.findAverageByToMemberId(toMemberId);
+
+        usedPost.setMannerAverage(average != null ? average : 0.0);
+
+        usedPostRepository.save(usedPost);
     }
 }

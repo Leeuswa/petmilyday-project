@@ -40,13 +40,13 @@ public class Product {
 
     // =============== [상세페이지 연동 컬럼 추가] ===============
     @Column(name = "material", length = 100)
-    private String material; // 주요 소재 (예: 마이크로화이버 고밀도 코튼)
+    private String material;
 
     @Column(name = "size_info", length = 100)
-    private String sizeInfo; // 사이즈 (예: M size)
+    private String sizeInfo;
 
     @Column(name = "origin", length = 100)
-    private String origin; // 제조국 / 제조원 (예: 대한민국 / petmilyday 협력사)
+    private String origin;
     // ========================================================
 
     @Column(name = "is_active", nullable = false)

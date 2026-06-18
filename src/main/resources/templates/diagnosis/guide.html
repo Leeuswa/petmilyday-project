@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>petmilyday - AI 동물 가이드</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+        *{
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+            font-family:'Sora',sans-serif;
+        }
+
+        body{
+            background:#f0f2f7;
+            color:#0d1433;
+        }
+
+        .main-container{
+            max-width:1000px;
+            margin:40px auto;
+        }
+
+        .page-title{
+            font-size:26px;
+            font-weight:700;
+            margin-bottom:8px;
+        }
+
+        .page-desc{
+            color:#64748b;
+            margin-bottom:24px;
+        }
+
+        .guide-card{
+            background:white;
+            border:1px solid #d0d5e8;
+            border-radius:14px;
+            padding:28px;
+        }
+
+        .form-label{
+            display:block;
+            font-weight:700;
+            margin-bottom:10px;
+        }
+
+        .question-box{
+            width:100%;
+            min-height:140px;
+            border:1px solid #d0d5e8;
+            border-radius:12px;
+            padding:14px;
+            resize:none;
+            font-size:14px;
+            line-height:1.6;
+        }
+
+        .btn-submit{
+            margin-top:15px;
+            border:none;
+            background:#3d58e0;
+            color:white;
+            border-radius:10px;
+            padding:12px 22px;
+            font-weight:700;
+            cursor:pointer;
+        }
+
+        .btn-submit:hover{
+            background:#2b44cc;
+        }
+
+        .answer-box{
+            margin-top:28px;
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            border-radius:12px;
+            padding:20px;
+            line-height:1.8;
+            white-space:pre-line;
+        }
+
+        .example-box{
+            margin-top:24px;
+            background:#ffffff;
+            border:1px solid #d0d5e8;
+            border-radius:14px;
+            padding:22px;
+        }
+
+        .example-title{
+            font-weight:700;
+            margin-bottom:12px;
+        }
+
+        .example-list{
+            color:#475569;
+            line-height:2;
+            margin-left:18px;
+        }
+
+        .btn-back{
+            display:inline-block;
+            margin-top:20px;
+            text-decoration:none;
+            color:#3d58e0;
+            font-weight:700;
+        }
+
+        .example-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:12px;
+        }
+
+        .example-more-btn{
+            border:none;
+            background:#eef2ff;
+            color:#3d58e0;
+            padding:8px 14px;
+            border-radius:8px;
+            font-weight:700;
+            cursor:pointer;
+        }
+
+        .example-more-btn:hover{
+            background:#dbe4ff;
+        }
+
+        .example-list li{
+            cursor:pointer;
+            padding:4px 0;
+        }
+
+        .example-list li:hover{
+            color:#3d58e0;
+            font-weight:600;
+        }
+
+        .more-examples{
+            display:none;
+            margin-top:8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="main-container">
+
+    <h2 class="page-title">AI 동물 가이드</h2>
+
+    <p class="page-desc">
+        반려동물의 품종, 생활 습관, 건강 관리, 사료 등 궁금한 점을 질문할 수 있습니다.
+    </p>
+
+    <div class="guide-card">
+
+        <form th:action="@{/ai-guide}"
+              method="post">
+
+            <label class="form-label">
+                질문 입력
+            </label>
+
+            <textarea name="question"
+                      class="question-box"
+                      placeholder="예: 고양이가 물을 잘 안 마실 때 어떻게 관리해야 하나요?"
+                      th:text="${question}">
+            </textarea>
+
+            <button type="submit"
+                    class="btn-submit">
+                AI 가이드 요청
+            </button>
+
+        </form>
+
+        <div th:if="${answer != null}"
+             class="answer-box"
+             th:text="${answer}">
+        </div>
+
+    </div>
+
+    <div class="example-box">
+
+        <div class="example-header">
+            <div class="example-title">
+                질문 예시
+            </div>
+
+            <button type="button"
+                    class="example-more-btn"
+                    onclick="toggleExamples()">
+                예시 더보기
+            </button>
+        </div>
+
+        <ul class="example-list">
+            <li onclick="setQuestion('강아지가 분리불안이 있을 때 어떻게 도와줘야 하나요?')">
+                강아지가 분리불안이 있을 때 어떻게 도와줘야 하나요?
+            </li>
+
+            <li onclick="setQuestion('고양이가 물을 잘 안 마실 때 관리 방법이 궁금해요.')">
+                고양이가 물을 잘 안 마실 때 관리 방법이 궁금해요.
+            </li>
+
+            <li onclick="setQuestion('노령견에게 좋은 생활 관리 방법을 알려주세요.')">
+                노령견에게 좋은 생활 관리 방법을 알려주세요.
+            </li>
+
+            <li onclick="setQuestion('반려동물이 사료를 잘 안 먹을 때 어떻게 해야 하나요?')">
+                반려동물이 사료를 잘 안 먹을 때 어떻게 해야 하나요?
+            </li>
+        </ul>
+
+        <ul id="moreExamples"
+            class="example-list more-examples">
+
+            <li onclick="setQuestion('고양이 화장실은 몇 개 정도 두는 게 좋나요?')">
+                고양이 화장실은 몇 개 정도 두는 게 좋나요?
+            </li>
+
+            <li onclick="setQuestion('고양이가 밤마다 우다다를 심하게 해요. 어떻게 해야 하나요?')">
+                고양이가 밤마다 우다다를 심하게 해요. 어떻게 해야 하나요?
+            </li>
+
+            <li onclick="setQuestion('고양이가 스크래처를 안 쓰고 소파를 긁어요.')">
+                고양이가 스크래처를 안 쓰고 소파를 긁어요.
+            </li>
+
+            <li onclick="setQuestion('강아지 입냄새가 심한데 어떻게 관리해야 하나요?')">
+                강아지 입냄새가 심한데 어떻게 관리해야 하나요?
+            </li>
+
+            <li onclick="setQuestion('강아지가 산책을 너무 싫어해요. 어떻게 적응시키면 좋을까요?')">
+                강아지가 산책을 너무 싫어해요. 어떻게 적응시키면 좋을까요?
+            </li>
+
+            <li onclick="setQuestion('강아지가 낯선 사람을 보면 많이 짖어요.')">
+                강아지가 낯선 사람을 보면 많이 짖어요.
+            </li>
+
+            <li onclick="setQuestion('고양이 털이 많이 빠지는데 관리 방법이 궁금해요.')">
+                고양이 털이 많이 빠지는데 관리 방법이 궁금해요.
+            </li>
+
+            <li onclick="setQuestion('강아지 목욕은 얼마나 자주 시켜야 하나요?')">
+                강아지 목욕은 얼마나 자주 시켜야 하나요?
+            </li>
+
+        </ul>
+
+    </div>
+
+    <a href="/ai-diagnosis"
+       class="btn-back">
+        ← AI 자가진단 메인으로
+    </a>
+
+</div>
+
+</body>
+<script>
+    const form = document.querySelector("form");
+    const button = document.querySelector("button[type='submit']");
+
+    if (form && button) {
+        form.addEventListener("submit", function () {
+            button.disabled = true;
+            button.innerText = "처리 중...";
+        });
+    }
+</script>
+<script>
+    function toggleExamples() {
+        const moreExamples = document.getElementById("moreExamples");
+        const button = document.querySelector(".example-more-btn");
+
+        if (moreExamples.style.display === "none" || moreExamples.style.display === "") {
+            moreExamples.style.display = "block";
+            button.innerText = "예시 접기";
+        } else {
+            moreExamples.style.display = "none";
+            button.innerText = "예시 더보기";
+        }
+    }
+
+    function setQuestion(text) {
+        const questionBox = document.querySelector("textarea[name='question']");
+        questionBox.value = text;
+        questionBox.focus();
+    }
+</script>
+</html>

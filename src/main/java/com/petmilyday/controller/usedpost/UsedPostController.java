@@ -8,7 +8,6 @@ import com.petmilyday.entity.used.UsedPostStatus;
 import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.repository.used.UsedPostReportRepository;
 import com.petmilyday.repository.used.UsedPostRepository;
-import com.petmilyday.service.usedpost.MannerScoreService;
 import com.petmilyday.service.usedpost.UsedPostService;
 import com.petmilyday.service.wishlist.WishlistService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -35,24 +33,7 @@ public class UsedPostController {
     private final WishlistService wishlistService;
     private final MemberRepository memberRepository;
     private final UsedPostRepository usedPostRepository;
-    private final MannerScoreService mannerScoreService;
     private final UsedPostReportRepository usedPostReportRepository;
-
-    // ItemCondition 변환
-    private ItemCondition parseCondition(String value) {
-
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-
-        try {
-            return ItemCondition.valueOf(value.toUpperCase());
-
-        } catch (IllegalArgumentException e) {
-
-            return null;
-        }
-    }
 
     // UsedPostStatus 변환
     private UsedPostStatus parseStatus(String value) {
@@ -68,6 +49,27 @@ public class UsedPostController {
 
             return null;
         }
+    }
+
+    // 페이징 값 설정
+    private void addPagingAttributes(
+            Model model,
+            Page<?> result,
+            Pageable pageable
+    ) {
+
+        int page = pageable.getPageNumber();
+
+        int startPage = Math.max(0, page - 4);
+
+        int endPage =
+                result.getTotalPages() > 0
+                        ? Math.min(result.getTotalPages() - 1, page + 4)
+                        : 0;
+
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("currentPage", page);
     }
 
     // 중고거래 목록 이동
@@ -86,59 +88,52 @@ public class UsedPostController {
             @RequestParam(required = false) Boolean offerAccepted,
             @RequestParam(required = false, defaultValue = "false") boolean onlyWish,
             Authentication authentication,
-            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC)
+            @PageableDefault(size = 6, sort = "id", direction = Sort.Direction.DESC)
             Pageable pageable,
             Model model
     ) {
 
-        Long memberId = null;
-
-        if (authentication != null) {
-            String username = authentication.getName();
-
-            Member member = memberRepository.findByUsername(username)
-                    .orElse(null);
-
-            if (member != null) {
-                memberId = member.getId();
-            }
-        }
-
         // 찜 목록
         if (onlyWish) {
 
-            if (memberId == null) {
+            if (authentication == null) {
+                return "redirect:/member/login";
+            }
+
+            String username = authentication.getName();
+
+            Member member =
+                    memberRepository.findByUsername(username)
+                            .orElse(null);
+
+            if (member == null) {
                 return "redirect:/member/login";
             }
 
             Page<UsedPost> result =
-                    usedPostService.getWishPosts(memberId, pageable);
+                    usedPostService.getWishPosts(
+                            member.getId(),
+                            pageable
+                    );
 
             Page<UsedPostDTO> posts =
-                    result.map(post -> {
-
-                        UsedPostDTO dto = new UsedPostDTO(post);
-
-                        if (post.getMember() != null) {
-                            dto.setMannerAverage(
-                                    mannerScoreService.getAverageScore(
-                                            post.getMember().getId()
-                                    )
-                            );
-                        } else {
-                            dto.setMannerAverage(0.0);
-                        }
-
-                        return dto;
-                    });
+                    result.map(UsedPostDTO::new);
 
             model.addAttribute("posts", posts);
             model.addAttribute("onlyWish", true);
 
+            model.addAttribute("keyword", keyword);
+            model.addAttribute("category", category);
+            model.addAttribute("region", region);
+            model.addAttribute("condition", condition);
+            model.addAttribute("offerAccepted", offerAccepted);
+
+            addPagingAttributes(model, result, pageable);
+
             return "used/list";
         }
 
-        // offerAccepted 정리 (false → null 처리)
+        // 검색 조건 정리
         if (keyword != null && keyword.isBlank()) {
             keyword = null;
         }
@@ -155,32 +150,15 @@ public class UsedPostController {
             offerAccepted = null;
         }
 
-        Page<UsedPost> result = usedPostService.searchList(
-                keyword,
-                category,
-                region,
-                condition,
-                offerAccepted,
-                pageable
-        );
-
         Page<UsedPostDTO> posts =
-                result.map(post -> {
-
-                    UsedPostDTO dto = new UsedPostDTO(post);
-
-                    if (post.getMember() != null) {
-                        dto.setMannerAverage(
-                                mannerScoreService.getAverageScore(
-                                        post.getMember().getId()
-                                )
-                        );
-                    } else {
-                        dto.setMannerAverage(0.0);
-                    }
-
-                    return dto;
-                });
+                usedPostService.searchListDto(
+                        keyword,
+                        category,
+                        region,
+                        condition,
+                        offerAccepted,
+                        pageable
+                );
 
         model.addAttribute("posts", posts);
 
@@ -191,17 +169,7 @@ public class UsedPostController {
         model.addAttribute("offerAccepted", offerAccepted);
         model.addAttribute("onlyWish", onlyWish);
 
-        int page = pageable.getPageNumber();
-
-        int startPage = Math.max(0, page - 4);
-        int endPage = Math.min(
-                result.getTotalPages() - 1,
-                page + 4
-        );
-
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
-        model.addAttribute("currentPage", page);
+        addPagingAttributes(model, posts, pageable);
 
         return "used/list";
     }
@@ -219,12 +187,12 @@ public class UsedPostController {
 
         String username = authentication.getName();
 
-        Member member = memberRepository.findByUsername(username)
-                .orElse(null);
+        Member member =
+                memberRepository.findByUsername(username)
+                        .orElse(null);
 
         if (member != null) {
 
-            // 닉네임 우선
             String writerName =
                     member.getNickname() != null
                             && !member.getNickname().isBlank()
@@ -232,7 +200,6 @@ public class UsedPostController {
                             : member.getUsername();
 
             model.addAttribute("writerName", writerName);
-
             model.addAttribute("memberId", member.getId());
         }
 
@@ -262,7 +229,6 @@ public class UsedPostController {
     // 게시글 상세 조회
     @GetMapping("/used/detail/{id}")
     public String detail(
-
             @PathVariable Long id,
             Model model,
             Authentication authentication
@@ -283,14 +249,14 @@ public class UsedPostController {
 
             String username = authentication.getName();
 
-            Member member = memberRepository.findByUsername(username)
-                    .orElse(null);
+            Member member =
+                    memberRepository.findByUsername(username)
+                            .orElse(null);
 
             if (member != null) {
                 memberId = member.getId();
             }
         }
-
 
         boolean isWriter =
                 memberId != null
@@ -312,7 +278,9 @@ public class UsedPostController {
         }
 
         Double mannerAverage =
-                mannerScoreService.getAverageScore(post.getMemberId());
+                post.getMannerAverage() != null
+                        ? post.getMannerAverage()
+                        : 0.0;
 
         model.addAttribute("mannerAverage", mannerAverage);
         model.addAttribute("alreadyReported", alreadyReported);
@@ -340,9 +308,10 @@ public class UsedPostController {
 
         String username = authentication.getName();
 
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() ->
-                        new RuntimeException("회원 없음"));
+        Member member =
+                memberRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException("회원 없음"));
 
         try {
 
@@ -366,7 +335,6 @@ public class UsedPostController {
     // 게시글 수정 페이지
     @GetMapping("/used/edit/{id}")
     public String editForm(
-
             @PathVariable Long id,
             Model model,
             Authentication authentication
@@ -387,9 +355,10 @@ public class UsedPostController {
 
         String username = authentication.getName();
 
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() ->
-                        new RuntimeException("회원 없음"));
+        Member member =
+                memberRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException("회원 없음"));
 
         if (!member.getId().equals(post.getMemberId())) {
             return "redirect:/used/detail/" + id;
@@ -403,7 +372,6 @@ public class UsedPostController {
     // 게시글 수정
     @PostMapping("/used/edit/{id}")
     public String edit(
-
             @PathVariable Long id,
             @ModelAttribute UsedPostDTO dto,
             Authentication authentication
@@ -418,9 +386,10 @@ public class UsedPostController {
 
         String username = authentication.getName();
 
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() ->
-                        new RuntimeException("회원 없음"));
+        Member member =
+                memberRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException("회원 없음"));
 
         if (!member.getId().equals(post.getMemberId())) {
             return "redirect:/used/detail/" + id;
@@ -434,7 +403,6 @@ public class UsedPostController {
     // 판매 상태 변경
     @PostMapping("/used/status/{id}")
     public String changeStatus(
-
             @PathVariable Long id,
             @RequestParam String status,
             Authentication authentication
@@ -449,9 +417,10 @@ public class UsedPostController {
 
         String username = authentication.getName();
 
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() ->
-                        new RuntimeException("회원 없음"));
+        Member member =
+                memberRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException("회원 없음"));
 
         if (!member.getId().equals(post.getMemberId())) {
             return "redirect:/used/detail/" + id;
@@ -487,9 +456,10 @@ public class UsedPostController {
 
         String username = authentication.getName();
 
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() ->
-                        new RuntimeException("회원 없음"));
+        Member member =
+                memberRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException("회원 없음"));
 
         if (!member.getId().equals(post.getMemberId())) {
             return "redirect:/used/detail/" + id;
@@ -503,7 +473,6 @@ public class UsedPostController {
     // 찜 목록 조회
     @GetMapping("/wishlist/list")
     public String wishList(
-
             Authentication authentication,
             Model model
     ) {
@@ -514,9 +483,10 @@ public class UsedPostController {
 
         String username = authentication.getName();
 
-        Member member = memberRepository.findByUsername(username)
-                .orElseThrow(() ->
-                        new RuntimeException("회원 없음"));
+        Member member =
+                memberRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException("회원 없음"));
 
         Long memberId = member.getId();
 
@@ -542,8 +512,9 @@ public class UsedPostController {
             return "redirect:/member/login";
         }
 
-        UsedPost post = usedPostRepository.findById(id)
-                .orElse(null);
+        UsedPost post =
+                usedPostRepository.findById(id)
+                        .orElse(null);
 
         if (post == null) {
             return "redirect:/used/list";
@@ -551,22 +522,20 @@ public class UsedPostController {
 
         String username = authentication.getName();
 
-        Member member = memberRepository.findByUsername(username)
-                .orElse(null);
+        Member member =
+                memberRepository.findByUsername(username)
+                        .orElse(null);
 
         if (member == null) {
             return "redirect:/member/login";
         }
 
-        // 작성자 체크
         if (!post.getMember().getId().equals(member.getId())) {
             return "redirect:/used/detail/" + id;
         }
 
-        // 삭제
         usedPostRepository.delete(post);
 
-        // 목록으로 이동
         return "redirect:/used/list";
     }
 }

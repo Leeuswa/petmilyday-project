@@ -8,7 +8,6 @@
           rel="stylesheet">
 
     <style>
-
         *{
             box-sizing:border-box;
             margin:0;
@@ -69,10 +68,21 @@
             font-weight:700;
         }
 
+        .warning-box{
+            background:#fff7ed;
+            border:1px solid #fed7aa;
+            color:#9a3412;
+            border-radius:10px;
+            padding:15px;
+            line-height:1.7;
+            margin-top:10px;
+        }
+
         .btn-group{
             display:flex;
             gap:10px;
             margin-top:20px;
+            flex-wrap:wrap;
         }
 
         .btn{
@@ -93,6 +103,13 @@
             border:1px solid #d0d5e8;
         }
 
+        .result-image{
+            width:220px;
+            height:160px;
+            object-fit:cover;
+            border-radius:10px;
+            border:1px solid #e2e8f0;
+        }
     </style>
 </head>
 
@@ -105,6 +122,32 @@
     <h2 class="page-title">AI 진단 결과</h2>
 
     <div class="result-card">
+
+        <div class="result-box">
+            <div class="result-title">반려동물 정보</div>
+
+            <div>
+                <strong th:text="${result.pet.name}">이름</strong>
+                <span th:text="' / ' + ${result.pet.species}"> / 종류</span>
+                <span th:text="' / ' + ${result.pet.breed}"> / 품종</span>
+            </div>
+        </div>
+
+        <div class="result-box">
+            <div class="result-title">입력 증상</div>
+
+            <div th:text="${result.symptomText}">
+                입력 증상
+            </div>
+        </div>
+
+        <div class="result-box"
+             th:if="${result.imageUrl != null}">
+            <div class="result-title">업로드 사진</div>
+
+            <img th:src="${result.imageUrl}"
+                 class="result-image">
+        </div>
 
         <div class="result-box">
             <div class="result-title">의심 질환</div>
@@ -130,12 +173,9 @@
             </div>
         </div>
 
-        <div class="result-box"
-             th:if="${result.imageUrl != null}">
-            <div class="result-title">업로드 사진</div>
-
-            <img th:src="${result.imageUrl}"
-                 style="width:220px; height:160px; object-fit:cover; border-radius:10px;">
+        <div class="warning-box">
+            ※ 본 결과는 AI 기반 참고용 정보이며 실제 수의사의 진료를 대체할 수 없습니다.
+            증상이 지속되거나 심각도가 높을 경우 동물병원 방문을 권장합니다.
         </div>
 
         <div class="btn-group">

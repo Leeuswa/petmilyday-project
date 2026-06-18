@@ -55,5 +55,17 @@ public interface UsedPostService {
             Pageable pageable
     );
 
+    Page<UsedPostDTO> searchListDto(
+            String keyword,
+            String category,
+            String region,
+            ItemCondition condition,
+            Boolean offerAccepted,
+            Pageable pageable
+    );
 
+    Page<UsedPostDTO> getWishPostsDto(
+            Long memberId,
+            Pageable pageable
+    );
 }

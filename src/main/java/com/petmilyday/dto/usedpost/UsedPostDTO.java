@@ -58,9 +58,7 @@ public class UsedPostDTO {
 
     private Double mannerAverage;
 
-    // =========================
     // Entity -> DTO
-    // =========================
     public UsedPostDTO(UsedPost post) {
 
         this.id = post.getId();
@@ -70,7 +68,6 @@ public class UsedPostDTO {
 
             this.memberId = post.getMember().getId();
 
-            // 닉네임 우선
             if (post.getMember().getNickname() != null
                     && !post.getMember().getNickname().isBlank()) {
 
@@ -124,6 +121,12 @@ public class UsedPostDTO {
                         ? post.getOfferAccepted()
                         : false;
 
+        // 매너점수 평균
+        this.mannerAverage =
+                post.getMannerAverage() != null
+                        ? post.getMannerAverage()
+                        : 0.0;
+
         this.createdAt = post.getCreatedAt();
 
         this.updatedAt = post.getUpdatedAt();
@@ -139,9 +142,7 @@ public class UsedPostDTO {
         }
     }
 
-    // =========================
     // DTO -> Entity
-    // =========================
     public UsedPost toEntity() {
 
         return UsedPost.builder()
@@ -186,12 +187,17 @@ public class UsedPostDTO {
                                 : 0
                 )
 
+                // 매너점수 기본값
+                .mannerAverage(
+                        this.mannerAverage != null
+                                ? this.mannerAverage
+                                : 0.0
+                )
+
                 .build();
     }
 
-    // =========================
     // 상태 한글 변환
-    // =========================
     public String getStatusLabel() {
 
         if (status == null) {

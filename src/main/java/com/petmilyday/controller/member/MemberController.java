@@ -4,8 +4,6 @@ import com.petmilyday.dto.member.MemberDTO;
 import com.petmilyday.dto.member.PetProFileDTO;
 import com.petmilyday.service.member.MemberService;
 import com.petmilyday.service.member.PetProfileService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -26,192 +24,153 @@ public class MemberController {
     private final MemberService memberService;
     private final PetProfileService petProfileService;
 
-    // 1. 회원가입 화면 요청 (GET /member/register)
+    // 회원가입 요청
     @GetMapping("/register")
     public String registerForm(Model model) {
         model.addAttribute("registerRequest", new MemberDTO.RegisterRequest());
         return "member/register";
     }
 
-    // 2. 회원가입 처리 요청 (POST /member/register)
+    // 회원가입 처리
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute("registerRequest") MemberDTO.RegisterRequest request,
+    public String register(@Valid @ModelAttribute("registerRequest") MemberDTO.RegisterRequest dto,
                            BindingResult bindingResult,
-                           Model model) {
-
+                           RedirectAttributes redirectAttributes) {
+        // 유효성 검사
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().get(0).getDefaultMessage();
-            System.err.println("백엔드 회원가입 차단 사유: " + errorMessage);
-            model.addAttribute("globalError", errorMessage);
             return "member/register";
         }
 
         try {
-            memberService.register(request);
-            System.out.println("회원가입 성공! DB 저장 완료: " + request.getUsername());
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("globalError", e.getMessage());
-            return "member/register";
+            memberService.register(dto);
+            redirectAttributes.addFlashAttribute("successMsg", "회원가입이 성공적으로 완료되었습니다.");
+            return "redirect:/member/login";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("globalError", e.getMessage());
+            return "redirect:/member/register";
         }
-
-        return "redirect:/member/login";
     }
 
-    // 3. 로그인 화면 요청 (GET /member/login)
+    // 로그인 요청
     @GetMapping("/login")
-    public String loginForm(Model model) {
-        model.addAttribute("loginRequest", new MemberDTO.LoginRequest());
+    public String loginForm() {
         return "member/login";
     }
 
-    // 4. 로그인 처리 (POST /member/login)
+    // 로그인 처리
     @PostMapping("/login")
-    public String login(@Valid @ModelAttribute("loginRequest") MemberDTO.LoginRequest request,
-                        BindingResult bindingResult,
-                        HttpServletResponse response,
-                        Model model) {
-
-        if (bindingResult.hasErrors()) {
-            return "member/login";
-        }
-
+    public String login(@ModelAttribute MemberDTO.LoginRequest loginRequest,
+                        jakarta.servlet.http.HttpServletResponse response,
+                        RedirectAttributes redirectAttributes) {
         try {
-            MemberDTO.LoginResponse loginResponse = memberService.login(request);
+            MemberDTO.LoginResponse loginResponse = memberService.login(loginRequest);
 
-            Cookie jwtCookie = new Cookie("JWT_TOKEN", loginResponse.getToken());
-            jwtCookie.setHttpOnly(true);
-            jwtCookie.setPath("/");
-            jwtCookie.setMaxAge(60 * 30);
-            response.addCookie(jwtCookie);
-
-            System.out.println("로그인 성공 및 토큰 발급 완료: " + loginResponse.getUsername());
-            return "redirect:/";
-
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("globalError", e.getMessage());
-            return "member/login";
-        }
-    }
-
-    // 5. 회원 정보 수정 처리 (POST /member/me/update-profile)
-    @PostMapping("/me/update-profile")
-    public String updateProfile(@Valid @ModelAttribute("updateRequest") MemberDTO.UpdateProfileRequest request,
-                                BindingResult bindingResult,
-                                Model model) {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("globalError", bindingResult.getAllErrors().get(0).getDefaultMessage());
-            return "member/mypage";
-        }
-
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String username = auth.getName();
-            memberService.updateProfile(username, request);
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("globalError", e.getMessage());
-            return "member/mypage";
-        }
-
-        return "redirect:/member/mypage";
-    }
-
-    // 6. 회원 탈퇴 처리 (POST /member/me/withdraw)
-    @PostMapping("/me/withdraw")
-    public String withdraw(@RequestParam(required = false) String password,
-                           HttpServletResponse response,
-                           Model model) {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            String username = auth.getName();
-
-            memberService.withdraw(username, password);
-
-            Cookie jwtCookie = new Cookie("JWT_TOKEN", null);
-            jwtCookie.setMaxAge(0);
-            jwtCookie.setPath("/");
-            response.addCookie(jwtCookie);
+            jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("Authorization", loginResponse.getToken());
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(60 * 60 * 24);
+            response.addCookie(cookie);
 
             return "redirect:/";
         } catch (IllegalArgumentException e) {
-            model.addAttribute("globalError", e.getMessage());
-            return "member/mypage";
+            redirectAttributes.addFlashAttribute("globalError", e.getMessage());
+            return "redirect:/member/login";
         }
     }
 
-    // 7. 로그아웃 처리 (GET /member/logout)
+    // 아이디 중복 확인
+    @GetMapping("/check-username")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<Boolean> checkUsername(@RequestParam("username") String username) {
+        boolean isDuplicate = memberService.checkUsername(username);
+        return org.springframework.http.ResponseEntity.ok(isDuplicate);
+    }
+
+    // 로그아웃 요청
     @GetMapping("/logout")
-    public String logout(HttpServletResponse response) {
-        Cookie jwtCookie = new Cookie("JWT_TOKEN", null);
-        jwtCookie.setMaxAge(0); // 쿠키 0초로 설정
-        jwtCookie.setPath("/");
-        response.addCookie(jwtCookie);
-        SecurityContextHolder.clearContext();
+    public String logout(jakarta.servlet.http.HttpServletResponse response,
+                         RedirectAttributes redirectAttributes) {
+
+        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("Authorization", "");
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        redirectAttributes.addFlashAttribute("successMsg", "안전하게 로그아웃 되었습니다.");
         return "redirect:/";
     }
 
+    // 로그아웃 처리
+    @PostMapping("/logout")
+    public String logoutPost(jakarta.servlet.http.HttpServletResponse response,
+                             RedirectAttributes redirectAttributes) {
+        return logout(response, redirectAttributes);
+    }
+
+    // 마이페이지
     @GetMapping("/mypage")
-    public String myPage(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
-            return "redirect:/member/login";
-        }
-
-        String username = auth.getName();
-        MemberDTO.MyPageResponse myPageResponse = memberService.getMyPageInfo(username);
-
-        model.addAttribute("member", myPageResponse);
+    public String myPage(Authentication authentication, Model model) {
+        String username = authentication.getName();
+        MemberDTO.MyPageResponse myPageInfo = memberService.getMyPageInfo(username);
+        model.addAttribute("member", myPageInfo);
         return "member/mypage";
     }
 
+    // 회원정보 수정 화면
     @GetMapping("/modify-profile")
-    public String modifyProfileForm(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+    public String modifyProfileForm(Authentication authentication, Model model) {
+        String username = authentication.getName();
+        MemberDTO.MyPageResponse info = memberService.getMyPageInfo(username);
 
-        MemberDTO.MyPageResponse myInfo = memberService.getMyPageInfo(username);
-
-        MemberDTO.UpdateProfileRequest updateRequest = new MemberDTO.UpdateProfileRequest();
-        updateRequest.setNickname(myInfo.getNickname());
-        updateRequest.setEmail(myInfo.getEmail());
+        MemberDTO.UpdateRequest updateRequest = MemberDTO.UpdateRequest.builder()
+                .nickname(info.getNickname())
+                .email(info.getEmail())
+                .phoneNumber(info.getPhoneNumber())
+                .address(info.getAddress())
+                .detailAddress(info.getDetailAddress())
+                .bio(info.getBio())
+                .build();
 
         model.addAttribute("updateRequest", updateRequest);
         return "member/modify-profile";
     }
 
+    // 회원정보 수정 처리
     @PostMapping("/modify-profile")
-    public String modifyProfile(@Valid @ModelAttribute("updateRequest") MemberDTO.UpdateProfileRequest request,
+    public String modifyProfile(@Valid @ModelAttribute("updateRequest") MemberDTO.UpdateRequest dto,
                                 BindingResult bindingResult,
-                                RedirectAttributes redirectAttributes,
-                                Model model) {
-
+                                Authentication authentication,
+                                RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "member/modify-profile";
         }
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+        String username = authentication.getName();
+        try {
+            memberService.updateProfile(username, dto);
+            redirectAttributes.addFlashAttribute("message", "회원 정보가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("globalError", e.getMessage());
+            return "redirect:/member/modify-profile";
+        }
 
-        memberService.updateProfile(username, request);
-
-        redirectAttributes.addFlashAttribute("successMsg", "회원정보가 성공적으로 수정되었습니다.");
         return "redirect:/member/mypage";
     }
 
+    // 비밀번호 변경 요청
     @GetMapping("/modify-password")
     public String modifyPasswordForm(Model model) {
         model.addAttribute("passwordRequest", new MemberDTO.UpdatePasswordRequest());
         return "member/modify-password";
     }
 
-    // [데이터 처리] 비밀번호 변경 완료
+    // 비밀번호 변경 처리
     @PostMapping("/modify-password")
     public String modifyPassword(@Valid @ModelAttribute("passwordRequest") MemberDTO.UpdatePasswordRequest request,
                                  BindingResult bindingResult,
                                  Model model,
                                  RedirectAttributes redirectAttributes) {
-
         if (bindingResult.hasErrors()) {
             return "member/modify-password";
         }
@@ -221,18 +180,16 @@ public class MemberController {
 
         try {
             memberService.updatePassword(username, request);
-
-            redirectAttributes.addFlashAttribute("successMsg", "비밀번호가 성공적으로 변경되었습니다.");
-            return "redirect:/member/mypage";
-
-        } catch (IllegalArgumentException e) { // 기존 비번 틀릴 경우 통제
+            redirectAttributes.addFlashAttribute("successMsg", "비밀번호가 성공적으로 변경되었습니다. 다시 로그인해 주세요.");
+            return "redirect:/member/logout"; // 변경 후 안전하게 자동 로그아웃 처리
+        } catch (IllegalArgumentException e) {
             model.addAttribute("globalError", e.getMessage());
             return "member/modify-password";
         }
     }
 
     @GetMapping("/pet-profile")
-    public String petProfilePage(Model model) {
+    public String petProfileForm(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
 

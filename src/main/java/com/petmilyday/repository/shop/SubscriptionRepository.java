@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
 
+    // 특정 회원의 구독 상태별 정기구독 목록 조회
     List<Subscription> findByMemberUsernameAndStatus(String username, SubscriptionStatus status);
 }

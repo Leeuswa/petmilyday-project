@@ -8,6 +8,7 @@ import com.petmilyday.repository.member.PetProfileRepository;
 import com.petmilyday.service.diagnosis.DiagnosisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
@@ -38,11 +39,28 @@ public class DiagnosisController {
                     memberRepository.findByUsername(authentication.getName())
                             .orElseThrow();
 
+            Page<DiagnosisHistory> histories =
+                    diagnosisService.getHistory(
+                            member.getId(),
+                            PageRequest.of(0, 3)
+                    );
+
+            model.addAttribute("recentHistories", histories.getContent());
+
             model.addAttribute(
-                    "recentHistories",
-                    diagnosisHistoryRepository
-                            .findTop3ByMember_IdOrderByCreatedAtDesc(member.getId())
+                    "totalDiagnosisCount",
+                    histories.getTotalElements()
             );
+
+            if (!histories.getContent().isEmpty()) {
+
+                model.addAttribute(
+                        "lastDiagnosisDate",
+                        histories.getContent()
+                                .get(0)
+                                .getCreatedAt()
+                );
+            }
         }
 
         return "diagnosis/main";

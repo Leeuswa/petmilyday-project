@@ -23,7 +23,7 @@ public class ProductQnaService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
 
-    // 상품별 Q&A 목록 조회 (프론트 데이터 전송용)
+    // 상품별 Q&A 목록 조회
     public List<Map<String, Object>> getQnaListByProduct(Long productId) {
         List<ProductQna> qnas = productQnaRepository.findByProductIdOrderByCreatedAtDesc(productId);
         return qnas.stream().map(q -> Map.<String, Object>of(

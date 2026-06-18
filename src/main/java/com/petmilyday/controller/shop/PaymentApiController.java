@@ -28,6 +28,7 @@ public class PaymentApiController {
     @jakarta.persistence.PersistenceContext
     private jakarta.persistence.EntityManager em;
 
+    // 카카오페이 결제 준비 요청 및 세션 데이터 저장
     @PostMapping("/ready")
     public ResponseEntity<?> readyStandardPayment(@RequestBody Map<String, Object> params, HttpSession session) {
         try {
@@ -94,6 +95,7 @@ public class PaymentApiController {
         }
     }
 
+    // 결제 성공 승인 처리 및 최종 주문 내역 DB 저장
     @GetMapping("/success")
     public ModelAndView paymentSuccess(@RequestParam("pg_token") String pgToken, HttpSession session) {
         Integer totalPrice = (Integer) session.getAttribute("totalPrice");

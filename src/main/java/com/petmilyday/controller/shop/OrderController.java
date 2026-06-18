@@ -17,17 +17,15 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    /**
-     * 주문 결제 페이지 이동
-     */
+    // 주문 결제 페이지 이동
+
     @GetMapping("/checkout")
     public String checkoutPage() {
         return "shop/checkout";
     }
 
-    /**
-     * 사용자의 주문 내역 페이지 이동
-     */
+    // 사용자의 주문 내역 페이지 이동
+
     @GetMapping("/order_history")
     public String orderHistoryPage(Model model, Principal principal) {
         if (principal != null) {

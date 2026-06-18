@@ -6,6 +6,7 @@ import com.petmilyday.entity.chat.ChatRoom;
 import com.petmilyday.entity.member.Member;
 import com.petmilyday.entity.used.*;
 import com.petmilyday.repository.member.MemberRepository;
+import com.petmilyday.repository.used.MannerScoreRepository;
 import com.petmilyday.repository.used.UsedPostImgRepository;
 import com.petmilyday.repository.used.UsedPostReportRepository;
 import com.petmilyday.repository.used.UsedPostRepository;
@@ -36,10 +37,9 @@ public class UsedPostServiceImpl implements UsedPostService {
     private final MemberRepository memberRepository;
     private final UsedPostReportRepository usedPostReportRepository;
     private final S3UploadService s3UploadService;
+    private final MannerScoreRepository mannerScoreRepository;
 
-    // =========================
     // 전체 목록
-    // =========================
     @Override
     public Page<UsedPostDTO> getList(Pageable pageable) {
 
@@ -47,10 +47,8 @@ public class UsedPostServiceImpl implements UsedPostService {
                 .map(UsedPostDTO::new);
     }
 
-    // =========================
-    // 상세
-    // =========================
     @Override
+    @Transactional(readOnly = true)
     public UsedPostDTO getDetail(Long id) {
 
         UsedPost post = usedPostRepository.findDetail(id);
@@ -59,12 +57,23 @@ public class UsedPostServiceImpl implements UsedPostService {
             return null;
         }
 
-        return new UsedPostDTO(post);
+        UsedPostDTO dto = new UsedPostDTO(post);
+
+        if (post.getMember() != null) {
+            Double average =
+                    mannerScoreRepository.findAverageScoreByMemberId(
+                            post.getMember().getId()
+                    );
+
+            dto.setMannerAverage(average);
+        } else {
+            dto.setMannerAverage(0.0);
+        }
+
+        return dto;
     }
 
-    // =========================
     // 검색
-    // =========================
     @Override
     public Page<UsedPost> searchList(
             String keyword,
@@ -139,9 +148,7 @@ public class UsedPostServiceImpl implements UsedPostService {
         }
     }
 
-    // =========================
     // 신고
-    // =========================
     @Override
     @Transactional
     public void reportPost(
@@ -191,9 +198,7 @@ public class UsedPostServiceImpl implements UsedPostService {
         usedPostRepository.save(post);
     }
 
-    // =========================
     // 수정(update)
-    // =========================
     @Override
     @Transactional
     public void update(
@@ -222,9 +227,7 @@ public class UsedPostServiceImpl implements UsedPostService {
         usedPostRepository.save(post);
     }
 
-    // =========================
     // 수정(edit)
-    // =========================
     @Override
     @Transactional
     public void edit(
@@ -235,9 +238,7 @@ public class UsedPostServiceImpl implements UsedPostService {
         update(id, dto);
     }
 
-    // =========================
     // 상태 변경
-    // =========================
     @Override
     @Transactional
     public void changeStatus(
@@ -255,46 +256,33 @@ public class UsedPostServiceImpl implements UsedPostService {
         usedPostRepository.save(post);
     }
 
-    // =========================
     // 판매 완료
-    // =========================
     @Override
     @Transactional
     public void completeSale(Long postId) {
 
-        UsedPost post =
-                usedPostRepository.findById(postId)
-                        .orElseThrow(() ->
-                                new RuntimeException("게시글 없음"));
-
-
-        post.setStatus(UsedPostStatus.SOLD);
-
-        usedPostRepository.save(post);
+        usedPostRepository.updateStatus(
+                postId,
+                UsedPostStatus.SOLD
+        );
     }
 
-    // =========================
     // 찜 목록 DTO
-    // =========================
     @Override
+    @Transactional(readOnly = true)
     public List<UsedPostDTO> getWishList(List<Long> ids) {
 
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
 
-        return usedPostRepository.findAllById(ids)
+        return usedPostRepository.findWishPostsForDto(ids)
                 .stream()
-                .filter(post ->
-                        post.getIsHidden() == null
-                                || !post.getIsHidden())
                 .map(UsedPostDTO::new)
                 .toList();
     }
 
-    // =========================
     // 찜 목록 페이징
-    // =========================
     @Override
     public Page<UsedPost> getWishPosts(
             Long memberId,
@@ -312,5 +300,63 @@ public class UsedPostServiceImpl implements UsedPostService {
                 ids,
                 pageable
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<UsedPostDTO> searchListDto(
+            String keyword,
+            String category,
+            String region,
+            ItemCondition condition,
+            Boolean offerAccepted,
+            Pageable pageable
+    ) {
+
+        return usedPostRepository.searchList(
+                        keyword,
+                        category,
+                        region,
+                        condition,
+                        offerAccepted,
+                        pageable
+                )
+                .map(post -> {
+                    UsedPostDTO dto = new UsedPostDTO(post);
+
+                    if (post.getMember() != null) {
+                        Double average =
+                                mannerScoreRepository.findAverageScoreByMemberId(
+                                        post.getMember().getId()
+                                );
+
+                        dto.setMannerAverage(average);
+                    } else {
+                        dto.setMannerAverage(0.0);
+                    }
+
+                    return dto;
+                });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<UsedPostDTO> getWishPostsDto(
+            Long memberId,
+            Pageable pageable
+    ) {
+
+        List<Long> ids =
+                wishlistRepository.findUsedPostIdsByMemberId(memberId);
+
+        if (ids.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        return usedPostRepository.findWishPosts(
+                        ids,
+                        pageable
+                )
+                .map(UsedPostDTO::new);
     }
 }
