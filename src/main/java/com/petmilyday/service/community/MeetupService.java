@@ -1,5 +1,6 @@
 package com.petmilyday.service.community;
 
+import com.petmilyday.dto.community.CommunityPostDTO;
 import com.petmilyday.dto.community.MeetupPostDTO;
 import com.petmilyday.dto.community.PageRequestDTO;
 import com.petmilyday.dto.community.PageResponseDTO;
@@ -26,4 +27,8 @@ public interface MeetupService {
     void modifyMeetup(String username, MeetupPostDTO dto);
 
     void updateViewCount(Long id);
+
+    List<MeetupPostDTO> getMyMeetups(String username);
+
+    List<MeetupPostDTO> getParticipatedMeetups(String username);
 }

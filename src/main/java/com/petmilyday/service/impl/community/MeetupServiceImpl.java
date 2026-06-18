@@ -184,4 +184,57 @@ public class MeetupServiceImpl implements MeetupService {
         MeetupPost post = meetupPostRepository.findById(id).orElseThrow();
         post.addViewCount();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MeetupPostDTO> getMyMeetups(String username) {
+
+        Member host = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        List<MeetupPost> meetups = meetupPostRepository.findByHostOrderByIdDesc(host);
+
+        return meetups.stream()
+                .map(post -> MeetupPostDTO.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .content(post.getContent())
+                        .location(post.getLocation())
+                        .meetupDate(post.getMeetupDate())
+                        .maxParticipants(post.getMaxParticipants())
+                        .currentParticipants(post.getCurrentParticipants())
+                        .status(post.getStatus().name()) // Enum 타입 String 변환
+                        .hostName(host.getNickname() != null ? host.getNickname() : host.getName())
+                        .hostUsername(host.getUsername())
+                        .viewCount(post.getViewCount())
+                        .createdAt(post.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MeetupPostDTO> getParticipatedMeetups(String username) {
+        List<MeetupParticipant> participants = meetupParticipantRepository.findByMemberUsernameOrderByJoinedAtDesc(username);
+
+        return participants.stream()
+                .map(participant -> {
+                    MeetupPost post = participant.getMeetupPost();
+                    return MeetupPostDTO.builder()
+                            .id(post.getId())
+                            .title(post.getTitle())
+                            .content(post.getContent())
+                            .location(post.getLocation())
+                            .meetupDate(post.getMeetupDate())
+                            .maxParticipants(post.getMaxParticipants())
+                            .currentParticipants(post.getCurrentParticipants())
+                            .status(post.getStatus().name())
+                            .hostName(post.getHost().getNickname() != null ? post.getHost().getNickname() : post.getHost().getName())
+                            .hostUsername(post.getHost().getUsername())
+                            .viewCount(post.getViewCount())
+                            .createdAt(post.getCreatedAt())
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
 }
