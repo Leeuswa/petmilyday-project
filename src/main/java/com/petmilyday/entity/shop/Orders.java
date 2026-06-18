@@ -32,6 +32,12 @@ public class Orders {
     @Column(name = "delivery_address", nullable = false, length = 255)
     private String deliveryAddress;
 
+    @Column(name = "receiver_name", length = 50)
+    private String receiverName;
+
+    @Column(name = "receiver_phone", length = 20)
+    private String receiverPhone;
+
     @Column(nullable = false, length = 20)
     private String status;
 

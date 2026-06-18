@@ -1,0 +1,141 @@
+@charset "UTF-8";
+
+/* 🎯 [완벽 복구] 정민이가 원한 가장 깔끔하고 포근한 100% 원본 배경 간격 그대로 적용 */
+body {
+    background-color: #faf7f2 !important;
+
+    /* 💡 각 🐾 이모지 코드 안에 opacity='0.25'를 넣어서 25%만큼 연하게 흐렸어! */
+    background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.1'%3E🐾%3C/text%3E%3C/svg%3E"),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.1'%3E🐾%3C/text%3E%3C/svg%3E") !important;
+    /* 💡 지그재그 격자 간격 오프셋 고정 */
+    background-position: 0px 0px, 150px 150px !important;
+
+    /* 💡 가로세로 60px 주기로 아담하고 촘촘하게 배열 */
+    background-size: 300px 300px !important;
+    background-repeat: repeat !important;
+
+    font-family: 'Sora', sans-serif;
+    color: #4a4035;
+}
+
+/* 🎯 [레이아웃 조율] 4열 상태에서 카드가 큼직하게 나오도록 전체 가로폭 한계 확장 */
+.shop-premium-container {
+    max-width: 2300px !important;
+    margin: 0 auto;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+
+/* 패널 간의 좌우 간격을 시원하게 벌려서 답답함 완벽 해소 */
+.shop-premium-container .row.g-4 {
+    --bs-gutter-x: 2.8rem !important;
+}
+
+.shop-card {
+    border: 1px solid #eaddcf !important;
+    border-radius: 16px !important;
+    box-shadow: 0 6px 18px rgba(165, 140, 115, 0.05) !important;
+    background-color: #ffffff !important;
+}
+
+.sidebar-panel {
+    position: sticky;
+    top: 90px;
+    z-index: 10;
+}
+
+.info-label {
+    color: #8c7e6e;
+    font-size: 0.85rem;
+}
+
+/* 세로형 이모티콘 카테고리 메뉴 바인딩 */
+.category-item {
+    border: none !important;
+    color: #554a3e !important;
+    font-weight: 500;
+    padding: 12px 14px !important;
+    font-size: 0.94rem;
+    white-space: nowrap !important; /* 글자 무조건 한 줄 고정 */
+    width: 100% !important;
+    display: flex !important;
+    align-items: center;
+    background: transparent !important;
+}
+.category-custom-img {
+    width: 22px !important;
+    height: 22px !important;
+    object-fit: contain;
+    margin-right: 10px !important;
+}
+.category-custom-icon {
+    font-size: 1.15rem;
+    color: #bfae9c;
+    margin-right: 10px !important;
+}
+.category-item:hover {
+    background-color: #fbf9f6 !important;
+    color: #ff6b21 !important;
+}
+.category-item.on {
+    background-color: #fff3ec !important;
+    color: #ff6b21 !important;
+    font-weight: 700 !important;
+}
+
+/* 중앙 메인 상품 카드 (가로폭 확장 및 4열 유지) */
+.main-product-card {
+    background-color: #ffffff !important;
+    border: 1px solid #eaddcf !important;
+    border-radius: 16px !important;
+    padding: 18px !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.main-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(139, 115, 92, 0.14) !important;
+    border-color: #ff7a3c !important;
+}
+
+/* 🎯 상품 제목 전체 노출 보장 (글자 절대 안 잘림) */
+.product-expanded-title {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: #3d3123 !important;
+    line-height: 1.45;
+    cursor: pointer;
+    white-space: normal !important;
+    display: block !important;
+    height: auto !important;
+    min-height: 44px;
+}
+
+.stars {
+    color: #ffa502;
+}
+
+.primary-cart-action {
+    background-color: #ff7a3c !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    padding: 11px 0 !important;
+}
+.primary-cart-action:hover {
+    background-color: #e65c1f !important;
+}
+
+/* 우측 정기구독 대시보드 */
+.dashboard-subscription-card {
+    border-top: 4px solid #ff7a3c !important;
+}
+.sub-scroll-area {
+    max-height: 440px;
+    overflow-y: auto;
+}
+.subscription-inner-item {
+    border: 1px solid #eaddcf !important;
+    background-color: #fdfdfc !important;
+}

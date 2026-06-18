@@ -31,6 +31,8 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final BooleanPath isActive = createBoolean("isActive");
 
+    public final BooleanPath isDeleted = createBoolean("isDeleted");
+
     public final StringPath material = createString("material");
 
     public final StringPath name = createString("name");

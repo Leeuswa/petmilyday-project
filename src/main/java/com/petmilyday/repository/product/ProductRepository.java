@@ -9,6 +9,8 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // 특정 카테고리 기준 상품 목록 조회
-    List<Product> findByCategory(String category);
+
+    List<Product> findByIsDeletedFalse();
+
+    List<Product> findByCategoryAndIsDeletedFalse(String category);
 }

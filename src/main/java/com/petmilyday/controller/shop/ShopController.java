@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.List;
@@ -31,7 +32,7 @@ public class ShopController {
     private final PetProfileRepository petProfileRepository;
     private final MemberRepository memberRepository;
 
-    // 쇼핑몰 메인 페이지 및 카테고리별 상품/구독/반려동물 프로필 연동
+    // 쇼핑몰 메인 페이지 (구독 패널 포함)
     @GetMapping("/shop")
     public String showShopPage(@RequestParam(required = false) String category,
                                Model model,
@@ -52,7 +53,8 @@ public class ShopController {
             String username = principal.getName();
             model.addAttribute("loggedInUser", username);
 
-            List<SubscriptionResponseDto> subList = subscriptionService.getActiveSubscriptions(username);
+            // 💡 여기 수정! (ACTIVE만 가져오던 걸 전부 다 가져오기로!)
+            List<SubscriptionResponseDto> subList = subscriptionService.getAllSubscriptions(username);
             model.addAttribute("subscriptionList", subList);
 
             Member member = memberRepository.findByUsername(username).orElse(null);
@@ -69,28 +71,33 @@ public class ShopController {
         return "shop/shop";
     }
 
-    // 상품 상세 정보 조회 및 구매 여부 검증
+    // 상품 상세 정보 조회
     @GetMapping("/shop/detail/{id}")
     public String showProductDetail(@PathVariable("id") Long id,
                                     Model model,
-                                    Principal principal) {
+                                    Principal principal,
+                                    RedirectAttributes redirectAttributes) {
 
         ProductResponseDto product = productService.getProductById(id);
+
+        if (product.isDeleted()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "이미 판매가 종료된 상품입니다.");
+            return "redirect:/shop";
+        }
+
         model.addAttribute("product", product);
 
         boolean isBuyer = false;
-
         if (principal != null) {
             model.addAttribute("loggedInUser", principal.getName());
             isBuyer = ordersRepository.existsByUsernameAndProductId(principal.getName(), id);
         }
-
         model.addAttribute("isBuyer", isBuyer);
 
         return "shop/detail";
     }
 
-    // 회원의 활성화된 정기구독 목록 관리 페이지
+    // 회원의 전체 정기구독 목록 관리 페이지
     @GetMapping("/shop/subscription")
     public String showSubscriptionManagementPage(Model model, Principal principal) {
 
@@ -103,14 +110,21 @@ public class ShopController {
             model.addAttribute("loggedInUser", principal.getName());
             model.addAttribute("activeTab", "shop");
 
-            List<SubscriptionResponseDto> subList = subscriptionService.getActiveSubscriptions(principal.getName());
+            // 💡 여기 수정! (ACTIVE만 가져오던 걸 전부 다 가져오기로!)
+            List<SubscriptionResponseDto> subList = subscriptionService.getAllSubscriptions(principal.getName());
             model.addAttribute("subscriptionList", subList);
+
+            System.out.println("🚩 구독 리스트 사이즈: " + subList.size());
+            for(SubscriptionResponseDto sub : subList) {
+                System.out.println(">> 상품명: " + sub.getProductName() + ", 상태: " + sub.getStatus());
+            }
         }
+
+
 
         return "shop/subscription_manage";
     }
 
-    // 선택한 상품 및 주기 기준 정기구독 결제 주문서 페이지
     @GetMapping("/shop/subscription-checkout")
     public String subscriptionCheckoutPage(@RequestParam("productId") Long productId,
                                            @RequestParam("quantity") int quantity,
