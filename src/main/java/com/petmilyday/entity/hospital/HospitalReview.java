@@ -54,4 +54,14 @@ public class HospitalReview {
         this.content = content;
         this.rating = rating;
     }
+
+    //신고기능
+    public void report() {
+        this.isReported = true;
+    }
+
+    //신고풀기
+    public void restoreReport() {
+        this.isReported = false;
+    }
 }

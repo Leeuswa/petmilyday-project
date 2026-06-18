@@ -13,4 +13,7 @@ public class NotificationDTO {
     private String message;
     private String url;
     private LocalDateTime createdAt;
+
+    private Long reservationId;
+    private Integer waitNumber;
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -15,11 +16,14 @@ public class AdminReservationController {
     private final AdminReservationService adminReservationService;
 
     // 메인 관리자 전체 예약 현황 조회
-    @GetMapping({ "/"})
-    public String reservationList(Model model) {
+    @GetMapping({"", "/"})
+    public String reservationList(@RequestParam(defaultValue = "0") int page,
+                                  Model model) {
 
-        model.addAttribute("reservationList",
-                adminReservationService.reservationList());
+        model.addAttribute("reservationPage",
+                adminReservationService.reservationList(page));
+
+        model.addAttribute("currentPage", page);
 
         return "admin/reservation/reservationList";
     }

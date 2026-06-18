@@ -19,9 +19,11 @@ public class AdminHospitalController {
 
     // 병원 목록 조회
     @GetMapping("/")
-    public String hospitalList(Model model) {
+    public String hospitalList(@RequestParam(defaultValue = "0") int page,
+                               Model model) {
 
-        model.addAttribute("hospitalList", adminHospitalService.findAll());
+        model.addAttribute("hospitalPage", adminHospitalService.findAllPage(page));
+        model.addAttribute("currentPage", page);
 
         return "admin/hospitals/hospitalList";
     }

@@ -14,6 +14,9 @@ import com.petmilyday.service.hospital.HospitalManagerService;
 import com.petmilyday.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,6 +98,18 @@ public class HospitalManagerServiceImpl implements HospitalManagerService {
     public List<HospitalManager> waitingList() {
         return hospitalManagerRepository.findByStatusWithMemberAndHospital(
                 HospitalManagerStatus.WAITING
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<HospitalManager> waitingListPage(int page) {
+
+        Pageable pageable = PageRequest.of(page, 10);
+
+        return hospitalManagerRepository.findByStatusWithMemberAndHospitalPage(
+                HospitalManagerStatus.WAITING,
+                pageable
         );
     }
 

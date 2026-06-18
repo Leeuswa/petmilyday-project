@@ -2,6 +2,8 @@ package com.petmilyday.repository.hospital;
 
 import com.petmilyday.entity.hospital.HospitalManager;
 import com.petmilyday.entity.hospital.HospitalManagerStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,6 +27,27 @@ public interface HospitalManagerRepository extends JpaRepository<HospitalManager
             """)
     List<HospitalManager> findByStatusWithMemberAndHospital(
             @Param("status") HospitalManagerStatus status
+    );
+
+    // 메인 관리자가 신청 목록 볼 때 - member, hospital까지 같이 조회 + 페이징
+    @Query(
+            value = """
+                    select hm
+                    from HospitalManager hm
+                    join fetch hm.member
+                    join fetch hm.hospital
+                    where hm.status = :status
+                    order by hm.id desc
+                    """,
+            countQuery = """
+                    select count(hm)
+                    from HospitalManager hm
+                    where hm.status = :status
+                    """
+    )
+    Page<HospitalManager> findByStatusWithMemberAndHospitalPage(
+            @Param("status") HospitalManagerStatus status,
+            Pageable pageable
     );
 
     // 이 회원이 이 병원의 승인된 관리자인지 확인

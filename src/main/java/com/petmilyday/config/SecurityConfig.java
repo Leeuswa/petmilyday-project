@@ -51,11 +51,45 @@ public class SecurityConfig {
 
                 // API별 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
+                        // 정적 리소스 허용
+                        .requestMatchers(
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/webjars/**",
+                                "/",
+                                "/error"
+                        ).permitAll()
+
                         // 회원가입, 로그인, 토큰 재발급 등 인증이 필요 없는 경로 허용
-                        .requestMatchers("/shop/**", "/api/subscription/**","/shop/subscription").permitAll()
-                        .requestMatchers("/css/**", "/js/**", "/images/**", "/", "/error").permitAll()
-                        .requestMatchers("/member/register", "/member/login", "/member/reissue").permitAll()
-                        .requestMatchers("/community/list", "/hospital/list", "/shop/list", "/ai/diagnosis").permitAll()
+                        .requestMatchers(
+                                "/member/register",
+                                "/member/login",
+                                "/member/reissue"
+                        ).permitAll()
+
+                        // 공개 페이지 허용
+                        .requestMatchers(
+                                "/community/list",
+                                "/hospital/list",
+                                "/shop/list",
+                                "/ai/diagnosis"
+                        ).permitAll()
+
+                        // 쇼핑/구독 관련 공개 API
+                        .requestMatchers(
+                                "/shop/**",
+                                "/api/subscription/**",
+                                "/shop/subscription"
+                        ).permitAll()
+
+                        // SSE 알림 구독 경로 허용
+                        .requestMatchers(
+                                "/notifications/**",
+                                "/api/notifications/**",
+                                "/notification/**",
+                                "/api/notification/**"
+                        ).permitAll()
 
                         // 메인 관리자 페이지는 ADMIN 권한만 접근 가능
                         .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -63,19 +97,25 @@ public class SecurityConfig {
                         // 병원 관리자 페이지는 HOSPITAL_ADMIN 권한만 접근 가능
                         .requestMatchers("/hospitalAdmin/**").hasRole("HOSPITAL_ADMIN")
 
-                        // 나머지 모든 회원 수정, 탈퇴, 반려동물 프로필 등 API는 JWT 인증 필수
+                        // 나머지 모든 요청은 인증 필요
                         .anyRequest().authenticated()
                 )
 
-                // OAuth2 소셜 로그인도 JWT에 맞춰서 설정 (성공 핸들러 추가 필요)
+                // OAuth2 소셜 로그인도 JWT에 맞춰서 설정
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
-                        .successHandler(oAuth2SuccessHandler) // 성공 핸들러 명시적 등록
+                        .successHandler(oAuth2SuccessHandler)
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(jwtTokenProvider),
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
+
+
 }

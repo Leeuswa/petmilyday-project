@@ -10,6 +10,9 @@ import com.petmilyday.repository.reservation.ReservationRepository;
 import com.petmilyday.service.hospital.HospitalReviewService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,20 +69,23 @@ public class HospitalReviewServiceImpl implements HospitalReviewService {
     public List<HospitalReviewResponseDTO> reviewList(Long hospitalId) {
 
         List<HospitalReview> reviews =
-                hospitalReviewRepository.findByHospitalIdAndIsReportedFalseOrderByCreatedAtDesc(hospitalId);
+                hospitalReviewRepository.findByHospitalIdOrderByCreatedAtDesc(hospitalId);
 
         return reviews.stream()
-                .map(review -> {
-                    HospitalReviewResponseDTO dto =
-                            modelMapper.map(review, HospitalReviewResponseDTO.class);
-
-                    dto.setMemberNickname(review.getMember().getNickname());
-                    dto.setMemberId(review.getMember().getId());
-                    dto.setHospitalId(review.getHospital().getId());
-
-                    return dto;
-                })
+                .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    // 리뷰 리스트 + 페이징
+    @Override
+    @Transactional(readOnly = true)
+    public Page<HospitalReviewResponseDTO> reviewListPage(Long hospitalId, int page) {
+
+        Pageable pageable = PageRequest.of(page, 5);
+
+        return hospitalReviewRepository
+                .findByHospitalIdOrderByCreatedAtDesc(hospitalId, pageable)
+                .map(this::toDTO);
     }
 
     // 리뷰 수정
@@ -144,17 +150,44 @@ public class HospitalReviewServiceImpl implements HospitalReviewService {
         List<HospitalReview> reviewList = hospitalReviewRepository.findMyReviews(username);
 
         return reviewList.stream()
-                .map(review -> {
-                    HospitalReviewResponseDTO dto =
-                            modelMapper.map(review, HospitalReviewResponseDTO.class);
-
-                    dto.setMemberNickname(review.getMember().getNickname());
-                    dto.setMemberId(review.getMember().getId());
-                    dto.setHospitalId(review.getHospital().getId());
-                    dto.setHospitalName(review.getHospital().getName());
-
-                    return dto;
-                })
+                .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    // 내 리뷰 목록 + 페이징
+    @Override
+    @Transactional(readOnly = true)
+    public Page<HospitalReviewResponseDTO> myReivewListPage(String username, int page) {
+
+        Pageable pageable = PageRequest.of(page, 5);
+
+        return hospitalReviewRepository.findMyReviewsPage(username, pageable)
+                .map(this::toDTO);
+    }
+
+    //리뷰 신고 기능
+    @Override
+    @Transactional
+    public Long reportReview(Long reviewId) {
+
+        HospitalReview review = hospitalReviewRepository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
+
+        review.report();
+
+        return review.getHospital().getId();
+    }
+
+    private HospitalReviewResponseDTO toDTO(HospitalReview review) {
+
+        HospitalReviewResponseDTO dto =
+                modelMapper.map(review, HospitalReviewResponseDTO.class);
+
+        dto.setMemberNickname(review.getMember().getNickname());
+        dto.setMemberId(review.getMember().getId());
+        dto.setHospitalId(review.getHospital().getId());
+        dto.setHospitalName(review.getHospital().getName());
+
+        return dto;
     }
 }

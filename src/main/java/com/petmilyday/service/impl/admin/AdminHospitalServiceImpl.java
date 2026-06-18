@@ -7,6 +7,10 @@ import com.petmilyday.service.admin.AdminHospitalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +57,21 @@ public class AdminHospitalServiceImpl implements AdminHospitalService {
         return hospitalList.stream()
                 .map(hospital -> modelMapper.map(hospital, AdminHospitalDTO.class))
                 .toList();
+    }
+
+    // 병원 리스트 목록 조회 + 페이징
+    @Override
+    @Transactional(readOnly = true)
+    public Page<AdminHospitalDTO> findAllPage(int page) {
+
+        Pageable pageable = PageRequest.of(
+                page,
+                10,
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        return hospitalRepository.findAll(pageable)
+                .map(hospital -> modelMapper.map(hospital, AdminHospitalDTO.class));
     }
 
     // 병원 1개 조회
