@@ -1,0 +1,142 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Sora', sans-serif;
+}
+
+body {
+    background: #f0f2f7;
+    color: #0d1433;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.main-container {
+    max-width: 900px;
+    margin: 40px auto;
+}
+
+.chat-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    max-height: 720px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.chat-header {
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+}
+
+.back-post-btn {
+    border-radius: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.chat-box {
+    height: 500px;
+    overflow-y: auto;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.date-divider {
+    text-align: center;
+    margin: 15px 0;
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.date-divider span {
+    background: #e2e8f0;
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+.msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.msg-row.me {
+    justify-content: flex-end;
+}
+
+.msg-row.other {
+    justify-content: flex-start;
+}
+
+.msg {
+    display: inline-block;
+    max-width: 55%;
+    padding: 8px 12px;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.msg.me {
+    background: #3b82f6;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.msg.other {
+    background: #e2e8f0;
+    color: #111827;
+    border-bottom-left-radius: 4px;
+}
+
+.msg-time {
+    font-size: 0.72rem;
+    color: #64748b;
+    margin-bottom: 3px;
+    white-space: nowrap;
+}
+
+.chat-input {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    padding: 10px 12px;
+    outline: none;
+}
+
+.chat-input input:focus {
+    border-color: #3d58e0;
+    box-shadow: 0 0 0 3px rgba(61, 88, 224, 0.12);
+}
+
+.chat-input button {
+    border-radius: 10px;
+    font-weight: 700;
+    padding: 0 20px;
+}
+
+.evaluate-btn {
+    border-radius: 10px;
+    font-weight: 700;
+}

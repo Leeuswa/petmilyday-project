@@ -7,110 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
 
-    <style>
-        *{
-            box-sizing:border-box;
-            margin:0;
-            padding:0;
-            font-family:'Sora',sans-serif;
-        }
-
-        body{
-            background:#f0f2f7;
-            color:#0d1433;
-        }
-
-        .main-container{
-            max-width:1000px;
-            margin:40px auto;
-        }
-
-        .page-title{
-            font-size:26px;
-            font-weight:700;
-            margin-bottom:20px;
-        }
-
-        .result-card{
-            background:white;
-            border:1px solid #d0d5e8;
-            border-radius:14px;
-            padding:30px;
-        }
-
-        .result-box{
-            margin-bottom:24px;
-            padding:18px;
-            background:#f8fafc;
-            border-radius:10px;
-            border:1px solid #e2e8f0;
-        }
-
-        .result-title{
-            font-size:15px;
-            font-weight:700;
-            margin-bottom:10px;
-            color:#2b44cc;
-        }
-
-        .severity-low{
-            color:#16a34a;
-            font-weight:700;
-        }
-
-        .severity-medium{
-            color:#f59e0b;
-            font-weight:700;
-        }
-
-        .severity-high{
-            color:#dc2626;
-            font-weight:700;
-        }
-
-        .warning-box{
-            background:#fff7ed;
-            border:1px solid #fed7aa;
-            color:#9a3412;
-            border-radius:10px;
-            padding:15px;
-            line-height:1.7;
-            margin-top:10px;
-        }
-
-        .btn-group{
-            display:flex;
-            gap:10px;
-            margin-top:20px;
-            flex-wrap:wrap;
-        }
-
-        .btn{
-            text-decoration:none;
-            padding:12px 20px;
-            border-radius:10px;
-            font-weight:600;
-        }
-
-        .btn-primary{
-            background:#3d58e0;
-            color:white;
-        }
-
-        .btn-secondary{
-            background:white;
-            color:#0d1433;
-            border:1px solid #d0d5e8;
-        }
-
-        .result-image{
-            width:220px;
-            height:160px;
-            object-fit:cover;
-            border-radius:10px;
-            border:1px solid #e2e8f0;
-        }
-    </style>
+    <link rel="stylesheet"
+          th:href="@{/css/diagnosis/diagnosis-result.css}">
 </head>
 
 <body>
@@ -119,57 +17,92 @@
 
 <div class="main-container">
 
-    <h2 class="page-title">AI 진단 결과</h2>
+    <div class="result-hero">
+        <h2>AI 진단 결과</h2>
+        <p>입력한 증상을 바탕으로 참고용 진단 결과를 정리했습니다.</p>
+    </div>
 
     <div class="result-card">
 
-        <div class="result-box">
-            <div class="result-title">반려동물 정보</div>
+        <div class="pet-box">
+            <div class="section-title">
+                반려동물 정보
+            </div>
 
-            <div>
-                <strong th:text="${result.pet.name}">이름</strong>
-                <span th:text="' / ' + ${result.pet.species}"> / 종류</span>
-                <span th:text="' / ' + ${result.pet.breed}"> / 품종</span>
+            <div class="pet-info">
+                <strong th:text="${result.pet.name}">
+                    이름
+                </strong>
+
+                <span th:text="${' / ' + result.pet.species}">
+                    / 종류
+                </span>
+
+                <span th:text="${' / ' + result.pet.breed}">
+                    / 품종
+                </span>
             </div>
         </div>
 
-        <div class="result-box">
-            <div class="result-title">입력 증상</div>
+        <div class="result-summary">
 
-            <div th:text="${result.symptomText}">
-                입력 증상
+            <div class="result-item">
+                <span class="result-label">의심 질환</span>
+
+                <span class="result-value"
+                      th:text="${result.resultDisease}">
+                    질환명
+                </span>
             </div>
+
+            <div class="result-item">
+                <span class="result-label">심각도</span>
+
+                <span class="severity-pill"
+                      th:classappend="${result.resultSeverity == 'LOW'} ? ' severity-low' : (${result.resultSeverity == 'MEDIUM'} ? ' severity-medium' : ' severity-high')"
+                      th:text="${result.resultSeverity == 'LOW'} ? '낮음' : (${result.resultSeverity == 'MEDIUM'} ? '보통' : '높음')">
+                    보통
+                </span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">진단일</span>
+
+                <span class="result-value"
+                      th:text="${#temporals.format(result.createdAt, 'yyyy-MM-dd HH:mm')}">
+                    날짜
+                </span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">입력 증상</span>
+
+                <span class="symptom-text"
+                      th:text="${result.symptomText}">
+                    입력 증상
+                </span>
+            </div>
+
         </div>
 
-        <div class="result-box"
+        <div class="image-box"
              th:if="${result.imageUrl != null}">
-            <div class="result-title">업로드 사진</div>
+
+            <div class="section-title">
+                업로드 사진
+            </div>
 
             <img th:src="${result.imageUrl}"
-                 class="result-image">
+                 class="result-image"
+                 alt="진단 이미지">
+
         </div>
 
-        <div class="result-box">
-            <div class="result-title">의심 질환</div>
-
-            <div th:text="${result.resultDisease}">
-            </div>
-        </div>
-
-        <div class="result-box">
-            <div class="result-title">심각도</div>
-
-            <div th:classappend="
-                ${result.resultSeverity == 'LOW'} ? 'severity-low' :
-                (${result.resultSeverity == 'MEDIUM'} ? 'severity-medium' : 'severity-high')"
-                 th:text="${result.resultSeverity}">
-            </div>
-        </div>
-
-        <div class="result-box">
-            <div class="result-title">권고사항</div>
+        <div class="recommend-box">
+            <strong>권고사항</strong>
 
             <div th:text="${result.resultRecommend}">
+                권고사항
             </div>
         </div>
 
@@ -181,18 +114,18 @@
         <div class="btn-group">
 
             <a href="/diagnosis/history"
-               class="btn btn-primary">
+               class="btn btn-primary result-move-btn">
                 진단 이력
             </a>
 
             <a th:if="${result.resultSeverity == 'HIGH' || result.resultSeverity == 'MEDIUM'}"
                href="/hospital/list"
-               class="btn btn-primary">
+               class="btn btn-success result-move-btn">
                 병원 예약
             </a>
 
             <a href="/diagnosis"
-               class="btn btn-secondary">
+               class="btn btn-secondary result-move-btn">
                 다시 진단하기
             </a>
 
@@ -201,6 +134,8 @@
     </div>
 
 </div>
+
+<script th:src="@{/js/diagnosis/diagnosis-result.js}"></script>
 
 </body>
 </html>

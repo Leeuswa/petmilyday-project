@@ -60,8 +60,12 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             }
         }
 
-        if (symptomText == null) {
-            symptomText = "";
+        if (symptomText == null || symptomText.isBlank()) {
+            symptomText = "증상 정보가 입력되지 않았습니다.";
+        }
+
+        if (symptomText.length() > 500) {
+            symptomText = symptomText.substring(0, 500);
         }
 
         String prompt = """

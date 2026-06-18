@@ -2,94 +2,59 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
     <meta charset="UTF-8">
     <title>petmilyday - 채팅목록</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <style>
-
-        body {
-            background-color: #f4f6fa;
-            font-family: 'Pretendard', sans-serif;
-        }
-
-        .main-container {
-            max-width: 900px;
-            margin: 40px auto;
-        }
-
-        .room-card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            padding: 20px;
-            margin-bottom: 15px;
-            transition: 0.2s;
-        }
-
-        .room-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-
-        .room-link {
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .empty-box {
-            background: white;
-            border-radius: 12px;
-            padding: 50px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Sora', sans-serif;
-        }
-
-        body {
-            background: #f0f2f7;
-            color: #0d1433;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-    </style>
+    <link rel="stylesheet"
+          th:href="@{/css/used/used-chat-list.css}">
 </head>
+
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
 
 <div class="main-container">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="chat-list-hero">
+        <div>
+            <h3>
+                내 채팅 목록
+            </h3>
 
-        <h3 class="fw-bold">
-            내 채팅 목록
-        </h3>
+            <p>
+                중고거래 게시글별 채팅방을 확인할 수 있습니다.
+            </p>
+        </div>
 
+        <a href="/used/list"
+           class="btn btn-light back-btn">
+            중고거래로
+        </a>
     </div>
 
-    <!-- 채팅방 없을 때 -->
     <div th:if="${#lists.isEmpty(rooms)}"
          class="empty-box">
 
-        <h5 class="text-muted">
+        <div class="empty-icon">
+            💬
+        </div>
+
+        <h5>
             진행중인 채팅이 없습니다.
         </h5>
 
+        <p>
+            관심 있는 중고거래 게시글에서 1:1 채팅을 시작해보세요.
+        </p>
+
     </div>
 
-    <!-- 채팅방 목록 -->
     <div th:unless="${#lists.isEmpty(rooms)}">
 
         <a th:each="room : ${rooms}"
@@ -98,47 +63,51 @@
 
             <div class="room-card">
 
-                <div class="d-flex justify-content-between">
+                <div class="room-content">
 
-                    <div>
+                    <div class="room-main">
 
-                        <h5 class="fw-bold"
-                            th:text="${room.postTitle}">
-                        </h5>
+                        <div class="room-title-row">
 
-                        <div class="text-muted small">
+                            <h5 class="room-title"
+                                th:text="${room.postTitle}">
+                                게시글 제목
+                            </h5>
+
+                            <span th:if="${room.unreadCount > 0}"
+                                  class="unread-badge"
+                                  th:text="${room.unreadCount}">
+                                1
+                            </span>
+
+                        </div>
+
+                        <div class="opponent-line">
 
                             상대방 :
                             <span th:text="${room.opponentName}">
-                        </span>
-
-                        </div>
-
-                        <div class="mt-2 text-secondary"
-                             th:text="${room.lastMessage}">
-                        </div>
-
-                        <div class="text-muted small mt-1"
-                             th:if="${room.lastMessageTime != null}"
-                             th:text="${#temporals.format(room.lastMessageTime,'MM-dd HH:mm')}">
-                        </div>
-                    </div>
-
-                    <div class="text-end">
-
-                        <div class="text-end">
-
-                            <span th:if="${room.unreadCount > 0}"
-                                  class="badge bg-danger"
-                                  th:text="${room.unreadCount}">
+                                상대방
                             </span>
 
-                            <div class="badge bg-primary">
-                                입장
-                            </div>
-
                         </div>
 
+                        <div class="last-message"
+                             th:text="${room.lastMessage != null and !room.lastMessage.isBlank() ? room.lastMessage : '아직 메시지가 없습니다.'}">
+                            마지막 메시지
+                        </div>
+
+                        <div class="message-time"
+                             th:if="${room.lastMessageTime != null}"
+                             th:text="${#temporals.format(room.lastMessageTime,'MM-dd HH:mm')}">
+                            시간
+                        </div>
+
+                    </div>
+
+                    <div class="room-action">
+                        <span class="enter-badge">
+                            입장
+                        </span>
                     </div>
 
                 </div>

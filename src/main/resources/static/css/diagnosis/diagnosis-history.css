@@ -1,0 +1,228 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Sora', sans-serif;
+}
+
+body {
+    background: #f0f2f7;
+    color: #0d1433;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.main-container {
+    max-width: 1000px;
+    margin: 40px auto;
+}
+
+.history-hero {
+    background: linear-gradient(135deg, #3d58e0, #6d7df2);
+    color: white;
+    border-radius: 18px;
+    padding: 24px 28px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 20px rgba(61, 88, 224, 0.22);
+}
+
+.history-hero h2 {
+    margin-bottom: 6px;
+    font-size: 26px;
+    font-weight: 800;
+}
+
+.history-hero p {
+    margin: 0;
+    color: #eef2ff;
+}
+
+.top-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.btn-diagnosis {
+    text-decoration: none;
+    background: #3d58e0;
+    color: white;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.btn-diagnosis:hover {
+    background: #2b44cc;
+    color: white;
+}
+
+.history-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+    transition: 0.2s;
+}
+
+.history-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    border-color: #c7d2fe;
+}
+
+.history-card.selected {
+    border-color: #3d58e0;
+    box-shadow: 0 8px 22px rgba(61, 88, 224, 0.18);
+}
+
+.history-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+}
+
+.pet-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.date {
+    color: #64748b;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.symptom {
+    margin-top: 12px;
+    padding: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    color: #334155;
+    line-height: 1.6;
+}
+
+.symptom strong {
+    display: block;
+    color: #3d58e0;
+    margin-bottom: 6px;
+}
+
+.history-img {
+    width: 120px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-top: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.result-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 16px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.disease-label {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.disease-value {
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.severity-badge {
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.severity-low {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.severity-medium {
+    background: #fffbeb;
+    color: #d97706;
+}
+
+.severity-high {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.recommend {
+    margin-top: 10px;
+    color: #334155;
+    line-height: 1.7;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.empty-box {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    padding: 45px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.empty-icon {
+    font-size: 34px;
+    margin-bottom: 10px;
+}
+
+.empty-desc {
+    color: #64748b;
+    margin-top: 8px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 25px;
+    list-style: none;
+}
+
+.page-item a {
+    display: block;
+    padding: 8px 13px;
+    border: 1px solid #d0d5e8;
+    background: white;
+    color: #0d1433;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.page-item.active a {
+    background: #3d58e0;
+    color: white;
+    border-color: #3d58e0;
+}
+
+.page-item.disabled a {
+    color: #b8bfdc;
+    pointer-events: none;
+    background: #f8fafc;
+}

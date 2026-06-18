@@ -104,6 +104,21 @@ public class DiagnosisController {
                 memberRepository.findByUsername(authentication.getName())
                         .orElseThrow();
 
+        if (symptomText == null || symptomText.isBlank()) {
+
+            model.addAttribute(
+                    "pets",
+                    petProfileRepository.findByMember(member)
+            );
+
+            model.addAttribute(
+                    "error",
+                    "증상을 입력해주세요."
+            );
+
+            return "diagnosis/form";
+        }
+
         DiagnosisHistory result =
                 diagnosisService.diagnose(
                         member.getId(),
