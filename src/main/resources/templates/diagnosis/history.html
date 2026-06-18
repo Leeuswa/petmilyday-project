@@ -7,165 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
 
-    <style>
-        *{
-            box-sizing:border-box;
-            margin:0;
-            padding:0;
-            font-family:'Sora',sans-serif;
-        }
-
-        body{
-            background:#f0f2f7;
-            color:#0d1433;
-        }
-
-        .main-container{
-            max-width:1000px;
-            margin:40px auto;
-        }
-
-        .top-area{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:20px;
-        }
-
-        .page-title{
-            font-size:26px;
-            font-weight:700;
-        }
-
-        .btn-diagnosis{
-            text-decoration:none;
-            background:#3d58e0;
-            color:white;
-            padding:11px 18px;
-            border-radius:10px;
-            font-weight:700;
-            font-size:14px;
-        }
-
-        .history-card{
-            background:white;
-            border:1px solid #d0d5e8;
-            border-radius:14px;
-            padding:20px;
-            margin-bottom:15px;
-        }
-
-        .pet-name{
-            font-size:18px;
-            font-weight:700;
-        }
-
-        .disease{
-            color:#2b44cc;
-            font-weight:600;
-            margin-top:10px;
-        }
-
-        .severity{
-            margin-top:6px;
-            font-weight:600;
-        }
-
-        .recommend{
-            margin-top:10px;
-            color:#3d4670;
-            line-height:1.6;
-        }
-
-        .date{
-            color:#64748b;
-            font-size:13px;
-            margin-top:10px;
-        }
-
-        .empty-box{
-            background:white;
-            border-radius:14px;
-            border:1px solid #d0d5e8;
-            padding:40px;
-            text-align:center;
-        }
-
-        .pagination{
-            display:flex;
-            justify-content:center;
-            gap:6px;
-            margin-top:25px;
-            list-style:none;
-        }
-
-        .page-item a{
-            display:block;
-            padding:8px 13px;
-            border:1px solid #d0d5e8;
-            background:white;
-            color:#0d1433;
-            text-decoration:none;
-            border-radius:8px;
-            font-weight:600;
-        }
-
-        .page-item.active a{
-            background:#3d58e0;
-            color:white;
-            border-color:#3d58e0;
-        }
-
-        .page-item.disabled a{
-            color:#b8bfdc;
-            pointer-events:none;
-            background:#f8fafc;
-        }
-
-        .symptom{
-            margin-top:12px;
-            padding:12px;
-            background:#f8fafc;
-            border:1px solid #e2e8f0;
-            border-radius:10px;
-            color:#3d4670;
-            line-height:1.6;
-        }
-
-        .severity-low{
-            color:#16a34a;
-        }
-
-        .severity-medium{
-            color:#f59e0b;
-        }
-
-        .severity-high{
-            color:#dc2626;
-        }
-
-        .result-summary{
-            display:flex;
-            align-items:center;
-            gap:10px;
-            margin-top:15px;
-            margin-bottom:15px;
-        }
-
-        .disease-label{
-            color:#64748b;
-            font-size:14px;
-        }
-
-        .severity-badge{
-            background:#eef2ff;
-            color:#3d58e0;
-            padding:4px 10px;
-            border-radius:20px;
-            font-size:13px;
-            font-weight:700;
-        }
-    </style>
+    <link rel="stylesheet"
+          th:href="@{/css/diagnosis/diagnosis-history.css}">
 </head>
 
 <body>
@@ -174,8 +17,13 @@
 
 <div class="main-container">
 
+    <div class="history-hero">
+        <h2>AI 진단 이력</h2>
+        <p>이전에 진행한 반려동물 자가진단 결과를 확인할 수 있습니다.</p>
+    </div>
+
     <div class="top-area">
-        <h2 class="page-title">AI 진단 이력</h2>
+        <div></div>
 
         <a href="/diagnosis"
            class="btn-diagnosis">
@@ -185,7 +33,19 @@
 
     <div th:if="${histories == null or histories.content.isEmpty()}"
          class="empty-box">
-        진단 이력이 없습니다.
+
+        <div class="empty-icon">
+            📋
+        </div>
+
+        <h3>
+            진단 이력이 없습니다.
+        </h3>
+
+        <p class="empty-desc">
+            반려동물 증상을 입력하고 AI 자가진단을 진행해보세요.
+        </p>
+
     </div>
 
     <div th:if="${histories != null and not histories.content.isEmpty()}">
@@ -193,42 +53,57 @@
         <div th:each="history : ${histories.content}"
              class="history-card">
 
-            <div class="pet-name">
-                <span th:text="${history.pet.name + ' (' + history.pet.species + ')'}"></span>
-            </div>
+            <div class="history-top">
 
-            <div class="date"
-                 th:text="${#temporals.format(history.createdAt,'yyyy-MM-dd HH:mm')}">
+                <div>
+                    <div class="pet-name">
+                        <span th:text="${history.pet.name + ' (' + history.pet.species + ')'}">
+                            반려동물
+                        </span>
+                    </div>
+
+                    <div class="date"
+                         th:text="${#temporals.format(history.createdAt,'yyyy-MM-dd HH:mm')}">
+                        날짜
+                    </div>
+                </div>
+
+                <span class="severity-badge"
+                      th:classappend="${history.resultSeverity == 'LOW'} ? ' severity-low' : (${history.resultSeverity == 'MEDIUM'} ? ' severity-medium' : ' severity-high')"
+                      th:text="${history.resultSeverity == 'LOW'} ? '낮음' : (${history.resultSeverity == 'MEDIUM'} ? '보통' : '높음')">
+                    심각도
+                </span>
+
             </div>
 
             <div class="symptom">
                 <strong>입력 증상</strong>
+
                 <div th:text="${history.symptomText}">
+                    입력 증상
                 </div>
             </div>
 
             <img th:if="${history.imageUrl != null}"
                  th:src="${history.imageUrl}"
-                 style="width:120px;
-                height:90px;
-                object-fit:cover;
-                border-radius:10px;
-                margin-top:10px;
-                border:1px solid #e2e8f0;">
+                 class="history-img">
 
             <div class="result-summary">
 
-                <span class="disease-label">의심 질환</span>
-                <span th:text="${history.resultDisease}"></span>
+                <span class="disease-label">
+                    의심 질환
+                </span>
 
-                <span class="severity-badge"
-                      th:text="${history.resultSeverity}">
+                <span class="disease-value"
+                      th:text="${history.resultDisease}">
+                    질환
                 </span>
 
             </div>
 
             <div class="recommend"
                  th:text="${history.resultRecommend}">
+                권고사항
             </div>
 
         </div>
@@ -238,24 +113,30 @@
 
                 <li class="page-item"
                     th:classappend="${histories.first} ? 'disabled'">
+
                     <a th:href="@{/diagnosis/history(page=${histories.number - 1})}">
                         이전
                     </a>
+
                 </li>
 
                 <li class="page-item"
                     th:each="i : ${#numbers.sequence(startPage, endPage)}"
                     th:classappend="${i == currentPage} ? 'active'">
+
                     <a th:href="@{/diagnosis/history(page=${i})}"
                        th:text="${i + 1}">
                     </a>
+
                 </li>
 
                 <li class="page-item"
                     th:classappend="${histories.last} ? 'disabled'">
+
                     <a th:href="@{/diagnosis/history(page=${histories.number + 1})}">
                         다음
                     </a>
+
                 </li>
 
             </ul>
@@ -264,6 +145,8 @@
     </div>
 
 </div>
+
+<script th:src="@{/js/diagnosis/diagnosis-history.js}"></script>
 
 </body>
 </html>

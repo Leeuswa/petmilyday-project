@@ -2,72 +2,75 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>결제 확인</title>
+    <title>petmilyday - 결제 확인</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <style>
-        body {
-            background: #f4f6fa;
-            font-family: 'Pretendard', sans-serif;
-        }
-
-        .pay-container {
-            max-width: 650px;
-            margin: 80px auto;
-        }
-
-        .pay-card {
-            background: white;
-            border-radius: 20px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-        }
-
-        .notice-box {
-            background: #fff7ed;
-            border: 1px solid #fed7aa;
-            color: #c2410c;
-            border-radius: 12px;
-            padding: 14px;
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-    </style>
+    <link rel="stylesheet"
+          th:href="@{/css/used/used-payment-confirm.css}">
 </head>
 
 <body>
 
+<div th:replace="~{fragments/header :: header}"></div>
+
 <div class="pay-container">
+
+    <div class="pay-hero">
+        <h3>
+            결제 확인
+        </h3>
+
+        <p>
+            결제 정보를 확인하고 테스트 결제를 진행할 수 있습니다.
+        </p>
+    </div>
 
     <div class="pay-card">
 
         <div class="card-body p-5">
 
-            <h3 class="fw-bold mb-4">
-                결제 확인
-            </h3>
+            <div class="pay-section">
 
-            <div class="mb-3">
-                <strong>상품명</strong>
-                <div th:text="${post.title}">
+                <div class="pay-label">
                     상품명
                 </div>
+
+                <div class="pay-value"
+                     th:text="${post.title}">
+                    상품명
+                </div>
+
             </div>
 
-            <div class="mb-3">
-                <strong>결제금액</strong>
-                <div class="text-primary fs-4 fw-bold">
+            <div class="pay-section">
+
+                <div class="pay-label">
+                    결제금액
+                </div>
+
+                <div class="price-text">
                     <span th:text="${#numbers.formatInteger(post.price,0,'COMMA')}">
                         0
                     </span>원
                 </div>
+
             </div>
 
-            <div class="mb-4">
-                <strong>결제수단</strong>
-                <div>카카오페이 테스트 결제</div>
+            <div class="pay-section">
+
+                <div class="pay-label">
+                    결제수단
+                </div>
+
+                <div class="pay-value">
+                    카카오페이 테스트 결제
+                </div>
+
             </div>
 
             <div class="notice-box mb-4">
@@ -75,14 +78,17 @@
                 실제 결제는 발생하지 않으며, 시연용으로 테스트 결제 완료 처리를 할 수 있습니다.
             </div>
 
-            <form th:action="@{/payment/ready}" method="post">
+            <form th:action="@{/payment/ready}"
+                  method="post"
+                  id="paymentReadyForm">
 
                 <input type="hidden"
                        name="postId"
                        th:value="${post.id}">
 
                 <button type="submit"
-                        class="btn btn-warning w-100 py-3 fw-bold">
+                        class="btn btn-warning w-100 py-3 fw-bold pay-btn"
+                        id="paymentReadyBtn">
                     카카오페이 결제창 열기
                 </button>
 
@@ -94,7 +100,7 @@
             </a>
 
             <a th:href="@{/used/detail/{id}(id=${post.id})}"
-               class="btn btn-outline-secondary w-100 mt-2">
+               class="btn btn-outline-secondary w-100 mt-2 py-3 fw-bold">
                 취소
             </a>
 
@@ -103,6 +109,8 @@
     </div>
 
 </div>
+
+<script th:src="@{/js/used/used-payment-confirm.js}"></script>
 
 </body>
 </html>

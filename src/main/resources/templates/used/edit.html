@@ -1,69 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
     <meta charset="UTF-8">
     <title>petmilyday - 게시글 수정</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <style>
-
-        body {
-            background-color: #f4f6fa;
-            font-family: 'Pretendard', sans-serif;
-        }
-
-        .main-container {
-            max-width: 900px;
-            margin: 40px auto;
-        }
-
-        .write-card {
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            padding: 35px;
-        }
-
-        .form-label {
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .form-control,
-        .form-select {
-            border-radius: 10px;
-            padding: 12px;
-        }
-
-        textarea.form-control {
-            min-height: 220px;
-            resize: none;
-        }
-
-        .submit-btn {
-            padding: 12px 30px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Sora', sans-serif;
-        }
-
-        body {
-            background: #f0f2f7;
-            color: #0d1433;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-    </style>
+    <link rel="stylesheet"
+          th:href="@{/css/used/used-edit.css}">
 </head>
 
 <body>
@@ -72,25 +21,37 @@
 
 <div class="main-container">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="edit-hero">
+        <div class="d-flex justify-content-between align-items-center">
 
-        <h3 class="fw-bold">
-            게시글 수정
-        </h3>
+            <div>
+                <h3>
+                    게시글 수정
+                </h3>
 
-        <a th:href="@{/used/detail/{id}(id=${post.id})}"
-           class="btn btn-outline-secondary">
-            뒤로가기
-        </a>
+                <p>
+                    등록한 중고거래 게시글 정보를 수정할 수 있습니다.
+                </p>
+            </div>
 
+            <a th:href="@{/used/detail/{id}(id=${post.id})}"
+               class="btn btn-light back-btn">
+                뒤로가기
+            </a>
+
+        </div>
     </div>
 
     <div class="write-card">
 
         <form th:action="@{/used/edit/{id}(id=${post.id})}"
-              method="post">
+              method="post"
+              id="editForm">
 
-            <!-- 제목 -->
+            <div class="form-section-title">
+                기본 정보
+            </div>
+
             <div class="mb-4">
 
                 <label class="form-label">
@@ -101,105 +62,114 @@
                        name="title"
                        class="form-control"
                        th:value="${post.title}"
+                       placeholder="게시글 제목을 입력하세요"
                        required>
 
             </div>
 
-            <!-- 카테고리 -->
-            <div class="mb-4">
+            <div class="row g-4">
 
-                <label class="form-label">
-                    카테고리
-                </label>
+                <div class="col-md-6">
 
-                <select name="category"
-                        class="form-select">
+                    <label class="form-label">
+                        카테고리
+                    </label>
 
-                    <option value="사료/간식"
-                            th:selected="${post.category == '사료/간식'}">
-                        사료/간식
-                    </option>
+                    <select name="category"
+                            class="form-select"
+                            required>
 
-                    <option value="장난감"
-                            th:selected="${post.category == '장난감'}">
-                        장난감
-                    </option>
+                        <option value="사료/간식"
+                                th:selected="${post.category == '사료/간식'}">
+                            사료/간식
+                        </option>
 
-                    <option value="의류"
-                            th:selected="${post.category == '의류'}">
-                        의류
-                    </option>
+                        <option value="장난감"
+                                th:selected="${post.category == '장난감'}">
+                            장난감
+                        </option>
 
-                    <option value="가구/매트"
-                            th:selected="${post.category == '가구/매트'}">
-                        가구/매트
-                    </option>
+                        <option value="의류"
+                                th:selected="${post.category == '의류'}">
+                            의류
+                        </option>
 
-                </select>
+                        <option value="가구/매트"
+                                th:selected="${post.category == '가구/매트'}">
+                            가구/매트
+                        </option>
 
-            </div>
+                    </select>
 
-            <!-- 가격 -->
-            <div class="mb-4">
+                </div>
 
-                <label class="form-label">
-                    가격
-                </label>
+                <div class="col-md-6">
 
-                <input type="number"
-                       name="price"
-                       class="form-control"
-                       th:value="${post.price}"
-                       required>
+                    <label class="form-label">
+                        거래 지역
+                    </label>
 
-            </div>
+                    <input type="text"
+                           name="region"
+                           class="form-control"
+                           th:value="${post.region}"
+                           placeholder="예: 서울 강남구"
+                           required>
 
-            <!-- 지역 -->
-            <div class="mb-4">
-
-                <label class="form-label">
-                    지역
-                </label>
-
-                <input type="text"
-                       name="region"
-                       class="form-control"
-                       th:value="${post.region}"
-                       required>
+                </div>
 
             </div>
 
-            <!-- 상태 -->
-            <div class="mb-4">
+            <div class="row g-4 mt-1">
 
-                <label class="form-label">
-                    상품 상태
-                </label>
+                <div class="col-md-6">
 
-                <select name="itemCondition"
-                        class="form-select">
+                    <label class="form-label">
+                        판매 가격
+                    </label>
 
-                    <option value="NEW"
-                            th:selected="${post.itemCondition.name() == 'NEW'}">
-                        새제품
-                    </option>
+                    <input type="number"
+                           name="price"
+                           class="form-control"
+                           th:value="${post.price}"
+                           placeholder="가격을 입력하세요"
+                           min="0"
+                           required>
 
-                    <option value="LIKE_NEW"
-                            th:selected="${post.itemCondition.name() == 'LIKE_NEW'}">
-                        거의새것
-                    </option>
+                </div>
 
-                    <option value="USED"
-                            th:selected="${post.itemCondition.name() == 'USED'}">
-                        중고
-                    </option>
+                <div class="col-md-6">
 
-                </select>
+                    <label class="form-label">
+                        상품 상태
+                    </label>
+
+                    <select name="itemCondition"
+                            class="form-select"
+                            required>
+
+                        <option value="NEW"
+                                th:selected="${post.itemCondition.name() == 'NEW'}">
+                            새제품
+                        </option>
+
+                        <option value="LIKE_NEW"
+                                th:selected="${post.itemCondition.name() == 'LIKE_NEW'}">
+                            거의새것
+                        </option>
+
+                        <option value="USED"
+                                th:selected="${post.itemCondition.name() == 'USED'}">
+                            중고
+                        </option>
+
+                    </select>
+
+                </div>
 
             </div>
 
-            <!-- 가격 제안 가능 -->
-            <div class="mb-4 form-check">
+            <div class="offer-box mt-4">
 
                 <input type="checkbox"
                        name="offerAccepted"
@@ -213,9 +183,16 @@
                     가격 제안 가능
                 </label>
 
+                <p>
+                    구매자가 채팅으로 가격을 제안할 수 있도록 허용합니다.
+                </p>
+
             </div>
 
-            <!-- 내용 -->
+            <div class="form-section-title mt-4">
+                상세 내용
+            </div>
+
             <div class="mb-4">
 
                 <label class="form-label">
@@ -223,14 +200,18 @@
                 </label>
 
                 <textarea name="content"
-                          class="form-control"
+                          class="form-control content-area"
+                          placeholder="상품 상태, 사용 기간, 거래 희망 장소 등을 입력하세요."
                           required
                           th:text="${post.content}"></textarea>
 
             </div>
 
-            <!-- 버튼 -->
-            <div class="d-flex justify-content-end gap-2">
+            <div class="notice-box">
+                이미지는 게시글 작성 시 등록된 이미지가 유지됩니다. 이미지 변경 기능은 별도 수정이 필요합니다.
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
 
                 <a th:href="@{/used/detail/{id}(id=${post.id})}"
                    class="btn btn-outline-secondary submit-btn">
@@ -238,7 +219,8 @@
                 </a>
 
                 <button type="submit"
-                        class="btn btn-primary submit-btn">
+                        class="btn btn-primary submit-btn"
+                        id="editSubmitBtn">
                     수정완료
                 </button>
 
@@ -249,6 +231,8 @@
     </div>
 
 </div>
+
+<script th:src="@{/js/used/used-edit.js}"></script>
 
 </body>
 </html>

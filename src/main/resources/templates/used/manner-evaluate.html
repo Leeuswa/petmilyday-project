@@ -1,84 +1,34 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <title>petmilyday - 매너 평가</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
           rel="stylesheet">
-    <meta charset="UTF-8">
-    <title>매너 평가</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <style>
-
-        body {
-            background-color: #f4f6fa;
-            font-family: 'Pretendard', sans-serif;
-        }
-
-        .navbar-custom {
-            background-color: #0f172a;
-            padding: 15px 0;
-            color: white;
-        }
-
-        .main-container {
-            max-width: 600px;
-            margin: 60px auto;
-        }
-
-        .card-box {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .sub-text {
-            color: #6c757d;
-            margin-bottom: 25px;
-        }
-
-        select.form-select {
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Sora', sans-serif;
-        }
-
-        body {
-            background: #f0f2f7;
-            color: #0d1433;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-    </style>
+    <link rel="stylesheet"
+          th:href="@{/css/used/used-manner-evaluate.css}">
 </head>
-
-<div th:replace="~{fragments/header :: header}"></div>
 
 <body>
 
+<div th:replace="~{fragments/header :: header}"></div>
+
 <div class="main-container">
+
+    <div class="evaluate-hero">
+        <h3>
+            매너 평가
+        </h3>
+
+        <p>
+            거래 상대방에게 매너 점수를 남겨주세요.
+        </p>
+    </div>
 
     <div class="card-box">
 
@@ -90,7 +40,9 @@
             거래 상대방에게 1~5점 매너 점수를 남겨주세요.
         </div>
 
-        <form action="/manner/evaluate" method="post">
+        <form action="/manner/evaluate"
+              method="post"
+              id="mannerForm">
 
             <input type="hidden"
                    name="postId"
@@ -100,15 +52,16 @@
                    name="targetMemberId"
                    th:value="${targetMemberId}">
 
-
-            <div class="mb-3">
+            <div class="score-box">
 
                 <label class="form-label fw-bold">
                     점수 선택
                 </label>
 
                 <select name="score"
-                        class="form-select">
+                        class="form-select"
+                        id="scoreSelect"
+                        required>
 
                     <option value="5">★★★★★ (5점)</option>
                     <option value="4">★★★★☆ (4점)</option>
@@ -118,10 +71,16 @@
 
                 </select>
 
+                <div class="score-preview"
+                     id="scorePreview">
+                    매우 만족스러운 거래였어요.
+                </div>
+
             </div>
 
             <button type="submit"
-                    class="btn btn-primary btn-submit">
+                    class="btn btn-primary btn-submit"
+                    id="submitBtn">
                 평가하기
             </button>
 
@@ -130,6 +89,8 @@
     </div>
 
 </div>
+
+<script th:src="@{/js/used/used-manner-evaluate.js}"></script>
 
 </body>
 </html>

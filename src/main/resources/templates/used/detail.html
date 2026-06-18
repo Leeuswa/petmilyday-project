@@ -1,183 +1,53 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet">
     <meta charset="UTF-8">
     <title>petmilyday - 게시글 상세</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
-    <style>
-
-        body {
-            background-color: #f4f6fa;
-            font-family: 'Pretendard', sans-serif;
-        }
-
-        .main-container {
-            max-width: 1000px;
-            margin: 40px auto;
-        }
-
-        .detail-card {
-            background: white;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            padding: 30px;
-        }
-
-        .main-image {
-            width: 100%;
-            max-height: 450px;
-            object-fit: contain;
-            border-radius: 12px;
-            background: #f1f5f9;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .main-image:hover {
-            opacity: 0.95;
-        }
-
-        .thumbnail-list {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        .thumbnail-list img {
-            width: 90px;
-            height: 90px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .thumbnail-list img:hover {
-            transform: scale(1.05);
-        }
-
-        .thumbnail-list img.active-thumb {
-            border-color: #0d6efd;
-        }
-
-        .price-text {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #0d6efd;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            background: #e0f2f1;
-            color: #00796b;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .info-text {
-            color: #64748b;
-            font-size: 0.95rem;
-            line-height: 1.8;
-        }
-
-        .content-box {
-            margin-top: 30px;
-            padding-top: 25px;
-            border-top: 1px solid #e2e8f0;
-            white-space: pre-line;
-            line-height: 1.8;
-            min-height: 200px;
-        }
-
-        .back-btn {
-            border-radius: 10px;
-            padding: 10px 20px;
-        }
-
-        .action-btn {
-            border-radius: 10px;
-            font-weight: 600;
-            padding: 7px 14px;
-        }
-
-        .writer-box {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 18px;
-            margin-top: 30px;
-        }
-
-        .modal-content {
-            border-radius: 16px;
-            border: none;
-        }
-
-        .report-reason {
-            border-radius: 10px;
-            padding: 12px;
-            border: 1px solid #dee2e6;
-            width: 100%;
-            resize: none;
-        }
-
-        .seller-score {
-            display: inline-block;
-            padding: 8px 14px;
-            background: #fff7ed;
-            border: 1px solid #fed7aa;
-            border-radius: 10px;
-            font-weight: 600;
-            color: #c2410c;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Sora', sans-serif;
-        }
-
-        body {
-            background: #f0f2f7;
-            color: #0d1433;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-    </style>
+    <link rel="stylesheet"
+          th:href="@{/css/used/used-detail.css}">
 </head>
 
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
 
-<div class="main-container">
+<div class="main-container"
+     id="usedDetailPage"
+     th:data-member-id="${memberId}"
+     th:data-used-post-id="${post.id}">
 
     <div th:if="${param.reportSuccess}"
          class="alert alert-success">
         신고가 접수되었습니다.
     </div>
 
-    <div class="mb-4 d-flex justify-content-between align-items-center">
+    <div class="detail-top-card">
+        <div class="d-flex justify-content-between align-items-center">
 
-        <h3 class="fw-bold">
-            게시글 상세
-        </h3>
+            <div>
+                <h3>
+                    게시글 상세
+                </h3>
 
-        <a href="/used/list"
-           class="btn btn-outline-secondary back-btn">
-            목록으로
-        </a>
+                <p>
+                    상품 정보와 판매자 정보를 확인해보세요.
+                </p>
+            </div>
 
+            <a href="/used/list"
+               class="btn btn-light back-btn">
+                목록으로
+            </a>
+
+        </div>
     </div>
 
     <div class="detail-card">
@@ -187,6 +57,7 @@
             <img id="mainImage"
                  th:if="${post.imageUrlList != null and !post.imageUrlList.isEmpty()}"
                  th:src="${post.imageUrlList[0]}"
+                 th:alt="${post.title}"
                  class="main-image">
 
             <div th:if="${post.imageUrlList == null or post.imageUrlList.isEmpty()}"
@@ -201,9 +72,10 @@
 
             <img th:each="img, stat : ${post.imageUrlList}"
                  th:src="${img}"
+                 th:alt="${post.title}"
                  th:attr="data-img=${img}"
                  th:classappend="${stat.index == 0} ? 'active-thumb'"
-                 onclick="changeMainImage(this)">
+                 class="js-thumb">
 
         </div>
 
@@ -228,7 +100,7 @@
                 <div class="text-end">
 
                     <span class="status-badge"
-                          th:text="${post.status}">
+                          th:text="${post.statusLabel}">
                     </span>
 
                     <div class="mt-3 d-flex gap-2 justify-content-end flex-wrap">
@@ -236,14 +108,16 @@
                         <form th:if="${!isWriter}"
                               th:action="@{/wishlist/toggle}"
                               method="post">
-                            <input type="hidden" name="usedPostId" th:value="${post.id}">
+
+                            <input type="hidden"
+                                   name="usedPostId"
+                                   th:value="${post.id}">
 
                             <div class="d-flex align-items-center gap-2">
 
                                 <button type="button"
                                         id="wishBtn"
-                                        class="btn btn-outline-danger action-btn"
-                                        onclick="toggleWish()">
+                                        class="btn btn-outline-danger action-btn">
                                     🤍 찜하기
                                 </button>
 
@@ -280,7 +154,8 @@
 
                         <div th:if="${post.status.name() == 'SOLD'}">
 
-                            <button class="btn btn-secondary action-btn" disabled>
+                            <button class="btn btn-secondary action-btn"
+                                    disabled>
                                 판매완료
                             </button>
 
@@ -308,18 +183,21 @@
                         <form th:if="${isWriter and post.status.name() != 'SOLD'}"
                               th:action="@{/used/complete/{id}(id=${post.id})}"
                               method="post">
-                            <button type="submit" class="btn btn-success action-btn">
+
+                            <button type="submit"
+                                    class="btn btn-success action-btn">
                                 판매완료
                             </button>
+
                         </form>
 
                         <form th:if="${isWriter and post.status.name() == 'SOLD'}"
                               th:action="@{/used/delete/{id}(id=${post.id})}"
-                              method="post">
+                              method="post"
+                              class="delete-form">
 
                             <button type="submit"
-                                    class="btn btn-outline-danger action-btn"
-                                    onclick="return confirm('정말 삭제하시겠습니까?');">
+                                    class="btn btn-outline-danger action-btn">
                                 삭제
                             </button>
 
@@ -340,64 +218,89 @@
                 <div class="seller-score">
                     ⭐ 매너점수
                     <span th:text="${#numbers.formatDecimal(mannerAverage, 1, 1)}">
+                        0.0
                     </span>
                 </div>
 
-                <div>
-                    작성자 :
-                    <strong th:text="${post.writerName}">
-                        관리자
-                    </strong>
-                </div>
+                <div class="info-grid">
 
-                <div>
-                    지역 :
-                    <span th:text="${post.region}">
-                        서울
-                    </span>
-                </div>
+                    <div class="info-item">
+                        <span class="info-label">작성자</span>
+                        <span class="info-value"
+                              th:text="${post.writerName}">
+                            관리자
+                        </span>
+                    </div>
 
-                <div>
-                    상품상태 :
-                    <span th:text="${post.itemCondition}">
-                        USED
-                    </span>
-                </div>
+                    <div class="info-item">
+                        <span class="info-label">카테고리</span>
+                        <span class="info-value"
+                              th:text="${post.category}">
+                            카테고리
+                        </span>
+                    </div>
 
-                <div>
-                    가격제안 :
-                    <span th:if="${post.offerAccepted}">
-                        가능
-                    </span>
+                    <div class="info-item">
+                        <span class="info-label">지역</span>
+                        <span class="info-value"
+                              th:text="${post.region}">
+                            서울
+                        </span>
+                    </div>
 
-                    <span th:unless="${post.offerAccepted}">
-                        불가능
-                    </span>
-                </div>
+                    <div class="info-item">
+                        <span class="info-label">상품상태</span>
+                        <span class="info-value"
+                              th:text="${post.itemConditionLabel}">
+                            중고
+                        </span>
+                    </div>
 
-                <div>
-                    작성일 :
-                    <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">
-                        2026-05-26
-                    </span>
-                </div>
+                    <div class="info-item">
+                        <span class="info-label">가격제안</span>
 
-                <div>
-                    수정일 :
-                    <span th:text="${#temporals.format(post.updatedAt, 'yyyy-MM-dd HH:mm')}">
-                        2026-05-26
-                    </span>
-                </div>
+                        <span th:if="${post.offerAccepted}"
+                              class="info-value offer-yes">
+                            가능
+                        </span>
 
-                <div>
-                    누적 신고 :
-                    <span th:text="${post.reportCount}">
-                        0
-                    </span> 회
+                        <span th:unless="${post.offerAccepted}"
+                              class="info-value offer-no">
+                            불가능
+                        </span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">누적 신고</span>
+                        <span class="info-value">
+                            <span th:text="${post.reportCount}">0</span> 회
+                        </span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">작성일</span>
+                        <span class="info-value"
+                              th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">
+                            2026-05-26
+                        </span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">수정일</span>
+                        <span class="info-value"
+                              th:text="${#temporals.format(post.updatedAt, 'yyyy-MM-dd HH:mm')}">
+                            2026-05-26
+                        </span>
+                    </div>
+
                 </div>
 
             </div>
 
+        </div>
+
+        <div class="content-title">
+            상품 설명
         </div>
 
         <div class="content-box"
@@ -518,109 +421,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-
-    let mainImage = document.getElementById("mainImage");
-
-    let defaultImage = mainImage ? mainImage.src : "";
-
-    function changeMainImage(element) {
-
-        mainImage.src = element.dataset.img;
-
-        document.querySelectorAll(".thumbnail-list img")
-            .forEach(img => img.classList.remove("active-thumb"));
-
-        element.classList.add("active-thumb");
-    }
-
-    function resetMainImage() {
-
-        mainImage.src = defaultImage;
-
-        const thumbs = document.querySelectorAll(".thumbnail-list img");
-
-        thumbs.forEach(img => img.classList.remove("active-thumb"));
-
-        if (thumbs.length > 0) {
-            thumbs[0].classList.add("active-thumb");
-        }
-    }
-
-</script>
-
-<script th:inline="javascript">
-
-    let memberId = /*[[${memberId}]]*/ null;
-    let usedPostId = /*[[${post.id}]]*/ 0;
-
-    window.onload = function () {
-        loadWishCount();
-        checkWish();
-    };
-
-    function toggleWish() {
-
-        if (memberId == null) {
-            alert("로그인이 필요합니다.");
-            location.href = "/member/login";
-            return;
-        }
-
-        fetch("/wishlist/toggle", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: "memberId=" + memberId + "&usedPostId=" + usedPostId
-        })
-            .then(res => res.json())
-            .then(data => {
-                updateWishUI(data.wished);
-                loadWishCount();
-            });
-    }
-
-    function loadWishCount() {
-
-        fetch("/wishlist/count?usedPostId=" + usedPostId)
-            .then(res => res.json())
-            .then(count => {
-                document.getElementById("wishCount").innerText = count;
-            });
-    }
-
-    function checkWish() {
-
-        if (memberId == null) {
-            return;
-        }
-
-        fetch("/wishlist/check?memberId=" + memberId + "&usedPostId=" + usedPostId)
-            .then(res => res.json())
-            .then(isWished => {
-                updateWishUI(isWished);
-            });
-    }
-
-    function updateWishUI(isWished) {
-
-        const btn = document.getElementById("wishBtn");
-
-        if (!btn) return;
-
-        if (isWished) {
-            btn.innerText = "❤️ 찜취소";
-            btn.classList.remove("btn-outline-danger");
-            btn.classList.add("btn-danger");
-        } else {
-            btn.innerText = "🤍 찜하기";
-            btn.classList.remove("btn-danger");
-            btn.classList.add("btn-outline-danger");
-        }
-    }
-
-</script>
+<script th:src="@{/js/used/used-detail.js}"></script>
 
 </body>
 </html>

@@ -213,4 +213,17 @@ public class UsedPostDTO {
             case SOLD -> "판매완료";
         };
     }
+
+    public String getItemConditionLabel() {
+
+        if (itemCondition == null) {
+            return "상태없음";
+        }
+
+        return switch (itemCondition) {
+            case NEW -> "새제품";
+            case LIKE_NEW -> "거의새것";
+            case USED -> "중고";
+        };
+    }
 }
