@@ -11,6 +11,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +31,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // CustomOAuth2UserService에서 주머니에 넣어두었던 db_username 값 가져오기
         String username = (String) oAuth2User.getAttributes().get("db_username");
 
+        // username 없을 때의 예외 처리
+        if (username == null) {
+            response.sendRedirect("/member/login?error=" + URLEncoder.encode("소셜 가입 중 오류가 발생했습니다.", StandardCharsets.UTF_8));
+            return;
+        }
+
         // 서비스 권한 체계에 맞춰 권한 정보 지정 (기본 USER)
         String role = "USER";
 
@@ -39,7 +47,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         Cookie jwtCookie = new Cookie("Authorization", token);
         jwtCookie.setHttpOnly(true);
         jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(60 * 30); // 쿠키 수명 30분 설정
+        jwtCookie.setMaxAge(60 * 30); // 쿠키 수명 30분
+        jwtCookie.setAttribute("SameSite", "Lax"); // 해커 방지
 
         response.addCookie(jwtCookie);
 

@@ -49,6 +49,8 @@ public class PetProfileServiceImpl implements PetProfileService {
                 .species(dto.getSpecies())
                 .breed(dto.getBreed())
                 .age(dto.getAge())
+                .gender(dto.getGender())
+                .photoUrl(dto.getPhotoUrl())
                 .build();
 
         petProfileRepository.save(petProfile);
@@ -67,5 +69,40 @@ public class PetProfileServiceImpl implements PetProfileService {
         petProfileRepository.delete(petProfile);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public PetProFileDTO getPet(Long petId, String loginId) {
+        PetProfile petProfile = petProfileRepository.findById(petId)
+                .orElseThrow(() -> new IllegalArgumentException("반려동물 프로필을 찾을 수 없습니다."));
 
+        if (!petProfile.getMember().getUsername().equals(loginId)) {
+            throw new IllegalArgumentException("해당 프로필 조회 권한이 없습니다.");
+        }
+
+        return modelMapper.map(petProfile, PetProFileDTO.class);
+    }
+
+    @Override
+    @Transactional
+    public void updatePet(Long petId, PetProFileDTO dto, String loginId) {
+        PetProfile petProfile = petProfileRepository.findById(petId)
+                .orElseThrow(() -> new IllegalArgumentException("반려동물 프로필을 찾을 수 없습니다."));
+
+        if (!petProfile.getMember().getUsername().equals(loginId)) {
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        }
+
+        PetProfile updatedPet = PetProfile.builder()
+                .id(petProfile.getId())
+                .member(petProfile.getMember())
+                .name(dto.getName())
+                .species(dto.getSpecies())
+                .breed(dto.getBreed())
+                .age(dto.getAge())
+                .gender(dto.getGender())
+                .photoUrl(dto.getPhotoUrl())
+                .build();
+
+        petProfileRepository.save(updatedPet);
+    }
 }
