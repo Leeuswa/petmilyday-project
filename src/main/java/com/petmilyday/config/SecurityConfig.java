@@ -36,29 +36,33 @@ public class SecurityConfig {
                 // 무상태 환경이므로 CSRF 공격 보호를 비활성화
                 .csrf(csrf -> csrf.disable())
 
+                // JWT 쿠키 기반 로그아웃 처리
                 .logout(logout -> logout
                         .logoutUrl("/member/logout")
                         .logoutSuccessUrl("/")
-                        .deleteCookies("Authorization", "JSESSIONID")
+                        .deleteCookies("Authorization", "JWT_TOKEN", "JSESSIONID")
                         .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .permitAll()
                 )
 
-                // 폼 로그인 화면이나 기존 세션 기반 로그아웃 메커니즘을 사용하지 않으므로 비활성화
+                // 폼 로그인, HTTP Basic 비활성화
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
 
-                // 스프링 시큐리티가 세션을 생성 및 사용하지 않도록 무상태
+                // JWT 기반이므로 세션 사용 안 함
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
+                // 인증이 필요한 페이지 접근 시 로그인 페이지로 이동
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.sendRedirect("/member/login");
                         })
                 )
 
-                // API별 접근 권한 설정
+                // 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
 
                         // 정적 리소스 허용
@@ -73,7 +77,7 @@ public class SecurityConfig {
                                 "/error"
                         ).permitAll()
 
-                        // 회원가입, 로그인, 토큰 재발급, 아이디 중복체크 허용
+                        // 회원 관련 공개 경로
                         .requestMatchers(
                                 "/member/register",
                                 "/member/login",
@@ -81,7 +85,7 @@ public class SecurityConfig {
                                 "/member/check-username"
                         ).permitAll()
 
-                        // 공개 페이지 허용
+                        // 공개 페이지
                         .requestMatchers(
                                 "/community/list",
                                 "/community/meetup/**",
@@ -90,14 +94,14 @@ public class SecurityConfig {
                                 "/ai/diagnosis"
                         ).permitAll()
 
-                        // 쇼핑/구독 관련 공개 API
+                        // 쇼핑/구독 관련 공개 경로
                         .requestMatchers(
                                 "/shop/**",
                                 "/api/subscription/**",
                                 "/shop/subscription"
                         ).permitAll()
 
-                        // SSE 알림 구독 경로 허용
+                        // 알림/SSE 경로 허용
                         .requestMatchers(
                                 "/notifications/**",
                                 "/api/notifications/**",
@@ -105,20 +109,20 @@ public class SecurityConfig {
                                 "/api/notification/**"
                         ).permitAll()
 
-                        // 메인 관리자 페이지는 ADMIN 권한만 접근 가능
+                        // 메인 관리자
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // 병원 관리자 페이지는 HOSPITAL_ADMIN 권한만 접근 가능
+                        // 병원 관리자
                         .requestMatchers(
                                 "/hospitalAdmin/**",
                                 "/hospital-admin/**"
                         ).hasRole("HOSPITAL_ADMIN")
 
-                        // 나머지 모든 요청은 인증 필요
+                        // 나머지는 로그인 필요
                         .anyRequest().authenticated()
                 )
 
-                // OAuth2 소셜 로그인도 JWT에 맞춰서 설정
+                // OAuth2 소셜 로그인
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
@@ -126,6 +130,7 @@ public class SecurityConfig {
                         .successHandler(oAuth2SuccessHandler)
                 )
 
+                // JWT 필터 등록
                 .addFilterBefore(
                         new JwtAuthenticationFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class

@@ -36,7 +36,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String token = jwtTokenProvider.createToken(username, role);
 
         // 발행된 토큰을 타임리프 브라우저가 읽을 수 있도록 쿠키에 저장
-        Cookie jwtCookie = new Cookie("JWT_TOKEN", token);
+        Cookie jwtCookie = new Cookie("Authorization", token);
         jwtCookie.setHttpOnly(true);
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(60 * 30); // 쿠키 수명 30분 설정
