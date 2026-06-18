@@ -10,6 +10,9 @@ public interface SubscriptionService {
     // 회원의 활성화된 정기구독 목록 조회
     List<SubscriptionResponseDto> getActiveSubscriptions(String username);
 
+    // 모든 구독 조회
+    List<SubscriptionResponseDto> getAllSubscriptions(String username);
+
     // 새로운 정기구독 내역 생성
     Long createSubscription(SubscriptionRequestDto requestDto, String username);
 

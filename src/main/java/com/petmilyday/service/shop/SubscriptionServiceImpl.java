@@ -26,7 +26,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final MemberRepository memberRepository;
     private final ProductRepository productRepository;
 
-    // 회원의 활성화된 정기구독 내역 조회
     @Override
     public List<SubscriptionResponseDto> getActiveSubscriptions(String username) {
         return subscriptionRepository.findByMemberUsernameAndStatus(username, SubscriptionStatus.ACTIVE)
@@ -35,7 +34,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .collect(Collectors.toList());
     }
 
-    // 정기구독 신청 정보 등록
+    // 💡 인터페이스에 추가한 메서드 구현!
+    @Override
+    public List<SubscriptionResponseDto> getAllSubscriptions(String username) {
+        return subscriptionRepository.findByMemberUsernameOrderByCreatedAtDesc(username)
+                .stream()
+                .map(SubscriptionResponseDto::new)
+                .collect(Collectors.toList());
+    }
+
     @Override
     @Transactional
     public Long createSubscription(SubscriptionRequestDto requestDto, String username) {
@@ -60,23 +67,29 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriptionRepository.save(subscription).getId();
     }
 
-    //정기배송 주기 변경
     @Override
     @Transactional
     public void changeCycle(Long id, int newCycle) {
         Subscription subscription = subscriptionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 구독 정보입니다."));
 
+        if (subscription.getProduct().isDeleted()) {
+            throw new IllegalArgumentException("판매가 종료된 상품은 주기를 변경할 수 없습니다.");
+        }
+
         subscription.setCycleDays(newCycle);
         subscription.setNextDeliveryDate(LocalDate.now().plusDays(newCycle));
     }
 
-    //정기배송 해제 처리
     @Override
     @Transactional
     public void cancelSubscription(Long id) {
         Subscription subscription = subscriptionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 구독 정보입니다."));
+
+        if (subscription.getStatus() == SubscriptionStatus.CANCELLED) {
+            throw new IllegalArgumentException("이미 해지된 구독입니다.");
+        }
 
         subscription.setStatus(SubscriptionStatus.CANCELLED);
     }

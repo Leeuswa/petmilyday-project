@@ -368,8 +368,16 @@
 
   </div>
 
-  <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a> <a th:href="@{/shop}" class="nav-link">동물용품샵</a>
+  <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a>
 
+  <div class="dropdown">
+    <a th:href="@{/shop}" class="nav-link dropbtn">동물용품샵</a>
+
+    <div class="dropdown-content" sec:authorize="hasRole('ADMIN')">
+      <a th:href="@{/admin/shop/list}">⚙️ 상품 목록 및 관리</a>
+      <a th:href="@{/admin/shop/new}">➕ 새 상품 등록</a>
+    </div>
+  </div>
   <div class="dropdown">
     <span class="nav-link dropbtn">게시판</span>
     <div class="dropdown-content">
@@ -433,8 +441,6 @@
 
 
   </div>
-
-  <!-- 로그인한 사용자만 SSE 알림 구독 -->
 
   <th:block sec:authorize="isAuthenticated()">
     <th:block th:replace="~{fragments/sseNotification :: sseNotification}"></th:block>

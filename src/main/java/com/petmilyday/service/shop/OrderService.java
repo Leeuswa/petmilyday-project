@@ -28,7 +28,6 @@ public class OrderService {
     private final ProductRepository productRepository;
 
     // 회원별 주문 내역 조회
-
     public List<OrderResponseDto> getOrderHistory(String username) {
         List<Orders> ordersList = ordersRepository.findByMemberUsernameOrderByCreatedAtDesc(username);
         List<OrderResponseDto> responseList = new ArrayList<>();
@@ -36,6 +35,7 @@ public class OrderService {
         for (int i = 0; i < ordersList.size(); i++) {
             Orders orders = ordersList.get(i);
 
+            // 정기구독 1회차 필터링 로직 (기존 유지)
             if (orders.getOrderName() != null && orders.getOrderName().contains("(1회")) {
                 continue;
             }
@@ -45,6 +45,7 @@ public class OrderService {
             dto.setProductName(orders.getOrderName());
             dto.setTotalPrice(orders.getTotalPrice());
 
+            // 상태 매핑
             if ("ORDERED".equals(orders.getStatus()) || "PAID".equals(orders.getStatus())) {
                 dto.setOrderStatus("결제완료");
             } else {
@@ -53,10 +54,16 @@ public class OrderService {
 
             dto.setOrderDate(orders.getCreatedAt());
 
+            // 주문 상품 정보 세팅 (quantity 및 isDeleted 체크)
             if (orders.getOrderItems() != null && !orders.getOrderItems().isEmpty()) {
-                dto.setQuantity(orders.getOrderItems().get(0).getQuantity());
+                OrderItem firstItem = orders.getOrderItems().get(0);
+                dto.setQuantity(firstItem.getQuantity());
+
+                // 💡 핵심: 첫 번째 상품의 삭제 여부를 가져와서 DTO에 세팅
+                dto.setDeleted(firstItem.getProduct().isDeleted());
             } else {
                 dto.setQuantity(1);
+                dto.setDeleted(false);
             }
 
             responseList.add(dto);
