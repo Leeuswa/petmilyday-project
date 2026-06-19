@@ -81,32 +81,61 @@
                 container.innerHTML = "";
 
                 if (!pageResponse.dtoList || pageResponse.dtoList.length === 0) {
-                    container.innerHTML = "<div style='padding:20px; text-align:center; color:var(--muted); font-weight:600;'>등록된 댓글이 없습니다. 첫 댓글을 남겨보세요.</div>";
+                    container.innerHTML = "<div style='padding:20px; text-align:center; color:var(--muted); font-weight:600;'>등록된 댓글이 없습니다.</div>";
                     return;
                 }
 
                 pageResponse.dtoList.forEach(comment => {
-                    const heartIcon = comment.likedByCurrentUser ? '♥' : '♡';
-                    const heartColor = comment.likedByCurrentUser ? 'var(--pink-deep)' : 'var(--muted)';
+                    const isChild = comment.parentId != null;
+
+                    const isLiked = comment.likedByCurrentUser;
+                    const heartIcon = isLiked ? '♥' : '♡';
+                    const likeBtnStyle = isLiked
+                        ? "border: 1px solid #FF4B4B; color: #FF4B4B; background-color: #FFF0F0;" // 좋아요 ON: 빨간색 테마
+                        : "border: 1px solid var(--pink-light); color: var(--muted); background-color: #ffffff;"; // 좋아요 OFF: 기본 회색 테마
 
                     const commentHtml = `
-                        <div class="comment-item" style="margin-bottom:15px; padding:15px; border-bottom:1px solid var(--pink-light);">
-                            <div class="comment-writer" style="display:flex; justify-content:space-between; margin-bottom:8px; font-weight:700;">
+                        <div class="comment-item ${isChild ? 'child' : ''}" style="margin-bottom:15px; padding:15px; border-bottom:1px solid var(--pink-light); ${isChild ? 'margin-left:40px; background:var(--pink-pale); border-radius: 0 16px 16px 0; border-left: 4px solid var(--pink-light);' : ''}">
+                            <div class="comment-writer" style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:700;">
                                 <span>${comment.writerName}</span>
-                                <div style="display:flex; gap:15px; align-items:center;">
-                                    <span class="comment-date" style="color:var(--muted); font-size:13px;">${comment.createdAt}</span>
-                                    <span style="cursor:pointer; color:${heartColor}; font-size:14px;" onclick="toggleCommentLike(${comment.id})">
-                                        ${heartIcon} ${comment.likeCount}
-                                    </span>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <span style="color:var(--muted); font-size:12px;">${comment.createdAt}</span>
+
+                                    <button type="button" onclick="toggleCommentLike(${comment.id})"
+                                            style="padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: 0.2s; outline: none; ${likeBtnStyle}">
+                                        <span>${heartIcon}</span> <span>${comment.likeCount}</span>
+                                    </button>
+
+                                    ${!isChild ? `<button type="button" class="comment-reply-btn" onclick="showReCommentForm(${comment.id})" style="font-size:13px; color:var(--pink); background:none; border:none; cursor:pointer; font-weight:800; padding:0;">답글</button>` : ''}
                                 </div>
                             </div>
-                            <div class="comment-body" style="color:var(--dark); font-size:15px;">${comment.content}</div>
+                            <div class="comment-body" style="color:var(--dark); font-size:15px; line-height:1.5;">${comment.content}</div>
+                            <div id="recomment-form-container-${comment.id}"></div>
                         </div>
                     `;
                     container.innerHTML += commentHtml;
                 });
             })
             .catch(error => console.error("댓글 로딩 실패:", error));
+    }
+
+    // 답글 작성 폼 생성
+    function showReCommentForm(parentId) {
+        const container = document.getElementById(`recomment-form-container-${parentId}`);
+        if(container.innerHTML.trim() !== "") {
+            container.innerHTML = "";
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="recomment-form" style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">
+                <textarea id="recomment-text-${parentId}" style="width:100%; height:60px; padding:10px; border:1px solid var(--pink-light); border-radius:8px;"></textarea>
+                <div style="display:flex; justify-content:flex-end; gap:5px;">
+                    <button type="button" class="btn-re-cancel" onclick="document.getElementById('recomment-form-container-${parentId}').innerHTML=''">취소</button>
+                    <button type="button" class="btn-re-submit" onclick="submitReComment(${parentId})" style="background:var(--pink); color:#fff; border:none; padding:5px 15px; border-radius:6px; cursor:pointer;">등록</button>
+                </div>
+            </div>
+        `;
     }
 
     function submitMainComment() {
