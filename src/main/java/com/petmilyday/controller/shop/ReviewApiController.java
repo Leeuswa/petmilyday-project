@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,9 +26,29 @@ public class ReviewApiController {
 
     // 특정 상품의 전체 리뷰 목록 조회
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<ProductReview>> getProductReviews(@PathVariable Long productId) {
+    public ResponseEntity<List<Map<String, Object>>> getProductReviews(@PathVariable Long productId) {
         List<ProductReview> reviews = reviewService.getReviewsByProduct(productId);
-        return ResponseEntity.ok(reviews);
+
+        List<Map<String, Object>> response = reviews.stream().map(review -> {
+
+            Member writer = memberRepository.findById(review.getMemberId()).orElse(null);
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", review.getId());
+            map.put("content", review.getContent());
+            map.put("rating", review.getRating());
+
+
+            map.put("reviewImgUrl", review.getImgUrl() != null ? review.getImgUrl() : "");
+
+
+            map.put("nickname", writer != null ? writer.getNickname() : "탈퇴한 회원");
+            map.put("memberId", review.getMemberId());
+
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(response);
     }
 
     // 로그인 회원 인증 및 새 리뷰 등록
