@@ -1,78 +1,276 @@
 <!DOCTYPE html>
-<html xmlns:th=\"http://www.thymeleaf.org\"
-      xmlns:sec=\"http://www.thymeleaf.org/extras/spring-security\">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>펫밀리데이 - 메인 홈</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    :root{
-      --bg:#f0f2f7;--bg2:#e6e9f2;--bg3:#d8dced;
-      --surface:#ffffff;--border:#d0d5e8;--border2:#b8bfdc;
-      --text:#0d1433;--text2:#3d4670;--text3:#8890b8;
-      --accent:#2b44cc;--accent-light:#eaedfa;--accent-mid:#3d58e0;
-      --indigo:#4a2bcc;--indigo-light:#eeebfa;
-      --sky:#0e88cc;--sky-light:#e7f4fb;
-      --amber:#b56a0a;--amber-light:#fdf2e3;
-      --rose:#b52844;--rose-light:#fceef1;
-      --green:#1a7a48;--green-light:#e6f4ec;
-      --r:8px;--rl:14px;
-    }
-    *{box-sizes:border-box;margin:0;padding:0;font-family:'Sora',sans-serif;}
-    body{background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;}
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap"
+        rel="stylesheet">
 
-    /* 와이어프레임에 있던 기존 클래스 스타일들 지정 */
-    .gnb { display: flex; align-items: center; padding: 16px 24px; background: var(--surface); border-bottom: 1px solid var(--border); }
-    .logo { font-size: 20px; font-weight: 700; color: var(--text); }
-    .logo span { color: var(--accent); }
-    .nav-link { margin-left: 24px; color: var(--text2); text-decoration: none; font-weight: 500; }
-    .nav-link.active { color: var(--accent); font-weight: 600; }
-    .btn { padding: 8px 16px; border-radius: var(--r); font-weight: 500; text-decoration: none; font-size: 13px; }
-    .btn-outline { border: 1px solid var(--border2); color: var(--text2); }
-    .btn-accent { background: var(--accent); color: white; }
-    .btn-sm { padding: 6px 12px; font-size: 12px; }
-
-    .hero { background: linear-gradient(135deg, var(--indigo), var(--sky)); color: white; padding: 40px; border-radius: var(--rl); margin: 24px; }
-    .hero h1 { font-size: 32px; margin-bottom: 16px; font-weight: 700; }
-    .hero p { font-size: 16px; opacity: 0.9; }
-
-    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 24px; }
-    .card { background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: var(--r); text-align: center; }
-    .text-center { text-align: center; }
-    .mb8 { margin-bottom: 8px; }
-    .mb16 { margin-bottom: 16px; }
-    .lg { font-size: 24px; }
-    .sm { font-size: 14px; }
-    .w5 { font-weight: 500; }
-    .w6 { font-weight: 600; }
-  </style>
+  <link rel="stylesheet" th:href="@{/css/main/mainHome.css}">
 </head>
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
 
-<main id="main">
-  <div class="page active">
-    <div class="hero">
-      <div style="color:var(--sky-light); font-weight:600; font-size:12px; margin-bottom:8px; letter-spacing:1px">PET HEALTH PLATFORM</div>
-      <h1>우리 아이의 건강,<br>petmilyday와 함께</h1>
-      <p>병원 예약부터 AI 진단, 물품 구매까지<br>반려동물의 모든 것을 한 곳에서 해결하세요.</p>
+<div class="shape s1" aria-hidden="true"></div>
+<div class="shape s2" aria-hidden="true"></div>
+<div class="shape s3" aria-hidden="true"></div>
+<div class="shape s4" aria-hidden="true"></div>
+
+<main class="main-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-badge"><span class="live-dot"></span> 지금 1,200개 병원 예약 가능</div>
+
+      <h1 class="hero-title">
+        우리 아이의<br>
+        <span class="line-color">건강한 하루</span>,<br>
+        <span class="line-italic">petmilyday</span>
+      </h1>
+
+      <p class="hero-desc">
+        동물병원 예약부터 AI 증상 진단, 용품 쇼핑까지<br>
+        반려동물의 모든 순간을 함께해요 💌
+      </p>
+
+      <div class="hero-btns">
+        <a th:href="@{/hospital/list}" class="btn-primary">🏥 병원 예약하기</a>
+        <a th:href="@{/ai-diagnosis}" class="btn-secondary">🤖 AI 증상 진단 →</a>
+      </div>
+
+      <div class="hero-trust">
+        <div class="trust-avatars">
+          <span>🐶</span><span>🐱</span><span>🐰</span><span>🐹</span>
+        </div>
+        <div class="trust-text">
+          <strong>52,000명</strong>의 보호자가<br>이미 사용하고 있어요
+        </div>
+      </div>
     </div>
 
-    <div style="padding: 0 24px; margin-bottom: 16px;">
-      <div class="w6" style="font-size:16px; color:var(--text)">빠른 메뉴</div>
-    </div>
+    <div class="hero-right">
 
-    <div class="grid4">
-      <div class="card"><div class="lg mb8">🏥</div><div class="sm w5">동물병원 예약</div></div>
-      <div class="card"><div class="lg mb8">🤖</div><div class="sm w5">AI 자가진단</div></div>
-      <div class="card"><div class="lg mb8">🛍️</div><div class="sm w5">동물용품샵</div></div>
-      <div class="card"><div class="lg mb8">♻️</div><div class="sm w5">중고거래</div></div>
+      <div class="float-card fc1">
+        <div class="fc-icon">✅</div>
+        <div class="fc-text">
+          <div class="fc-t">예약 완료!</div>
+          <div class="fc-s">강남동물병원 · 오후 3시</div>
+        </div>
+      </div>
+
+      <div class="float-card fc2">
+        <div class="fc-icon">🤖</div>
+        <div class="fc-text">
+          <div class="fc-t">AI 분석 완료</div>
+          <div class="fc-s">경미한 피부 트러블</div>
+        </div>
+      </div>
+
+      <div class="float-card fc3">
+        <div class="fc-icon">⭐</div>
+        <div class="fc-text">
+          <div class="fc-t">리뷰 4.9점</div>
+          <div class="fc-s">1,240개 후기</div>
+        </div>
+      </div>
+
+      <div class="hero-main-card">
+        <div class="card-header">
+          <span class="card-title">🐶 초코의 건강 리포트</span>
+          <span class="card-badge">✓ 이번 달 완료</span>
+        </div>
+
+        <div class="pet-profile">
+          <div class="pet-avatar">🐕</div>
+          <div class="pet-info">
+            <h3>초코</h3>
+            <p>말티즈 · 4세 · 3.2kg</p>
+            <div class="pet-tags">
+              <span class="pet-tag">건강함</span>
+              <span class="pet-tag">접종 완료</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="appt-info">
+          <div class="appt-cell">
+            <div class="label">다음 예약</div>
+            <div class="val">7월 15일</div>
+          </div>
+          <div class="appt-cell">
+            <div class="label">담당 병원</div>
+            <div class="val">강남동물병원</div>
+          </div>
+          <div class="appt-cell">
+            <div class="label">진료 유형</div>
+            <div class="val">건강검진</div>
+          </div>
+          <div class="appt-cell">
+            <div class="label">예방접종</div>
+            <div class="val">D+14일</div>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-label"><span>이번 달 건강 점수</span><span class="progress-score">70점</span></div>
+          <div class="progress-bar"><div class="progress-fill"></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-strip">
+    <div class="stat-item">
+      <div class="stat-num">1,200<span class="stat-unit">+</span></div>
+      <div class="stat-label">제휴 동물병원</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">52<span class="stat-unit">K+</span></div>
+      <div class="stat-label">행복한 반려동물 가족</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">98<span class="stat-unit">%</span></div>
+      <div class="stat-label">예약 만족도</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4.9<span class="stat-unit">★</span></div>
+      <div class="stat-label">평균 병원 평점</div>
     </div>
   </div>
+
+  <!-- SERVICES -->
+  <section class="services-section">
+    <div class="sec-eyebrow">🐾 서비스</div>
+    <h2 class="sec-title">petmilyday의 모든 것</h2>
+    <p class="sec-sub">반려동물 생활의 처음부터 끝까지 함께해요</p>
+
+    <div class="services-grid">
+
+      <a th:href="@{/hospital/list}" class="svc c-pink">
+        <div class="svc-icon-wrap ic-pink">🏥</div>
+        <h3>동물병원 예약</h3>
+        <p>가까운 병원을 탐색하고 원하는 시간에 바로 예약해요. 예약 확정 알림까지 받을 수 있어요.</p>
+        <div class="svc-footer">
+          <span class="svc-chip chip-pink">실시간 예약</span>
+          <span class="svc-arrow">→</span>
+        </div>
+      </a>
+
+      <a th:href="@{/ai-diagnosis}" class="svc c-mint">
+        <div class="svc-icon-wrap ic-mint">🤖</div>
+        <h3>AI 증상 자가진단</h3>
+        <p>간단한 증상 입력만으로 우리 아이 건강 상태를 빠르게 확인해요.</p>
+        <div class="svc-footer">
+          <span class="svc-chip chip-mint">AI 분석</span>
+          <span class="svc-arrow">→</span>
+        </div>
+      </a>
+
+      <a th:href="@{/shop}" class="svc c-yellow">
+        <div class="svc-icon-wrap ic-yellow">🛒</div>
+        <h3>동물용품 샵</h3>
+        <p>사료, 간식, 장난감까지 모든 펫 용품을 한 곳에서 만나보세요.</p>
+        <div class="svc-footer">
+          <span class="svc-chip chip-yellow">전체 상품</span>
+          <span class="svc-arrow">→</span>
+        </div>
+      </a>
+
+      <a th:href="@{/used}" class="svc c-purple">
+        <div class="svc-icon-wrap ic-purple">🔄</div>
+        <h3>중고 거래</h3>
+        <p>안 쓰는 펫 용품을 이웃과 나누고, 필요한 물건을 거래해요.</p>
+        <div class="svc-footer">
+          <span class="svc-chip chip-purple">중고거래</span>
+          <span class="svc-arrow">→</span>
+        </div>
+      </a>
+
+      <a th:href="@{/community/list}" class="svc c-sky">
+        <div class="svc-icon-wrap ic-sky">💬</div>
+        <h3>커뮤니티</h3>
+        <p>같은 반려동물 가족들과 정보와 이야기를 나눠요.</p>
+        <div class="svc-footer">
+          <span class="svc-chip chip-sky">소통</span>
+          <span class="svc-arrow">→</span>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="review-section">
+    <div class="sec-eyebrow sec-eyebrow-light">💌 후기</div>
+    <h2 class="sec-title sec-title-light">보호자들의 이야기</h2>
+    <p class="sec-sub sec-sub-light">52,000명의 반려동물 가족이 petmilyday와 함께해요</p>
+
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="stars" aria-hidden="true">★★★★★</div>
+        <p class="review-text">"전화 예약이 너무 번거로웠는데, 이제 바로 예약하고 알림도 받아요. 강아지 진료 기록도 한눈에 보여서 너무 편해요!"</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">👩</div>
+          <div>
+            <div class="reviewer-name">김지수 보호자</div>
+            <div class="reviewer-pet">🐶 포메라니안 3살</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="stars" aria-hidden="true">★★★★★</div>
+        <p class="review-text">"AI 진단이 처음엔 반신반의했는데, 피부 트러블을 정확히 짚어줘서 바로 병원 예약까지 연결됐어요. 신기하고 편해요!"</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">👨</div>
+          <div>
+            <div class="reviewer-name">박민준 보호자</div>
+            <div class="reviewer-pet">🐱 러시안블루 2살</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <div class="stars" aria-hidden="true">★★★★★</div>
+        <p class="review-text">"중고거래로 쓰던 케이지 팔고, 그 돈으로 사료 샀어요. 커뮤니티에서 반려인 친구도 생겼어요. 다 좋아요!"</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">👩</div>
+          <div>
+            <div class="reviewer-name">이채은 보호자</div>
+            <div class="reviewer-pet">🐰 네덜란드 드워프 1살</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-left">
+      <div class="cta-tag">🎁 가입 혜택</div>
+      <h2>지금 바로 시작해보세요!</h2>
+      <p>회원가입 후 첫 예약 시 진료비 할인 혜택을 받을 수 있어요 🎉</p>
+    </div>
+    <a th:href="@{/member/register}" sec:authorize="isAnonymous()" class="btn-cta">무료로 시작하기 →</a>
+    <a th:href="@{/hospital/list}" sec:authorize="isAuthenticated()" class="btn-cta">병원 예약하러 가기 →</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="home-footer">
+    <div class="footer-logo">🐾 pet<em>mily</em>day</div>
+    <p>© 2026 petmilyday — 반려동물과 함께하는 모든 순간</p>
+  </footer>
+
 </main>
 
+<script th:src="@{/js/main/mainHome.js}"></script>
 </body>
 </html>

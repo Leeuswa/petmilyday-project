@@ -4,442 +4,148 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       lang="ko">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet">
 </head>
 <body>
-<nav class="gnb" th:fragment="header">
-  <style>
-    :root {
-      --surface: #ffffff;
-      --border: #d0d5e8;
-      --border2: #b8bfdc;
-      --text: #0d1433;
-      --text2: #3d4670;
-      --accent: #2b44cc;
-      --accent-light: #eaedfa;
-      --bg2: #f0f2f7;
-      --r: 8px;
-    }
+<div th:fragment="header">
 
+  <link rel="stylesheet" th:href="@{/css/main/header.css}">
 
-    .gnb {
-      display: flex;
-      align-items: center;
-      padding: 16px 24px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      font-family: 'Sora', 'Noto Sans KR', sans-serif;
-      position: relative;
-      z-index: 1000;
-    }
+  <nav class="gnb">
+    <a th:href="@{/}" class="logo">
+      <span class="logo-paw">🐾</span>
+      pet<em>mily</em>day
+    </a>
 
-    .logo {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      text-decoration: none;
-      margin-right: 30px;
-    }
+    <a th:href="@{/}" class="nav-link">홈</a>
 
-    .logo span {
-      color: var(--accent);
-    }
+    <div class="dropdown">
+      <span class="nav-link dropbtn">동물병원 예약</span>
+      <div class="dropdown-content">
 
-    .nav-link {
-      margin: 0 15px;
-      color: var(--text2);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 15px;
-      transition: color 0.2s;
-    }
+        <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
+           th:href="@{/hospitalAdmin/hospital}">
+          병원 정보 관리
+        </a>
 
-    .nav-link:hover,
-    .nav-link.active {
-      color: var(--accent);
-    }
+        <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
+           th:href="@{/hospitalAdmin/reservations}">
+          병원 예약 관리
+        </a>
 
-    .dropdown {
-      position: relative;
-      display: inline-block;
-      padding: 10px 0;
-    }
+        <hr sec:authorize="hasRole('HOSPITAL_ADMIN')">
 
-    .dropbtn {
-      cursor: pointer;
-    }
+        <a th:href="@{/hospital/list}">
+          병원 검색/예약
+        </a>
 
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: var(--surface);
-      min-width: 170px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      overflow: hidden;
-      z-index: 9999;
-    }
+        <a sec:authorize="isAuthenticated()"
+           th:href="@{/reservation/list}">
+          내 예약 목록
+        </a>
 
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
+        <a sec:authorize="isAuthenticated()"
+           th:href="@{/reservation/medical-records}">
+          내 동물 진료기록
+        </a>
 
-    .dropdown-content a {
-      display: block;
-      padding: 12px 16px;
-      color: var(--text2);
-      font-size: 14px;
-      font-weight: 500;
-      text-align: center;
-      text-decoration: none;
-      border-bottom: 1px solid var(--bg2);
-      transition: all 0.2s ease;
-    }
+        <a sec:authorize="isAuthenticated()"
+           th:href="@{/vaccination/myVaccination}">
+          내 동물 예방접종
+        </a>
 
-    .dropdown-content a:last-child {
-      border-bottom: none;
-    }
+        <a sec:authorize="isAuthenticated()"
+           th:href="@{/review/myReview}">
+          내가 쓴 병원 리뷰
+        </a>
 
-    .dropdown-content a:hover {
-      background-color: var(--accent-light);
-      color: var(--accent);
-      font-weight: 600;
-    }
+      </div>
+    </div>
 
-    .dropdown-content hr {
-      margin: 4px 0;
-      border: none;
-      border-top: 1px solid var(--border);
-    }
+    <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a>
+    <a th:href="@{/shop}" class="nav-link">동물용품샵</a>
 
-    .btn {
-      padding: 8px 16px;
-      border-radius: var(--r);
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 13px;
-      cursor: pointer;
-      display: inline-block;
-    }
+    <div class="dropdown">
+      <span class="nav-link dropbtn">게시판</span>
+      <div class="dropdown-content">
+        <a th:href="@{/community/list}">일반 게시판</a>
+        <a th:href="@{/used}">중고거래</a>
+        <a th:href="@{/community/meetup/list}">모임 게시판</a>
+      </div>
+    </div>
 
-    .btn-outline {
-      border: 1px solid var(--border2);
-      background: transparent;
-      color: var(--text2);
-      border-radius: var(--r);
-      text-decoration: none;
-    }
+    <div class="gnb-spacer"></div>
 
-    .btn-outline:hover {
-      background: var(--bg2);
-    }
+    <div class="fxa g12">
 
-    .btn-accent {
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: var(--r);
-      text-decoration: none;
-    }
+      <th:block sec:authorize="isAnonymous()">
+        <a th:href="@{/member/login}" class="btn btn-outline btn-sm">로그인</a>
+        <a th:href="@{/member/register}" class="btn btn-accent btn-sm">회원가입</a>
+      </th:block>
 
-    .btn-accent:hover {
-      background: #3d58e0;
-    }
+      <th:block sec:authorize="isAuthenticated()">
 
-    .btn-sm {
-      padding: 8px 16px;
-      font-size: 13px;
-    }
+        <span class="gnb-username">
+          <span sec:authentication="name"></span>님
+        </span>
 
-    .fxa {
-      display: flex;
-      align-items: center;
-    }
+        <div class="notification-wrap">
+          <button type="button" class="notification-btn">
+            🔔
+            <span id="notification-count" class="notification-count" style="display:none;">0</span>
+          </button>
 
-    .g12 {
-      gap: 12px;
-    }
+          <div class="notification-dropdown">
+            <div class="notification-title">알림</div>
+            <div id="notification-list" class="notification-list">
+              <div class="notification-empty">새 알림이 없습니다.</div>
+            </div>
+          </div>
+        </div>
 
-    .mypage-wrap {
-      position: relative;
-    }
+        <div class="mypage-wrap">
+          <a th:href="@{/member/mypage}" class="btn btn-outline btn-sm">마이페이지 ▾</a>
 
-    .mypage-dropdown {
-      display: none;
-      position: absolute;
-      top: 100%;
-      right: 0;
-      padding-top: 8px;
-      z-index: 9999;
-    }
+          <div class="mypage-dropdown">
+            <div class="mypage-dropdown-inner">
 
-    .mypage-wrap:hover .mypage-dropdown {
-      display: block;
-    }
+              <a sec:authorize="hasRole('ADMIN')"
+                 th:href="@{/admin}">
+                관리자 대시보드
+              </a>
 
-    .mypage-dropdown-inner {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      box-shadow: 0 8px 24px rgba(13, 20, 51, 0.12);
-      min-width: 190px;
-      overflow: hidden;
-    }
+              <hr sec:authorize="hasRole('ADMIN')">
 
-    .mypage-dropdown a {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      font-size: 13px;
-      color: var(--text2);
-      text-decoration: none;
-      white-space: nowrap;
-      transition: background 0.12s;
-    }
+<!--              <a sec:authorize="hasRole('HOSPITAL_ADMIN')"-->
+<!--                 th:href="@{/hospitalAdmin/hospital}">-->
+<!--                병원 정보 관리-->
+<!--              </a>-->
 
-    .mypage-dropdown a:hover {
-      background: #f1f3fe;
-      color: var(--accent);
-    }
+<!--              <a sec:authorize="hasRole('HOSPITAL_ADMIN')"-->
+<!--                 th:href="@{/hospital-admin/reservations}">-->
+<!--                병원 예약 관리-->
+<!--              </a>-->
 
-    .mypage-dropdown hr {
-      margin: 4px 0;
-      border: none;
-      border-top: 1px solid var(--border);
-    }
+<!--              <hr sec:authorize="hasRole('HOSPITAL_ADMIN')">-->
 
-    .logout-btn {
-      color: #b52844;
-      border-color: #b52844;
-    }
+              <a th:href="@{/member/mypage}">👤 회원정보 수정</a>
 
-    .logout-btn:hover {
-      background: #fff1f4;
-    }
+            </div>
+          </div>
+        </div>
 
-    .notification-wrap {
-      position: relative;
-    }
-
-    .notification-btn {
-      position: relative;
-      border: 1px solid var(--border2);
-      background: #fff;
-      border-radius: var(--r);
-      padding: 8px 12px;
-      cursor: pointer;
-      font-size: 14px;
-      color: var(--text2);
-    }
-
-    .notification-btn:hover {
-      background: var(--bg2);
-    }
-
-    .notification-count {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      min-width: 18px;
-      height: 18px;
-      padding: 0 5px;
-      border-radius: 999px;
-      background: #e03131;
-      color: #fff;
-      font-size: 11px;
-      line-height: 18px;
-      text-align: center;
-      font-weight: 700;
-    }
-
-    .notification-dropdown {
-      display: none;
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 8px;
-      width: 280px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      box-shadow: 0 8px 24px rgba(13, 20, 51, 0.12);
-      overflow: hidden;
-      z-index: 9999;
-    }
-
-    .notification-wrap:hover .notification-dropdown {
-      display: block;
-    }
-
-    .notification-title {
-      padding: 12px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    .notification-list {
-      max-height: 260px;
-      overflow-y: auto;
-    }
-
-    .notification-empty {
-      padding: 14px;
-      font-size: 13px;
-      color: var(--text2);
-      text-align: center;
-    }
-
-    .notification-item {
-      display: block;
-      padding: 12px 14px;
-      font-size: 13px;
-      color: var(--text2);
-      text-decoration: none;
-      border-bottom: 1px solid var(--bg2);
-    }
-
-    .notification-item:hover {
-      background: var(--accent-light);
-      color: var(--accent);
-    }
-
-    .notification-time {
-      display: block;
-      margin-top: 4px;
-      font-size: 11px;
-      color: #777;
-    }
-
-
-  </style>
-
-  <a th:href="@{/}" class="logo">petmily<span>day</span></a> <a th:href="@{/}" class="nav-link">홈</a>
-
-  <div class="dropdown">
-    <span class="nav-link dropbtn">동물병원 예약</span>
-    <div class="dropdown-content">
-
-
-      <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
-         th:href="@{/hospitalAdmin/hospital}">
-        병원 정보 관리
-      </a>
-
-      <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
-         th:href="@{/hospitalAdmin/reservations}">
-        병원 예약 관리
-      </a>
-
-      <hr sec:authorize="hasRole('HOSPITAL_ADMIN')">
-
-      <a th:href="@{/hospital/list}">
-        병원 검색/예약
-      </a>
-
-      <a sec:authorize="isAuthenticated()"
-         th:href="@{/reservation/list}">
-        내 예약 목록
-      </a>
-
-      <a sec:authorize="isAuthenticated()"
-         th:href="@{/reservation/medical-records}">
-        내 동물 진료기록
-      </a>
-
-      <a sec:authorize="isAuthenticated()"
-         th:href="@{/vaccination/myVaccination}">
-        내 동물 예방접종
-      </a>
-
-      <a sec:authorize="isAuthenticated()"
-         th:href="@{/review/myReview}">
-        내가 쓴 병원 리뷰
-      </a>
+        <a th:href="@{/member/logout}" class="btn btn-outline btn-sm logout-btn">로그아웃</a>
+      </th:block>
 
     </div>
 
-
-  </div>
-
-  <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a> <a th:href="@{/shop}" class="nav-link">동물용품샵</a>
-
-  <div class="dropdown">
-    <span class="nav-link dropbtn">게시판</span>
-    <div class="dropdown-content">
-      <a th:href="@{/community/list}">일반 게시판</a>
-      <a th:href="@{/used}">중고거래</a>
-      <a th:href="@{/community/meetup/list}">모임 게시판</a>
-    </div>
-  </div>
-
-  <div style="flex:1"></div>
-
-  <div class="fxa g12">
-    <th:block sec:authorize="isAnonymous()">
-      <a th:href="@{/member/login}" class="btn btn-outline btn-sm">로그인</a>
-      <a th:href="@{/member/register}" class="btn btn-accent btn-sm">회원가입</a>
-    </th:block>
-
-
+    <!-- 로그인한 사용자만 SSE 알림 구독 -->
     <th:block sec:authorize="isAuthenticated()">
-  <span style="font-size: 14px; font-weight: 500; color: var(--text2);">
-    <span sec:authentication="name"></span>님
-  </span>
-
-      <div class="notification-wrap">
-        <button type="button" class="notification-btn">
-          🔔
-          <span id="notification-count" class="notification-count" style="display:none;">0</span>
-        </button>
-
-        <div class="notification-dropdown">
-          <div class="notification-title">알림</div>
-          <div id="notification-list" class="notification-list">
-            <div class="notification-empty">새 알림이 없습니다.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="mypage-wrap">
-        <a th:href="@{/member/mypage}" class="btn btn-outline btn-sm">마이페이지 ▾</a>
-        <div class="mypage-dropdown">
-          <div class="mypage-dropdown-inner">
-
-            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">
-              관리자 대시보드
-            </a>
-
-            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/hospital-managers}">
-              병원 관리자 신청 목록
-            </a>
-
-            <hr sec:authorize="hasRole('ADMIN')">
-
-            <a th:href="@{/member/mypage}">👤 회원정보 수정</a>
-
-          </div>
-        </div>
-      </div>
-
-      <a th:href="@{/member/logout}" class="btn btn-outline btn-sm logout-btn">로그아웃</a>
+      <th:block th:replace="~{fragments/sseNotification :: sseNotification}"></th:block>
     </th:block>
 
+  </nav>
 
-  </div>
-
-  <!-- 로그인한 사용자만 SSE 알림 구독 -->
-
-  <th:block sec:authorize="isAuthenticated()">
-    <th:block th:replace="~{fragments/sseNotification :: sseNotification}"></th:block>
-  </th:block>
-
-</nav>
+</div>
 </body>
 </html>
