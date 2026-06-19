@@ -53,7 +53,6 @@ public class ShopController {
             String username = principal.getName();
             model.addAttribute("loggedInUser", username);
 
-            // 💡 여기 수정! (ACTIVE만 가져오던 걸 전부 다 가져오기로!)
             List<SubscriptionResponseDto> subList = subscriptionService.getAllSubscriptions(username);
             model.addAttribute("subscriptionList", subList);
 
@@ -110,7 +109,6 @@ public class ShopController {
             model.addAttribute("loggedInUser", principal.getName());
             model.addAttribute("activeTab", "shop");
 
-            // 💡 여기 수정! (ACTIVE만 가져오던 걸 전부 다 가져오기로!)
             List<SubscriptionResponseDto> subList = subscriptionService.getAllSubscriptions(principal.getName());
             model.addAttribute("subscriptionList", subList);
 

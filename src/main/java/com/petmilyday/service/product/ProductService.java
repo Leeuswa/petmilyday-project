@@ -8,6 +8,10 @@ import com.petmilyday.entity.shop.SubscriptionStatus;
 import com.petmilyday.repository.product.ProductRepository;
 import com.petmilyday.repository.shop.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -140,6 +144,23 @@ public class ProductService {
         product.setMaterial(dto.getMaterial());
         product.setSizeInfo(dto.getSizeInfo());
         product.setOrigin(dto.getOrigin());
+    }
+
+    // 🎯 [여기 추가!] 관리자용 상품 정렬 및 페이징 조회 로직 구현
+    public Page<Product> getAdminProductPage(int page, int size, String sortType) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "id"); // 기본 정렬: 최신 등록순
+
+        // 컨트롤러에서 넘어온 문자열 분기에 따라 정렬 조건 조립
+        if ("priceAsc".equals(sortType)) {
+            sort = Sort.by(Sort.Direction.ASC, "price");
+        } else if ("priceDesc".equals(sortType)) {
+            sort = Sort.by(Sort.Direction.DESC, "price");
+        } else if ("nameAsc".equals(sortType)) {
+            sort = Sort.by(Sort.Direction.ASC, "name");
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return productRepository.findByIsDeletedFalse(pageable);
     }
 
 }
