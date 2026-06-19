@@ -21,7 +21,7 @@ public class OrderResponseDto {
     public OrderResponseDto(Orders order) {
         this.orderId = order.getId();
 
-        // 💡 1. 상품명은 orderItems 리스트의 첫 번째 것에서 가져오기
+        // 1. 상품명은 orderItems 리스트의 첫 번째 것에서 가져오기
         if (!order.getOrderItems().isEmpty()) {
             this.productName = order.getOrderItems().get(0).getProduct().getName();
             this.isDeleted = order.getOrderItems().get(0).getProduct().isDeleted();
@@ -31,7 +31,7 @@ public class OrderResponseDto {
         }
 
         this.totalPrice = order.getTotalPrice();
-        this.orderStatus = order.getStatus();      // orderStatus -> status로 변경
-        this.orderDate = order.getCreatedAt();    // orderDate -> createdAt으로 변경
+        this.orderStatus = order.getStatus();
+        this.orderDate = order.getCreatedAt();
     }
 }

@@ -1,26 +1,28 @@
 @charset "UTF-8";
 
 body {
-    background-color: #faf7f2 !important;
+    background-color: #FFF8FB !important;
     background-image:
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.1'%3E🐾%3C/text%3E%3C/svg%3E"),
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.1'%3E🐾%3C/text%3E%3C/svg%3E") !important;
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.06'%3E🐾%3C/text%3E%3C/svg%3E"),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.06'%3E🐾%3C/text%3E%3C/svg%3E") !important;
     background-position: 0px 0px, 150px 150px !important;
     background-size: 300px 300px !important;
     background-repeat: repeat !important;
-    font-family: 'Sora', sans-serif;
-    color: #4a4035;
+    font-family: 'Nunito', 'Sora', sans-serif;
+    color: #2D1B2E;
 }
 
 .shop-premium-container {
-    max-width: 1450px !important;
+    max-width: 1550px !important;
     margin: 0 auto;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
 }
 
 .shop-card {
-    border: 1px solid #eaddcf !important;
-    border-radius: 16px !important;
-    box-shadow: 0 6px 18px rgba(165, 140, 115, 0.05) !important;
+    border: 1px solid rgba(255,123,172,.12) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 12px 32px rgba(45,27,46,.04) !important;
     background-color: #ffffff !important;
     padding: 30px !important;
 }
@@ -28,6 +30,8 @@ body {
 .sidebar-panel {
     position: sticky;
     padding: 35px 30px !important;
+    top: 90px;
+    z-index: 10;
 }
 
 .sidebar-panel h5 {
@@ -40,32 +44,34 @@ body {
 
 .sidebar-panel .text-success-tag {
     font-size: 2rem !important;
+    color: #F0558A !important;
+    font-weight: 900 !important;
 }
 
 .info-label {
-    color: #8c7e6e;
+    color: #6B4C6E;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 6px !important;
 }
 
 .form-control {
-    border-radius: 10px !important;
-    border-color: #dcd1c4 !important;
-    color: #4a4035 !important;
+    border-radius: 12px !important;
+    border-color: #FFE4EF !important;
+    color: #2D1B2E !important;
     padding: 12px 16px !important;
     font-size: 1rem !important;
 }
 
 .form-control:focus {
-    border-color: #ff7a3c !important;
-    box-shadow: 0 0 0 0.25rem rgba(255, 122, 60, 0.15) !important;
+    border-color: #FF7BAC !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 123, 172, 0.15) !important;
 }
 
 .payment-box {
-    border: 2px solid #ff7a3c !important;
-    background-color: #fff3ec !important;
-    border-radius: 12px;
+    border: 2px solid #FF7BAC !important;
+    background-color: #FFF5F9 !important;
+    border-radius: 14px;
     padding: 20px !important;
     display: flex;
     align-items: center;
@@ -73,25 +79,25 @@ body {
 }
 
 .payment-box-disabled {
-    border: 1px solid #dee2e6;
-    border-radius: 12px;
+    border: 1px solid #FFE4EF;
+    border-radius: 14px;
     padding: 20px !important;
     opacity: 0.5;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #f8f9fa;
+    background-color: #faf7f2;
 }
 
 .checkbox-custom:checked {
-    background-color: #ff7a3c !important;
-    border-color: #ff7a3c !important;
+    background-color: #FF7BAC !important;
+    border-color: #FF7BAC !important;
 }
 
 .badge-custom-success {
-    background-color: #f0eae1 !important;
-    color: #7d6e5d !important;
-    border-color: #eaddcf !important;
+    background-color: #DFFBF4 !important;
+    color: #06D6A0 !important;
+    border-color: #06D6A0 !important;
 }
 
 .product-info-row {
@@ -102,38 +108,43 @@ body {
 .product-info-row p.fw-bold {
     font-size: 1.15rem !important;
     margin-bottom: 4px !important;
+    color: #2D1B2E !important;
 }
 
 .product-info-row p.text-muted {
     font-size: 0.85rem !important;
+    color: #A08AA3 !important;
 }
 
 .price-total-tag {
-    color: #ff7a3c !important;
+    color: #F0558A !important;
     font-weight: 800 !important;
     font-size: 1.25rem !important;
 }
 
 .text-success-tag {
-    color: #000000 !important;
+    color: #2D1B2E !important;
     font-weight: 800 !important;
 }
 
 .btn-sub-custom {
-    background-color: #2ecc71 !important;
+    background: linear-gradient(135deg, #06D6A0, #05b88a) !important;
     border: none !important;
     color: #ffffff !important;
-    font-weight: 700 !important;
-    border-radius: 12px !important;
+    font-weight: 900 !important;
+    border-radius: 999px !important;
     padding-top: 18px !important;
     padding-bottom: 18px !important;
     font-size: 1.25rem !important;
+    box-shadow: 0 4px 16px rgba(6,214,160,.2) !important;
+    transition: transform .2s, box-shadow .2s !important;
 }
 
 .btn-sub-custom:hover {
-    background-color: #27ae60 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(6,214,160,.3) !important;
 }
 
 .dashboard-subscription-card {
-    border-top: 6px solid #ff7a3c !important;
+    border-top: 5px solid #FF7BAC !important;
 }

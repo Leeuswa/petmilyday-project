@@ -10,13 +10,12 @@ body {
     background-repeat: repeat !important;
     font-family: 'Nunito', 'Sora', sans-serif;
     color: #2D1B2E;
-}
-
-.shop-premium-container {
-    max-width: 1550px !important;
-    margin: 0 auto;
-    padding-left: 24px !important;
-    padding-right: 24px !important;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
 }
 
 .shop-card {
@@ -24,51 +23,29 @@ body {
     border-radius: 24px !important;
     box-shadow: 0 12px 32px rgba(45,27,46,.04) !important;
     background-color: #ffffff !important;
+    max-width: 460px;
+    width: 100%;
 }
 
-.info-label {
-    color: #6B4C6E;
-    font-size: 0.85rem;
+.status-icon-wrap {
+    color: #06D6A0 !important;
+    font-size: 4.5rem !important;
 }
 
-.toolbar-btn {
-    border-radius: 999px !important;
-    border: 2px solid #FFE4EF !important;
-    color: #FF7BAC !important;
-    background-color: #ffffff !important;
-    font-weight: 800 !important;
-    padding: 8px 18px !important;
-    transition: all 0.2s ease !important;
-}
-
-.toolbar-btn:hover {
-    background-color: #ffffff !important;
-    border-color: #FF7BAC !important;
-    color: #F0558A !important;
-}
-
-.spec-custom-table th {
+.info-box-custom {
     background-color: #FFF5F9 !important;
-    color: #6B4C6E !important;
-    font-weight: 800 !important;
-    border-bottom: 2px solid #FFE4EF !important;
+    border-color: #FFE4EF !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
 }
 
-.spec-custom-table td {
-    padding: 14px 8px !important;
-    border-bottom: 1px solid #FFE4EF !important;
-    color: #2D1B2E !important;
-}
-
-.price-total-tag {
-    color: #2D1B2E !important;
-    font-weight: 800 !important;
+.separator-line {
+    border-top-color: #FFE4EF !important;
 }
 
 .badge-custom-success {
     background-color: #DFFBF4 !important;
     color: #06D6A0 !important;
-    font-weight: 800 !important;
 }
 
 .primary-cart-action {
@@ -77,7 +54,6 @@ body {
     color: #ffffff !important;
     font-weight: 900 !important;
     border-radius: 999px !important;
-    padding: 10px 20px !important;
     box-shadow: 0 4px 16px rgba(255,85,138,.25) !important;
     transition: transform .2s, box-shadow .2s !important;
 }
@@ -86,4 +62,19 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(255,85,138,.35) !important;
     background: linear-gradient(135deg, #FF7BAC, #F0558A) !important;
+}
+
+.toolbar-btn {
+    border-radius: 999px !important;
+    border: 2px solid #FFE4EF !important;
+    color: #FF7BAC !important;
+    background-color: #ffffff !important;
+    font-weight: 800 !important;
+    transition: all 0.2s ease !important;
+}
+
+.toolbar-btn:hover {
+    background-color: #ffffff !important;
+    border-color: #FF7BAC !important;
+    color: #F0558A !important;
 }

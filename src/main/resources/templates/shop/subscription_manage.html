@@ -54,7 +54,8 @@
                         결제 금액: <strong class="text-dark" th:text="${#numbers.formatInteger(sub.productPrice, 3, 'COMMA')} + '원'"></strong> (수량: [[${sub.quantity}]]개)
                     </p>
 
-                    <div class="info-label text-muted">
+                    <!-- 🎯 [UI 업그레이드] ACTIVE 상태일 때만 주기 및 다음 결제일 정보를 노출하도록 차단 제어 -->
+                    <div class="info-label text-muted" th:if="${sub.status == 'ACTIVE'}">
                         <i class="bi bi-arrow-repeat"></i> 주기: <span class="text-dark fw-medium" th:text="${sub.cycleDays} + '일 주기'"></span>
                         <span class="mx-2 text-black-50">|</span>
                         <i class="bi bi-calendar-event"></i> 다음 결제일: <strong class="price-total-tag" th:if="${sub.nextDeliveryDate != null}" th:text="${sub.nextDeliveryDate}"></strong>
