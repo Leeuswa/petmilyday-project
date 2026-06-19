@@ -73,6 +73,7 @@
         return requestHeaders;
     }
 
+    // 댓글 목록
     function loadComments() {
         fetch("/comments/list/" + postId)
             .then(response => response.json())
@@ -81,7 +82,7 @@
                 container.innerHTML = "";
 
                 if (!pageResponse.dtoList || pageResponse.dtoList.length === 0) {
-                    container.innerHTML = "<div style='padding:20px; text-align:center; color:var(--muted); font-weight:600;'>등록된 댓글이 없습니다.</div>";
+                    container.innerHTML = "<div style='padding:20px; text-align:center; color:var(--muted); font-weight:600;'>등록된 댓글이 없습니다. 첫 댓글을 남겨보세요.</div>";
                     return;
                 }
 
@@ -91,8 +92,8 @@
                     const isLiked = comment.likedByCurrentUser;
                     const heartIcon = isLiked ? '♥' : '♡';
                     const likeBtnStyle = isLiked
-                        ? "border: 1px solid #FF4B4B; color: #FF4B4B; background-color: #FFF0F0;" // 좋아요 ON: 빨간색 테마
-                        : "border: 1px solid var(--pink-light); color: var(--muted); background-color: #ffffff;"; // 좋아요 OFF: 기본 회색 테마
+                        ? "border: 1px solid #FF4B4B; color: #FF4B4B; background-color: #FFF0F0;"
+                        : "border: 1px solid var(--pink-light); color: var(--muted); background-color: #ffffff;";
 
                     const commentHtml = `
                         <div class="comment-item ${isChild ? 'child' : ''}" style="margin-bottom:15px; padding:15px; border-bottom:1px solid var(--pink-light); ${isChild ? 'margin-left:40px; background:var(--pink-pale); border-radius: 0 16px 16px 0; border-left: 4px solid var(--pink-light);' : ''}">
@@ -110,6 +111,7 @@
                                 </div>
                             </div>
                             <div class="comment-body" style="color:var(--dark); font-size:15px; line-height:1.5;">${comment.content}</div>
+
                             <div id="recomment-form-container-${comment.id}"></div>
                         </div>
                     `;
@@ -119,25 +121,7 @@
             .catch(error => console.error("댓글 로딩 실패:", error));
     }
 
-    // 답글 작성 폼 생성
-    function showReCommentForm(parentId) {
-        const container = document.getElementById(`recomment-form-container-${parentId}`);
-        if(container.innerHTML.trim() !== "") {
-            container.innerHTML = "";
-            return;
-        }
-
-        container.innerHTML = `
-            <div class="recomment-form" style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">
-                <textarea id="recomment-text-${parentId}" style="width:100%; height:60px; padding:10px; border:1px solid var(--pink-light); border-radius:8px;"></textarea>
-                <div style="display:flex; justify-content:flex-end; gap:5px;">
-                    <button type="button" class="btn-re-cancel" onclick="document.getElementById('recomment-form-container-${parentId}').innerHTML=''">취소</button>
-                    <button type="button" class="btn-re-submit" onclick="submitReComment(${parentId})" style="background:var(--pink); color:#fff; border:none; padding:5px 15px; border-radius:6px; cursor:pointer;">등록</button>
-                </div>
-            </div>
-        `;
-    }
-
+    // 메인 댓글 전송
     function submitMainComment() {
         const contentInput = document.getElementById("new-comment-text");
         const content = contentInput.value.trim();
@@ -152,36 +136,86 @@
             content: content
         };
 
-        fetch("/comments", {
+        fetch("/comments/", {
             method: "POST",
             headers: getAuthHeaders(),
             body: JSON.stringify(data)
         })
-            .then(response => {
+            .then(async response => {
                 if (response.ok) {
                     contentInput.value = "";
                     loadComments();
                 } else {
-                    alert("로그인이 필요합니다.");
+                    const errorText = await response.text();
+                    alert(`댓글 등록 실패 (상태코드: ${response.status})\n서버 에러 원인: ${errorText}`);
                 }
             })
-            .catch(error => {
-                console.error("통신 장애:", error);
-                alert("서버 통신 중 에러가 발생했습니다.");
-            });
+            .catch(error => console.error("통신 장애:", error));
     }
 
-    // 좋아요 토글 기능
+    // 대댓글 폼 열기
+    function showReCommentForm(parentId) {
+        const container = document.getElementById(`recomment-form-container-${parentId}`);
+        if(container.innerHTML.trim() !== "") {
+            container.innerHTML = "";
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="recomment-form" style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">
+                <textarea id="recomment-text-${parentId}" style="width:100%; height:70px; padding:12px; border:2px solid var(--pink-light); border-radius:12px; outline:none; resize:none; font-family:inherit; font-size:14px;" placeholder="답글 내용을 입력해주세요."></textarea>
+                <div style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button type="button" onclick="document.getElementById('recomment-form-container-${parentId}').innerHTML=''" style="background:#ffffff; color:var(--muted); border:2px solid var(--pink-light); padding:8px 16px; border-radius:12px; font-weight:700; cursor:pointer;">취소</button>
+                    <button type="button" onclick="submitReComment(${parentId})" style="background:var(--pink); color:#ffffff; border:none; padding:8px 16px; border-radius:12px; font-weight:700; cursor:pointer;">등록</button>
+                </div>
+            </div>
+        `;
+    }
+
+    // 대댓글 전송
+    function submitReComment(parentId) {
+        const contentInput = document.getElementById(`recomment-text-${parentId}`);
+        const content = contentInput.value.trim();
+        if(!content) {
+            alert("답글 내용을 입력해주세요.");
+            return;
+        }
+
+        const data = {
+            postId: parseInt(postId, 10),
+            content: content,
+            parentId: parseInt(parentId, 10)
+        };
+
+        fetch("/comments/", {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        })
+            .then(async response => {
+                if(response.ok) {
+                    document.getElementById(`recomment-form-container-${parentId}`).innerHTML = "";
+                    loadComments();
+                } else {
+                    const errorText = await response.text();
+                    alert(`대댓글 등록 실패 (상태코드: ${response.status})\n서버 에러 원인: ${errorText}`);
+                }
+            })
+            .catch(error => console.error("통신 장애:", error));
+    }
+
+    // 좋아요 토글
     function toggleCommentLike(commentId) {
         fetch(`/comments/${commentId}/like`, {
             method: "POST",
             headers: getAuthHeaders()
         })
-            .then(response => {
+            .then(async response => {
                 if (response.ok) {
                     loadComments();
                 } else {
-                    alert("로그인이 필요한 기능입니다.");
+                    const errorText = await response.text();
+                    alert(`좋아요 실패 (상태코드: ${response.status})\n서버 에러 원인: ${errorText}`);
                 }
             })
             .catch(error => console.error("좋아요 처리 실패:", error));
