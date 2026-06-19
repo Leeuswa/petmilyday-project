@@ -119,7 +119,6 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         webClient.post()
                 .uri("/online/v1/payment/approve")
                 .header("Authorization", "SECRET_KEY " + secretKey.trim())
-                // 🎯 [수정 포인트 2] FORM_URLENCODED에서 APPLICATION_JSON으로 변경!
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(params)
                 .retrieve()
