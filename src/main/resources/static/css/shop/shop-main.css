@@ -1,41 +1,46 @@
 @charset "UTF-8";
 
-/* 🎯 [완벽 복구] 정민이가 원한 가장 깔끔하고 포근한 100% 원본 배경 간격 그대로 적용 */
 body {
-    background-color: #faf7f2 !important;
-
-    /* 💡 각 🐾 이모지 코드 안에 opacity='0.25'를 넣어서 25%만큼 연하게 흐렸어! */
+    background-color: #FFF8FB !important;
     background-image:
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.1'%3E🐾%3C/text%3E%3C/svg%3E"),
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.1'%3E🐾%3C/text%3E%3C/svg%3E") !important;
-    /* 💡 지그재그 격자 간격 오프셋 고정 */
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.06'%3E🐾%3C/text%3E%3C/svg%3E"),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.06'%3E🐾%3C/text%3E%3C/svg%3E") !important;
     background-position: 0px 0px, 150px 150px !important;
-
-    /* 💡 가로세로 60px 주기로 아담하고 촘촘하게 배열 */
     background-size: 300px 300px !important;
     background-repeat: repeat !important;
-
-    font-family: 'Sora', sans-serif;
-    color: #4a4035;
+    font-family: 'Nunito', 'Sora', sans-serif;
+    color: #2D1B2E;
+    overflow-x: hidden;
 }
 
-/* 🎯 [레이아웃 조율] 4열 상태에서 카드가 큼직하게 나오도록 전체 가로폭 한계 확장 */
+.shape {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: floatShape 8s ease-in-out infinite;
+}
+.s1 { width: 180px; height: 180px; background: radial-gradient(circle, rgba(255,123,172,.18), transparent 70%); top: 8%; left: 3%; }
+.s2 { width: 120px; height: 120px; background: radial-gradient(circle, rgba(255,209,102,.2), transparent 70%); top: 30%; right: 5%; animation-delay: -3s; }
+.s3 { width: 200px; height: 200px; background: radial-gradient(circle, rgba(6,214,160,.12), transparent 70%); bottom: 20%; left: 8%; animation-delay: -5s; }
+.s4 { width: 100px; height: 100px; background: radial-gradient(circle, rgba(155,114,207,.15), transparent 70%); bottom: 35%; right: 3%; animation-delay: -1s; }
+@keyframes floatShape { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-24px); } }
+
 .shop-premium-container {
     max-width: 2300px !important;
     margin: 0 auto;
-    padding-left: 20px !important;
-    padding-right: 20px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
 }
 
-/* 패널 간의 좌우 간격을 시원하게 벌려서 답답함 완벽 해소 */
 .shop-premium-container .row.g-4 {
-    --bs-gutter-x: 2.8rem !important;
+    --bs-gutter-x: 2rem !important;
 }
 
 .shop-card {
-    border: 1px solid #eaddcf !important;
-    border-radius: 16px !important;
-    box-shadow: 0 6px 18px rgba(165, 140, 115, 0.05) !important;
+    border: 1px solid rgba(255,123,172,.12) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 12px 32px rgba(45,27,46,.04) !important;
     background-color: #ffffff !important;
 }
 
@@ -46,22 +51,31 @@ body {
 }
 
 .info-label {
-    color: #8c7e6e;
+    color: #6B4C6E;
     font-size: 0.85rem;
 }
 
-/* 세로형 이모티콘 카테고리 메뉴 바인딩 */
+.extra-small-text {
+    font-size: 11px !important;
+}
+
+.text-pink {
+    color: #FF7BAC !important;
+}
+
 .category-item {
     border: none !important;
-    color: #554a3e !important;
-    font-weight: 500;
-    padding: 12px 14px !important;
+    color: #6B4C6E !important;
+    font-weight: 700;
+    padding: 12px 16px !important;
     font-size: 0.94rem;
-    white-space: nowrap !important; /* 글자 무조건 한 줄 고정 */
+    white-space: nowrap !important;
     width: 100% !important;
     display: flex !important;
     align-items: center;
     background: transparent !important;
+    border-radius: 999px !important;
+    transition: background .2s, color .2s;
 }
 .category-custom-img {
     width: 22px !important;
@@ -71,38 +85,50 @@ body {
 }
 .category-custom-icon {
     font-size: 1.15rem;
-    color: #bfae9c;
     margin-right: 10px !important;
 }
 .category-item:hover {
-    background-color: #fbf9f6 !important;
-    color: #ff6b21 !important;
+    background-color: #FFE4EF !important;
+    color: #F0558A !important;
 }
 .category-item.on {
-    background-color: #fff3ec !important;
-    color: #ff6b21 !important;
-    font-weight: 700 !important;
+    background-color: #FFE4EF !important;
+    color: #F0558A !important;
+    font-weight: 800 !important;
 }
 
-/* 중앙 메인 상품 카드 (가로폭 확장 및 4열 유지) */
+.toolbar-btn {
+    border-radius: 999px !important;
+    border: 2px solid #FFE4EF !important;
+    color: #FF7BAC !important;
+    background-color: #ffffff !important;
+    font-weight: 800 !important;
+    transition: .2s !important;
+}
+.toolbar-btn:hover {
+    background-color: #ffffff !important;
+    border-color: #FF7BAC !important;
+    color: #F0558A !important;
+}
+
 .main-product-card {
     background-color: #ffffff !important;
-    border: 1px solid #eaddcf !important;
-    border-radius: 16px !important;
-    padding: 18px !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    border: 1px solid rgba(255,123,172,.08) !important;
+    border-radius: 24px !important;
+    padding: 20px !important;
+    box-shadow: 0 4px 20px rgba(45,27,46,.04) !important;
+    transition: transform .25s, box-shadow .25s, border-color .25s !important;
 }
 .main-product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 28px rgba(139, 115, 92, 0.14) !important;
-    border-color: #ff7a3c !important;
+    transform: translateY(-8px);
+    box-shadow: 0 20px 48px rgba(45,27,46,.1) !important;
+    border-color: rgba(255,123,172,.3) !important;
 }
 
-/* 🎯 상품 제목 전체 노출 보장 (글자 절대 안 잘림) */
 .product-expanded-title {
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    color: #3d3123 !important;
+    font-size: 0.98rem !important;
+    font-weight: 800 !important;
+    color: #2D1B2E !important;
     line-height: 1.45;
     cursor: pointer;
     white-space: normal !important;
@@ -112,30 +138,42 @@ body {
 }
 
 .stars {
-    color: #ffa502;
+    color: #FFD166;
 }
 
 .primary-cart-action {
-    background-color: #ff7a3c !important;
+    background: linear-gradient(135deg, #FF7BAC, #F0558A) !important;
     border: none !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    border-radius: 10px !important;
-    padding: 11px 0 !important;
+    color: white !important;
+    font-weight: 900 !important;
+    border-radius: 999px !important;
+    box-shadow: 0 4px 16px rgba(255,85,138,.25) !important;
+    transition: transform .2s, box-shadow .2s !important;
 }
 .primary-cart-action:hover {
-    background-color: #e65c1f !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,85,138,.35) !important;
+    background: linear-gradient(135deg, #FF7BAC, #F0558A) !important;
 }
 
-/* 우측 정기구독 대시보드 */
 .dashboard-subscription-card {
-    border-top: 4px solid #ff7a3c !important;
+    border-top: 5px solid #FF7BAC !important;
 }
 .sub-scroll-area {
     max-height: 440px;
     overflow-y: auto;
 }
 .subscription-inner-item {
-    border: 1px solid #eaddcf !important;
-    background-color: #fdfdfc !important;
+    border: 1px solid rgba(255,123,172,.1) !important;
+    background-color: #FFF5F9 !important;
+    padding: 12px !important;
+}
+.bg-mint-light {
+    background-color: #DFFBF4 !important;
+}
+.text-mint {
+    color: #06D6A0 !important;
+}
+.text-purple {
+    color: #9B72CF !important;
 }

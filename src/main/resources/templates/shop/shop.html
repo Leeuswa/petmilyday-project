@@ -21,39 +21,38 @@
 
   <div class="row g-4 justify-content-center">
 
-    <!-- 1. 좌측 패널 -->
     <div class="col-md-2 custom-side-col">
-      <div class="card shop-card sidebar-panel p-3 bg-white">
-        <p class="info-label fw-bold mb-2 px-2 text-uppercase">개인맞춤 카테고리</p>
+      <div class="card shop-card sidebar-panel p-3 bg-white" style="border: none !important;">
+        <p class="info-label fw-bold mb-2 px-2 text-uppercase" style="border-bottom: 1px solid transparent !important; padding-bottom: 8px;">개인맞춤 카테고리</p>
         <div class="list-group list-group-flush gap-1">
-          <a th:href="@{/shop?category=ALL}" class="list-group-item list-group-item-action category-item" th:classappend="${param.category == null or #strings.equals(param.category, 'ALL')} ? 'on' : ''">
+          <a th:href="@{/shop?category=ALL}" class="list-group-item list-group-item-action category-item border-0" th:classappend="${param.category == null or #strings.equals(param.category, 'ALL')} ? 'on' : ''">
             <i class="bi bi-bag-check-fill category-custom-icon"></i><span>전체 상품</span>
           </a>
-          <a th:href="@{/shop?category=사료}" class="list-group-item list-group-item-action category-item" th:classappend="${#strings.equals(param.category, '사료')} ? 'on' : ''">
+          <a th:href="@{/shop?category=사료}" class="list-group-item list-group-item-action category-item border-0" th:classappend="${#strings.equals(param.category, '사료')} ? 'on' : ''">
             <img th:src="@{/css/shop/pet-food.png}" class="category-custom-img" alt="사료"><span>사료 / 간식</span>
           </a>
-          <a th:href="@{/shop?category=위생}" class="list-group-item list-group-item-action category-item" th:classappend="${#strings.equals(param.category, '위생')} ? 'on' : ''">
+          <a th:href="@{/shop?category=위생}" class="list-group-item list-group-item-action category-item border-0" th:classappend="${#strings.equals(param.category, '위생')} ? 'on' : ''">
             <img th:src="@{/css/shop/pet-shower.png}" class="category-custom-img" alt="위생"><span>패드 / 위생</span>
           </a>
-          <a th:href="@{/shop?category=장난감}" class="list-group-item list-group-item-action category-item" th:classappend="${#strings.equals(param.category, '장난감')} ? 'on' : ''">
+          <a th:href="@{/shop?category=장난감}" class="list-group-item list-group-item-action category-item border-0" th:classappend="${#strings.equals(param.category, '장난감')} ? 'on' : ''">
             <img th:src="@{/css/shop/pet-act.png}" class="category-custom-img" alt="장난감"><span>장난감</span>
           </a>
-          <a th:href="@{/shop?category=의류}" class="list-group-item list-group-item-action category-item" th:classappend="${#strings.equals(param.category, '의류')} ? 'on' : ''">
+          <a th:href="@{/shop?category=의류}" class="list-group-item list-group-item-action category-item border-0" th:classappend="${#strings.equals(param.category, '의류')} ? 'on' : ''">
             <img th:src="@{/css/shop/pet-clothes.png}" class="category-custom-img" alt="의류"><span>의류 / 액세서리</span>
           </a>
         </div>
-        <hr class="opacity-25 my-3">
 
-        <p class="info-label fw-bold mb-2 px-2 text-uppercase">맞춤 필터</p>
+        <div style="height: 1px; background-color: transparent !important; margin: 20px 0;"></div>
+
+        <p class="info-label fw-bold mb-2 mt-2 px-2 text-uppercase" style="border-bottom: 1px solid transparent !important; padding-bottom: 8px;">맞춤 필터</p>
         <div class="list-group list-group-flush gap-1" id="petFilterGroup">
           <div th:if="${petList == null or petList.isEmpty()}" class="px-2 text-muted small" style="font-size: 11px;">
             반려동물을 등록해 주세요.
           </div>
 
           <button th:each="pet : ${petList}"
-                  class="list-group-item list-group-item-action category-item text-start pet-filter-btn"
-                  th:data-species="${pet.species}"
-                  th:data-age="${pet.age}"
+                  class="list-group-item list-group-item-action category-item text-start pet-filter-btn border-0"
+                  th:attr="data-species=${pet.species}, data-age=${pet.age}"
                   onclick="filterByPetProfile(this)">
             <i class="bi bi-stars category-custom-icon"></i><span th:text="${pet.name} + ' 맞춤'"></span>
           </button>
@@ -61,7 +60,6 @@
       </div>
     </div>
 
-    <!-- 2. 중앙 메인 상품 그리드 영역 (col-md-8 확장형 구조화) -->
     <div class="col-md-7 custom-center-col">
       <div class="card shop-card p-3 mb-4 d-flex flex-row justify-content-between align-items-center bg-white">
         <span class="fw-bold text-secondary small" th:text="'상품 ' + ${productList.size()} + '개'"></span>
@@ -79,7 +77,7 @@
       </div>
 
       <div id="productGrid" class="row row-cols-2 row-cols-xl-4 g-4">
-        <div class="col prod" th:each="product : ${productList}" th:data-name="${product.name}" th:data-price="${product.price}" th:data-prod-id="${product.id}" th:data-species="${product.petSpecies}">
+        <div class="col prod" th:each="product : ${productList}" th:data-name="${product.name}" th:data-price="${product.price}" th:attr="data-prod-id=${product.id}" th:data-species="${product.petSpecies}">
           <div class="card shop-card p-3 bg-white h-100 d-flex flex-column justify-content-between main-product-card">
 
             <div th:onclick="|location.href='/shop/detail/' + ${product.id}|" style="cursor: pointer;" class="product-image-container">
@@ -99,24 +97,26 @@
               <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
                 <h6 class="card-title text-dark fw-bold mb-0 product-expanded-title" th:text="${product.name}" th:onclick="|location.href='/shop/detail/' + ${product.id}|"></h6>
 
-                <button class="btn p-0 border-0 text-danger wish-btn" th:data-prod-id="${product.id}" onclick="toggleWishlist(event, this)">
+                <button class="btn p-0 border-0 text-danger wish-btn" th:attr="data-prod-id=${product.id}" onclick="toggleWishlist(event, this)">
                   <i class="bi bi-heart" style="font-size: 1.15rem;"></i>
                 </button>
               </div>
 
-              <div class="stars mb-3">★★★★★</div>
+              <div class="stars mb-3 d-flex align-items-center gap-1">
+                <span class="class-product-stars">☆☆☆☆☆</span>
+                <span class="text-muted small class-product-review-text" style="font-size: 11px;">(0.0)</span>
+              </div>
             </div>
 
             <div class="px-1 mt-auto action-footer-block">
               <p class="fw-bold text-dark fs-5 mb-2" th:text="${#numbers.formatInteger(product.price, 3, 'COMMA')} + '원'"></p>
-              <button class="btn btn-primary btn-sm w-100 py-2 fw-bold primary-cart-action" th:onclick="addToCart(event, [[${product.id}]])">담기</button>
+              <button class="btn btn-primary btn-sm w-100 py-2 fw-bold primary-cart-action" th:onclick="addToCart(event, [[${product.id}]])"> 담기</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 3. 우측 패널 -->
     <div class="col-md-3 custom-side-col">
       <div class="card shop-card sidebar-panel p-4 bg-white dashboard-subscription-card" th:if="${loggedInUser != null}">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -130,20 +130,22 @@
         <hr class="opacity-25">
 
         <div class="d-flex flex-column gap-2 sub-scroll-area" th:if="${subscriptionList != null and !subscriptionList.isEmpty()}">
-          <div class="card border p-3 bg-light rounded-3 subscription-inner-item" th:each="sub : ${subscriptionList}">
-            <span th:if="${sub.isDeleted}" class="text-danger fw-bold small">
-              <i class="bi bi-exclamation-circle-fill" style="font-size: 6px; vertical-align: middle;"></i> 판매 종료
-            </span>
-            <span th:unless="${sub.isDeleted}" class="text-primary fw-bold small">
-              <i class="bi bi-circle-fill" style="font-size: 6px; vertical-align: middle;"></i> 구독 중
-            </span>
+          <th:block th:each="sub : ${subscriptionList}">
+            <div class="card border p-3 bg-light rounded-3 subscription-inner-item" th:if="${sub.status == 'ACTIVE'}">
+              <span th:if="${sub.isDeleted}" class="text-danger fw-bold small">
+                <i class="bi bi-exclamation-circle-fill" style="font-size: 6px; vertical-align: middle;"></i> 판매 종료
+              </span>
+              <span th:unless="${sub.isDeleted}" class="text-primary fw-bold small">
+                <i class="bi bi-circle-fill" style="font-size: 6px; vertical-align: middle;"></i> 구독 중
+              </span>
 
-            <div class="fw-bold text-dark text-truncate my-1 sub-item-title" th:text="${sub.productName}"></div>
-            <span class="text-muted small sub-item-date" th:if="${sub.nextDeliveryDate != null}" th:text="${sub.cycleDays} + '일 주기 · ' + ${sub.nextDeliveryDate.getMonthValue()} + '.' + ${sub.nextDeliveryDate.getDayOfMonth()} + ' 배송'"></span>
-          </div>
+              <div class="fw-bold text-dark text-truncate my-1 sub-item-title" th:text="${sub.productName}"></div>
+              <span class="text-muted small sub-item-date" th:if="${!sub.isDeleted and sub.nextDeliveryDate != null}" th:text="${sub.cycleDays} + '일 주기 · ' + ${sub.nextDeliveryDate.getMonthValue()} + '.' + ${sub.nextDeliveryDate.getDayOfMonth()} + ' 배송'"></span>
+            </div>
+          </th:block>
         </div>
 
-        <div class="text-center py-4" th:if="${subscriptionList == null or subscriptionList.isEmpty()}">
+        <div class="text-center py-4" id="emptySubMessage" style="display: none;">
           <p class="fw-bold text-secondary mb-1 small">구독 중인 상품이 없습니다.</p>
           <span class="text-muted small">상세페이지에서 신청 가능해요!</span>
         </div>
@@ -161,7 +163,56 @@
   document.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
     loadMyWishlistStatus();
+    loadAllProductRatings();
+    checkActiveSubscriptionPresence();
   });
+
+  function checkActiveSubscriptionPresence() {
+    const subScrollArea = document.querySelector('.sub-scroll-area');
+    const emptyMsg = document.getElementById('emptySubMessage');
+    if (!emptyMsg) return;
+
+    if (!subScrollArea || subScrollArea.children.length === 0) {
+      emptyMsg.style.display = 'block';
+    } else {
+      let hasActive = false;
+      Array.from(subScrollArea.children).forEach(child => {
+        if (child && child.classList.contains('subscription-inner-item')) hasActive = true;
+      });
+      if (!hasActive) emptyMsg.style.display = 'block';
+    }
+  }
+
+  function loadAllProductRatings() {
+    const products = document.querySelectorAll('.prod');
+    products.forEach(p => {
+      const productId = p.getAttribute('data-prod-id');
+      if (!productId) return;
+
+      fetch('/api/reviews/product/' + productId)
+              .then(res => res.json())
+              .then(reviews => {
+                const starsSpan = p.querySelector('.class-product-stars');
+                const textSpan = p.querySelector('.class-product-review-text');
+                if (!starsSpan || !textSpan) return;
+
+                if (reviews.length === 0) {
+                  starsSpan.innerText = '☆☆☆☆☆';
+                  textSpan.innerText = '(0.0)';
+                  return;
+                }
+
+                let totalRating = 0;
+                reviews.forEach(r => { totalRating += r.rating; });
+                const avgRating = (totalRating / reviews.length).toFixed(1);
+                const starIconCount = Math.round(avgRating);
+
+                starsSpan.innerText = '★'.repeat(starIconCount) + '☆'.repeat(5 - starIconCount);
+                textSpan.innerText = `(${avgRating})`;
+              })
+              .catch(err => console.error("상품 별점 연산 에러:", err));
+    });
+  }
 
   function updateCartCount() {
     fetch('/api/cart/count')
@@ -299,6 +350,7 @@
       products.forEach(p => p.style.display = '');
     } else {
       allPetBtns.forEach(btn => btn.classList.remove('on'));
+      // 🎯 [버그 수정 2] 오타 보정: element.add('on') 대신 classList.add('on') 구조로 변경
       element.classList.add('on');
 
       products.forEach(p => {
