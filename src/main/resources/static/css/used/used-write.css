@@ -122,3 +122,52 @@ body {
     padding-top: 12px;
     padding-bottom: 12px;
 }
+
+@media (max-width: 768px) {
+    .main-container,
+    .pay-container,
+    .success-container {
+        margin: 20px 14px;
+    }
+
+    .card-grid,
+    .feature-grid,
+    .stats-grid,
+    .result-summary,
+    .info-grid,
+    .example-list {
+        grid-template-columns: 1fr;
+    }
+
+    .post-card,
+    .room-content,
+    .chat-header,
+    .history-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .img-box {
+        width: 100%;
+        height: 180px;
+        margin-right: 0;
+        margin-bottom: 14px;
+    }
+
+    .main-image {
+        max-height: 320px;
+    }
+
+    .btn-area {
+        flex-direction: column;
+    }
+
+    .btn-area a {
+        width: 100%;
+        text-align: center;
+    }
+
+    .msg {
+        max-width: 75%;
+    }
+}
