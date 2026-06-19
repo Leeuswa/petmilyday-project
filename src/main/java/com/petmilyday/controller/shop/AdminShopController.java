@@ -21,9 +21,14 @@ public class AdminShopController {
 
     // 관리자 상품 목록 조회
     @GetMapping("/list")
-    public String adminShopList(Model model) {
-        List<Product> productList = productService.findAll();
+    public String adminShopList(@RequestParam(value = "page", defaultValue = "0") int page,
+                                @RequestParam(value = "sort", defaultValue = "idDesc") String sort,
+                                Model model) {
+
+        org.springframework.data.domain.Page<Product> productList = productService.getAdminProductPage(page, 10, sort);
+
         model.addAttribute("productList", productList);
+        model.addAttribute("sort", sort);
 
         return "shop/list";
     }
