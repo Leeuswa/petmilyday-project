@@ -150,7 +150,7 @@
                     alert(`댓글 등록 실패 (상태코드: ${response.status})\n서버 에러 원인: ${errorText}`);
                 }
             })
-            .catch(error => console.error("통신 장애:", error));
+            .catch(error => console.error("통신 에러 :", error));
     }
 
     // 대댓글 폼 열기
