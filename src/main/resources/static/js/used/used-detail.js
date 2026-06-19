@@ -123,11 +123,9 @@ function updateWishUI(isWished) {
 
     if (isWished) {
         btn.innerText = "❤️ 찜취소";
-        btn.classList.remove("btn-outline-danger");
-        btn.classList.add("btn-danger");
+        btn.classList.add("wish-active");
     } else {
         btn.innerText = "🤍 찜하기";
-        btn.classList.remove("btn-danger");
-        btn.classList.add("btn-outline-danger");
+        btn.classList.remove("wish-active");
     }
 }

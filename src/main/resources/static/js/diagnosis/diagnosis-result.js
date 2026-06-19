@@ -3,7 +3,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     buttons.forEach(function (button) {
         button.addEventListener("click", function () {
-            button.style.opacity = "0.7";
+            button.style.opacity = "0.72";
+            button.innerText = "이동 중...";
         });
     });
 });

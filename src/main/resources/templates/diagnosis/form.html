@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>petmilyday - AI 자가진단</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet">
 
     <link rel="stylesheet"
@@ -15,34 +15,75 @@
 
 <div th:replace="~{fragments/header :: header}"></div>
 
-<div class="main-container">
+<div class="diagnosis-page">
 
-    <div class="ai-hero">
-        <h2>AI 자가진단</h2>
-        <p>반려동물의 증상을 입력하면 Ollama 기반 AI가 참고용 진단 결과를 제공합니다.</p>
+    <div class="diagnosis-hero">
+
+        <div class="hero-icon-left">
+            🐾
+        </div>
+
+        <div class="hero-center">
+            <h2>
+                AI 자가진단
+            </h2>
+
+            <p>
+                반려동물의 증상을 입력하면 Ollama 기반 AI가 참고용 진단 결과를 제공합니다.<br>
+                증상과 사진을 함께 입력하면 더 구체적인 분석에 도움이 됩니다.
+            </p>
+        </div>
+
+        <a href="/ai-diagnosis"
+           class="hero-back-btn">
+            ← 메인으로
+        </a>
+
+        <div class="hero-icon-right">
+            🩺
+        </div>
+
     </div>
 
     <div class="feature-grid">
 
         <div class="feature-card">
-            <div class="feature-icon">🩺</div>
-            <div class="feature-title">빠른 증상 분석</div>
+            <div class="feature-icon">
+                🩺
+            </div>
+
+            <div class="feature-title">
+                빠른 증상 분석
+            </div>
+
             <div class="feature-desc">
                 입력한 증상을 바탕으로 참고용 진단 결과를 제공합니다.
             </div>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🐾</div>
-            <div class="feature-title">반려동물 정보 반영</div>
+            <div class="feature-icon">
+                🐾
+            </div>
+
+            <div class="feature-title">
+                반려동물 정보 반영
+            </div>
+
             <div class="feature-desc">
                 선택한 반려동물 정보를 기준으로 증상을 분석합니다.
             </div>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">📋</div>
-            <div class="feature-title">진단 이력 저장</div>
+            <div class="feature-icon">
+                📋
+            </div>
+
+            <div class="feature-title">
+                진단 이력 저장
+            </div>
+
             <div class="feature-desc">
                 진단 결과를 저장하고 나중에 다시 확인할 수 있습니다.
             </div>
@@ -50,78 +91,144 @@
 
     </div>
 
-    <div class="diagnosis-card">
+    <div class="diagnosis-layout">
 
-        <form th:action="@{/diagnosis}"
-              method="post"
-              enctype="multipart/form-data"
-              id="diagnosisForm">
+        <main class="diagnosis-main">
 
-            <div th:if="${error != null}"
-                 class="error-box"
-                 th:text="${error}">
-            </div>
+            <div class="diagnosis-card">
 
-            <div class="form-group">
-                <label class="form-label">
-                    반려동물 선택
-                </label>
+                <div class="section-header">
+                    <h4>
+                        증상 정보 입력
+                    </h4>
 
-                <select class="form-select"
-                        name="petId"
-                        required>
-                    <option value="">
-                        선택하세요
-                    </option>
-
-                    <option th:each="pet : ${pets}"
-                            th:value="${pet.id}"
-                            th:text="${pet.name}">
-                    </option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">
-                    증상 입력
-                </label>
-
-                <textarea class="form-control"
-                          name="symptomText"
-                          maxlength="500"
-                          required
-                          placeholder="예: 피부가 빨갛고 계속 긁어요. 밥을 잘 안 먹고 기운이 없어요."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">
-                    증상 사진 업로드
-                </label>
-
-                <input type="file"
-                       class="form-control"
-                       name="image"
-                       id="imageInput"
-                       accept="image/*">
-
-                <div class="file-help"
-                     id="imageHelp">
-                    증상 부위 사진이 있으면 함께 업로드할 수 있습니다.
+                    <p>
+                        반려동물과 증상을 선택하고 AI 진단을 요청하세요.
+                    </p>
                 </div>
+
+                <form th:action="@{/diagnosis}"
+                      method="post"
+                      enctype="multipart/form-data"
+                      id="diagnosisForm">
+
+                    <div th:if="${error != null}"
+                         class="error-box"
+                         th:text="${error}">
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            반려동물 선택
+                        </label>
+
+                        <select class="form-select"
+                                name="petId"
+                                required>
+
+                            <option value="">
+                                선택하세요
+                            </option>
+
+                            <option th:each="pet : ${pets}"
+                                    th:value="${pet.id}"
+                                    th:text="${pet.name}">
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            증상 입력
+                        </label>
+
+                        <textarea class="form-control symptom-area"
+                                  name="symptomText"
+                                  maxlength="500"
+                                  required
+                                  placeholder="예: 피부가 빨갛고 계속 긁어요. 밥을 잘 안 먹고 기운이 없어요."></textarea>
+
+                        <div class="form-help">
+                            증상 부위, 지속 기간, 식욕과 활동량 변화를 함께 적으면 더 좋습니다.
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            증상 사진 업로드
+                        </label>
+
+                        <input type="file"
+                               class="form-control file-input"
+                               name="image"
+                               id="imageInput"
+                               accept="image/*">
+
+                        <div class="file-help"
+                             id="imageHelp">
+                            증상 부위 사진이 있으면 함께 업로드할 수 있습니다.
+                        </div>
+
+                    </div>
+
+                    <button type="submit"
+                            class="submit-btn"
+                            id="diagnosisSubmitBtn">
+                        AI 진단 요청
+                    </button>
+
+                </form>
+
+                <div class="sub-box">
+                    <strong>
+                        안내사항
+                    </strong>
+
+                    <span>
+                        AI 진단 결과는 참고용이며 실제 진단을 대체하지 않습니다.
+                        증상이 심하거나 지속될 경우 반드시 동물병원 진료를 권장합니다.
+                    </span>
+                </div>
+
             </div>
 
-            <button type="submit"
-                    class="btn-submit"
-                    id="diagnosisSubmitBtn">
-                AI 진단 요청
-            </button>
+        </main>
 
-        </form>
+        <aside class="diagnosis-side">
 
-        <div class="sub-box">
-            AI 진단 결과는 참고용이며 실제 진단을 대체하지 않습니다.
-            증상이 심하거나 지속될 경우 반드시 동물병원 진료를 권장합니다.
-        </div>
+            <div class="side-card pink-card">
+
+                <div class="side-title">
+                    입력 팁
+                </div>
+
+                <ul>
+                    <li>언제부터 증상이 있었는지 적어주세요.</li>
+                    <li>식욕, 배변, 활동량 변화를 함께 적어주세요.</li>
+                    <li>눈, 귀, 피부 등 부위를 구체적으로 적어주세요.</li>
+                </ul>
+
+            </div>
+
+            <div class="side-card mint-card">
+
+                <div class="side-title">
+                    진료 권장 상황
+                </div>
+
+                <p>
+                    구토, 호흡 이상, 심한 무기력, 갑작스러운 체중 감소가 있으면 동물병원 방문을 권장합니다.
+                </p>
+
+            </div>
+
+        </aside>
 
     </div>
 
