@@ -33,4 +33,10 @@ public class PetProfile {
 
     @Column(nullable = false, length = 50)
     private String breed;
+
+    @Column(nullable = false, length = 20)
+    private String gender;
+
+    @Column(length = 500)
+    private String photoUrl;
 }

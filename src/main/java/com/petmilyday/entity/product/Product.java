@@ -32,7 +32,7 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "img_url", nullable = false, length = 255)
+    @Column(name = "img_url", nullable = false, length = 1000)
     private String imgUrl;
 
     @Column(name = "pet_species", length = 50)
@@ -59,4 +59,7 @@ public class Product {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+    @Column(nullable = false)
+    private boolean isDeleted = false;
 }

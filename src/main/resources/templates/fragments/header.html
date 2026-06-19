@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       lang="ko">
@@ -29,7 +28,7 @@
         </a>
 
         <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
-           th:href="@{/hospitalAdmin/reservations}">
+           th:href="@{/hospital-admin/reservations}">
           병원 예약 관리
         </a>
 
@@ -63,7 +62,15 @@
     </div>
 
     <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a>
-    <a th:href="@{/shop}" class="nav-link">동물용품샵</a>
+
+    <div class="dropdown">
+      <a th:href="@{/shop}" class="nav-link dropbtn">동물용품샵</a>
+
+      <div class="dropdown-content" sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/admin/shop/list}">상품 목록 및 관리</a>
+        <a th:href="@{/admin/shop/new}">새 상품 등록</a>
+      </div>
+    </div>
 
     <div class="dropdown">
       <span class="nav-link dropbtn">게시판</span>
@@ -116,35 +123,25 @@
 
               <hr sec:authorize="hasRole('ADMIN')">
 
-<!--              <a sec:authorize="hasRole('HOSPITAL_ADMIN')"-->
-<!--                 th:href="@{/hospitalAdmin/hospital}">-->
-<!--                병원 정보 관리-->
-<!--              </a>-->
-
-<!--              <a sec:authorize="hasRole('HOSPITAL_ADMIN')"-->
-<!--                 th:href="@{/hospital-admin/reservations}">-->
-<!--                병원 예약 관리-->
-<!--              </a>-->
-
-<!--              <hr sec:authorize="hasRole('HOSPITAL_ADMIN')">-->
-
               <a th:href="@{/member/mypage}">👤 회원정보 수정</a>
+              <a th:href="@{/member/mypage/myPosts}">📝 내가 쓴 게시글</a>
+              <a th:href="@{/member/mypage/myMeetups}">🤝 나와 관련된 모임</a>
 
             </div>
           </div>
         </div>
 
         <a th:href="@{/member/logout}" class="btn btn-outline btn-sm logout-btn">로그아웃</a>
+
       </th:block>
 
     </div>
-
-    <!-- 로그인한 사용자만 SSE 알림 구독 -->
-    <th:block sec:authorize="isAuthenticated()">
-      <th:block th:replace="~{fragments/sseNotification :: sseNotification}"></th:block>
-    </th:block>
-
   </nav>
+
+  <!-- 로그인한 사용자만 SSE 알림 구독 -->
+  <th:block sec:authorize="isAuthenticated()">
+    <th:block th:replace="~{fragments/sseNotification :: sseNotification}"></th:block>
+  </th:block>
 
 </div>
 </body>

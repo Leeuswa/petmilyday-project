@@ -28,8 +28,16 @@ public class MeetupParticipant {
     @Column(name = "joined_at", nullable = false, updatable = false)
     private LocalDateTime joinedAt; // 참여 신청 일시
 
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private String status = "PENDING";
+
     @PrePersist
     public void prePersist() {
         this.joinedAt = LocalDateTime.now();
+    }
+
+    public void approve() {
+        this.status = "APPROVED";
     }
 }

@@ -94,15 +94,20 @@ body {
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 18px;
-    line-height: 1.8;
-    white-space: pre-line;
-    min-height: auto;
+    line-height: 1.7;
+    white-space: normal;
 }
 
 .answer-title {
     font-weight: 800;
     color: #3d58e0;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+}
+
+.answer-content {
+    color: #0f172a;
+    line-height: 1.75;
+    white-space: pre-line;
 }
 
 .example-box {
@@ -183,4 +188,63 @@ body {
     text-decoration: none;
     color: #3d58e0;
     font-weight: 700;
+}
+
+.hover-card {
+    transition: 0.2s;
+}
+
+.hover-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+    border-color: #c7d2fe;
+}
+
+@media (max-width: 768px) {
+    .main-container,
+    .pay-container,
+    .success-container {
+        margin: 20px 14px;
+    }
+
+    .card-grid,
+    .feature-grid,
+    .stats-grid,
+    .result-summary,
+    .info-grid,
+    .example-list {
+        grid-template-columns: 1fr;
+    }
+
+    .post-card,
+    .room-content,
+    .chat-header,
+    .history-top {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .img-box {
+        width: 100%;
+        height: 180px;
+        margin-right: 0;
+        margin-bottom: 14px;
+    }
+
+    .main-image {
+        max-height: 320px;
+    }
+
+    .btn-area {
+        flex-direction: column;
+    }
+
+    .btn-area a {
+        width: 100%;
+        text-align: center;
+    }
+
+    .msg {
+        max-width: 75%;
+    }
 }

@@ -126,4 +126,25 @@ public class CommunityServiceImpl implements CommunityService {
         post.addViewCount();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<CommunityPostDTO> getMyPosts(String username) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        List<CommunityPost> posts = communityPostRepository.findByMemberOrderByIdDesc(member);
+
+        return posts.stream()
+                .map(post -> {
+                    CommunityPostDTO dto = modelMapper.map(post, CommunityPostDTO.class);
+                    if (post.isAnonymous()) {
+                        dto.setWriterName("익명");
+                    } else {
+                        dto.setWriterName(member.getNickname() != null ? member.getNickname() : member.getName());
+                    }
+                    dto.setWriterUsername(member.getUsername());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 }

@@ -3,6 +3,8 @@ package com.petmilyday.controller.shop;
 import com.petmilyday.entity.shop.Orders;
 import com.petmilyday.entity.shop.OrderItem;
 import com.petmilyday.entity.product.Product;
+import com.petmilyday.repository.cart.CartItemRepository;
+import com.petmilyday.repository.cart.CartRepository;
 import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.repository.shop.OrdersRepository;
 import com.petmilyday.repository.shop.OrderItemRepository;
@@ -24,11 +26,12 @@ public class PaymentApiController {
     private final MemberRepository memberRepository;
     private final OrdersRepository ordersRepository;
     private final OrderItemRepository orderItemRepository;
+    private final CartItemRepository cartItemRepository;
+    private final CartRepository cartRepository;
 
     @jakarta.persistence.PersistenceContext
     private jakarta.persistence.EntityManager em;
 
-    // 카카오페이 결제 준비 요청 및 세션 데이터 저장
     @PostMapping("/ready")
     public ResponseEntity<?> readyStandardPayment(@RequestBody Map<String, Object> params, HttpSession session) {
         try {
@@ -68,8 +71,9 @@ public class PaymentApiController {
             if (!detailAddress.isEmpty()) {
                 fullAddress += " " + detailAddress;
             }
-
+            
             session.setAttribute("receiverName", params.get("receiverName"));
+            session.setAttribute("receiverPhone", params.get("receiverPhone"));
             session.setAttribute("deliveryAddress", fullAddress);
             session.setAttribute("totalPrice", totalAmount);
             session.setAttribute("itemName", itemName);
@@ -95,9 +99,10 @@ public class PaymentApiController {
         }
     }
 
-    // 결제 성공 승인 처리 및 최종 주문 내역 DB 저장
     @GetMapping("/success")
-    public ModelAndView paymentSuccess(@RequestParam("pg_token") String pgToken, HttpSession session) {
+    public ModelAndView paymentSuccess(@RequestParam("pg_token") String pgToken,
+                                       HttpSession session,
+                                       java.security.Principal principal) {
         Integer totalPrice = (Integer) session.getAttribute("totalPrice");
         if (totalPrice == null) {
             totalPrice = 14000;
@@ -106,14 +111,18 @@ public class PaymentApiController {
         try {
             String address = (String) session.getAttribute("deliveryAddress");
             String itemName = (String) session.getAttribute("itemName");
-            Long memberId = (Long) session.getAttribute("memberId");
             String isCart = (String) session.getAttribute("isCart");
 
-            if (memberId == null) {
-                memberId = 1L;
+            String receiverName = (String) session.getAttribute("receiverName");
+            String receiverPhone = (String) session.getAttribute("receiverPhone");
+
+            if (principal == null) {
+                throw new IllegalStateException("로그인 세션이 만료되었습니다. 다시 시도해 주세요.");
             }
 
-            com.petmilyday.entity.member.Member orderMember = memberRepository.findById(memberId)
+            String username = principal.getName();
+
+            com.petmilyday.entity.member.Member orderMember = memberRepository.findByUsername(username)
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
             Orders newOrder = Orders.builder()
@@ -121,6 +130,8 @@ public class PaymentApiController {
                     .orderName(itemName != null ? itemName : "반려동물 용품")
                     .totalPrice(totalPrice)
                     .deliveryAddress(address != null ? address : "배송지 미입력")
+                    .receiverName(receiverName != null ? receiverName : "수령인 미입력")
+                    .receiverPhone(receiverPhone != null ? receiverPhone : "연락처 미입력")
                     .status("PAID")
                     .paymentMethod("KAKAO_PAY")
                     .paymentKey(pgToken)
@@ -150,6 +161,17 @@ public class PaymentApiController {
 
                         orderItemRepository.save(orderItem);
                     }
+
+                    try {
+                        com.petmilyday.entity.cart.Cart userCart = cartRepository.findByUserId(orderMember.getId())
+                                .orElseThrow(() -> new IllegalArgumentException("장바구니가 존재하지 않습니다."));
+
+                        Long usersCartId = userCart.getId();
+                        cartItemRepository.deleteAllByCartId(usersCartId);
+                        System.out.println("🛒 결제 완료: 해당 유저의 장바구니 아이템 전체 삭제 성공!");
+                    } catch (Exception e) {
+                        System.err.println("❌ 장바구니 비우기 실패: " + e.getMessage());
+                    }
                 }
             } else {
                 Object pIdObj = session.getAttribute("productId");
@@ -171,6 +193,7 @@ public class PaymentApiController {
             }
 
             session.removeAttribute("receiverName");
+            session.removeAttribute("receiverPhone");
             session.removeAttribute("deliveryAddress");
             session.removeAttribute("totalPrice");
             session.removeAttribute("itemName");

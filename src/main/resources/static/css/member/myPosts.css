@@ -1,0 +1,9 @@
+.mypage-container { max-width: 800px; margin: 40px auto; font-family: 'Sora', 'Noto Sans KR', sans-serif; }
+.page-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #0d1433; border-bottom: 2px solid #0d1433; padding-bottom: 10px; }
+.post-list { list-style: none; padding: 0; margin: 0; }
+.post-item { border-bottom: 1px solid #eaedfa; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; }
+.post-item a { text-decoration: none; color: #2b44cc; font-weight: 600; font-size: 16px; }
+.post-item a:hover { text-decoration: underline; }
+.post-meta { font-size: 13px; color: #666; display: flex; gap: 15px; }
+.empty-msg { text-align: center; padding: 50px; color: #888; background: #f8f9fc; border-radius: 8px; }
+.btn-back { display: inline-block; margin-top: 20px; padding: 10px 15px; background: #eaedfa; color: #2b44cc; text-decoration: none; border-radius: 6px; font-weight: bold; }

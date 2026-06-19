@@ -26,4 +26,9 @@ public class PetProFileDTO {
 
     @NotBlank(message = "반려동물의 품종(말티즈, 코숏 등)을 입력해 주세요.")
     private String breed;
+
+    @NotBlank(message = "성별을 선택해 주세요.")
+    private String gender;
+
+    private String photoUrl;
 }

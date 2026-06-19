@@ -13,6 +13,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
@@ -30,6 +32,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         String username = (String) oAuth2User.getAttributes().get("db_username");
 
+        if (username == null) {
+            response.sendRedirect("/member/login?error=" +
+                    URLEncoder.encode("소셜 가입 중 오류가 발생했습니다.", StandardCharsets.UTF_8));
+            return;
+        }
+
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("소셜 로그인 회원을 찾을 수 없습니다."));
 
@@ -41,6 +49,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         jwtCookie.setHttpOnly(true);
         jwtCookie.setPath("/");
         jwtCookie.setMaxAge(60 * 30);
+        jwtCookie.setAttribute("SameSite", "Lax");
 
         response.addCookie(jwtCookie);
 

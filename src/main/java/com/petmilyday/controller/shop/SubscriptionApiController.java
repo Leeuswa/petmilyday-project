@@ -5,6 +5,7 @@ import com.petmilyday.entity.shop.SubscriptionStatus;
 import com.petmilyday.entity.shop.Orders;
 import com.petmilyday.entity.shop.OrderItem;
 import com.petmilyday.entity.product.Product;
+import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.repository.shop.SubscriptionRepository;
 import com.petmilyday.repository.shop.OrdersRepository;
 import com.petmilyday.repository.shop.OrderItemRepository;
@@ -28,11 +29,11 @@ public class SubscriptionApiController {
     private final SubscriptionRepository subscriptionRepository;
     private final OrdersRepository ordersRepository;
     private final OrderItemRepository orderItemRepository;
+    private final MemberRepository memberRepository;
 
     @jakarta.persistence.PersistenceContext
     private jakarta.persistence.EntityManager em;
 
-    // 카카오페이 정기결제 준비 및 세션 데이터 임시 저장
     @PostMapping("/ready")
     public ResponseEntity<?> readySubscription(@RequestBody Map<String, Object> params, HttpSession session) {
         try {
@@ -103,9 +104,10 @@ public class SubscriptionApiController {
         }
     }
 
-    // 정기결제 최종 승인 및 구독 빌링키(SID) 관리 데이터 구축
     @GetMapping("/success")
-    public ModelAndView subscriptionSuccess(@RequestParam("pg_token") String pgToken, HttpSession session) {
+    public ModelAndView subscriptionSuccess(@RequestParam("pg_token") String pgToken,
+                                            HttpSession session,
+                                            java.security.Principal principal) {
         Integer totalPrice = (Integer) session.getAttribute("totalPrice");
         if (totalPrice == null) totalPrice = 9900;
 
@@ -114,7 +116,6 @@ public class SubscriptionApiController {
             Long productId = (Long) session.getAttribute("productId");
             Integer cycleDays = (Integer) session.getAttribute("cycleDays");
             Integer quantity = (Integer) session.getAttribute("quantity");
-            Long memberId = (Long) session.getAttribute("memberId");
             String itemName = (String) session.getAttribute("itemName");
 
             String address = (String) session.getAttribute("deliveryAddress");
@@ -125,7 +126,10 @@ public class SubscriptionApiController {
             String partnerOrderId = (String) session.getAttribute("partnerOrderId");
             String partnerUserId = (String) session.getAttribute("partnerUserId");
 
-            if (memberId == null) memberId = 1L;
+            if (principal == null) {
+                throw new IllegalStateException("로그인 세션이 만료되었습니다.");
+            }
+
             if (productId == null) productId = 1L;
             if (cycleDays == null) cycleDays = 30;
             if (quantity == null) quantity = 1;
@@ -156,7 +160,10 @@ public class SubscriptionApiController {
                 System.out.println("🔥 정기결제 빌링키 sid 발급 성공: " + sid);
             }
 
-            com.petmilyday.entity.member.Member orderMember = em.getReference(com.petmilyday.entity.member.Member.class, memberId);
+            String username = principal.getName();
+            com.petmilyday.entity.member.Member orderMember = memberRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
             com.petmilyday.entity.product.Product subProduct = em.getReference(com.petmilyday.entity.product.Product.class, productId);
 
             Subscription newSubscription = new Subscription();
@@ -181,6 +188,12 @@ public class SubscriptionApiController {
 
             if (address != null) {
                 firstOrder.setDeliveryAddress(address);
+            }
+            if (receiverName != null) {
+                firstOrder.setReceiverName(receiverName);
+            }
+            if (receiverPhone != null) {
+                firstOrder.setReceiverPhone(receiverPhone);
             }
 
             ordersRepository.save(firstOrder);
@@ -217,7 +230,6 @@ public class SubscriptionApiController {
         return mav;
     }
 
-    // 활성화된 정기구독 상태를 해지 상태로 수정
     @Transactional
     @PostMapping("/cancel")
     public ModelAndView cancelSubscription(@RequestParam("subId") Long subId) {
@@ -237,7 +249,6 @@ public class SubscriptionApiController {
         return new ModelAndView("redirect:/shop/subscription");
     }
 
-    // 정기구독 배송 주기 변경 및 차기 배송일 업데이트
     @Transactional
     @PostMapping("/change-cycle")
     public ModelAndView changeSubscriptionCycle(@RequestParam("subId") Long subId,

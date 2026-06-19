@@ -6,67 +6,112 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/member/pet-profile.css}">
 </head>
-<body>
+  <body>
 
-<div th:replace="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/header :: header}"></div>
 
-<div class="container">
+    <div class="container layout-vertical">
 
-  <div class="left-box">
-    <h2 class="page-title">🐾 반려동물 프로필 관리</h2>
+      <div class="registration-section">
+        <div class="sub-title">새 반려동물 등록</div>
 
-    <div class="pet-list">
-      <div th:if="${#lists.isEmpty(petList)}" class="empty-msg">
-        아직 등록된 반려동물이 없습니다. 우측에서 우리 아이를 등록해 주세요!
-      </div>
+          <form th:action="@{/member/pet-profile/register}" method="post" th:object="${newPet}" enctype="multipart/form-data">
 
-      <div class="pet-item" th:each="pet : ${petList}">
-        <div class="pet-info">
-          <span class="pet-name" th:text="${pet.name}"></span>
-          <span class="pet-species" th:text="${pet.species} + ' - ' + ${pet.breed} + ' | ' + ${pet.age} + '살'"></span>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="아이의 이름을 적어주세요">
+                <span class="error-msg" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="species">종류</label>
+                <input type="text" id="species" th:field="*{species}" class="form-control" placeholder="예: 강아지, 고양이, 토끼">
+                <span class="error-msg" th:if="${#fields.hasErrors('species')}" th:errors="*{species}"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="breed">품종</label>
+                <input type="text" id="breed" th:field="*{breed}" class="form-control" placeholder="예: 말티즈, 코리안숏헤어">
+                <span class="error-msg" th:if="${#fields.hasErrors('breed')}" th:errors="*{breed}"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="age">나이</label>
+                <input type="number" id="age" th:field="*{age}" class="form-control" placeholder="아이의 나이를 입력해주세요">
+                <span class="error-msg" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></span>
+              </div>
+
+              <div class="form-group">
+                <label for="gender">성별</label>
+                  <select id="gender" th:field="*{gender}" class="form-control" required>
+                    <option value="">성별을 선택해주세요</option>
+                    <option value="여아">여아</option>
+                    <option value="남아">남아</option>
+                    <option value="중성화한 여아">중성화한 여아</option>
+                    <option value="중성화한 남아">중성화한 남아</option>
+                  </select>
+                <span class="error-msg" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
+              </div>
+            </div>
+
+            <div class="form-group file-upload-group">
+              <label for="file">반려동물 사진 <span class="required-star" style="color: red;">*필수</span></label>
+              <input type="file" id="file" name="file" class="form-control" accept="image/*" required>
+            </div>
+
+            <button type="submit" class="btn-submit">우리 아이 등록하기 🐾</button>
+          </form>
         </div>
-        <form th:action="@{/member/pet-profile/delete/{id}(id=${pet.id})}" method="post" onsubmit="return confirm('이 프로필을 삭제하시겠습니까?');">
-          <button type="submit" class="btn btn-danger">삭제</button>
-        </form>
+
+        <div class="pet-management-section">
+          <h2 class="page-title">🐾 등록된 반려동물 프로필 관리</h2>
+
+          <div class="pet-grid">
+            <div th:if="${#lists.isEmpty(petList)}" class="empty-msg">
+              아직 등록된 반려동물이 없습니다. 위에서 사진과 함께 우리 아이를 등록해 주세요!
+            </div>
+
+            <div class="pet-card-item" th:each="pet : ${petList}">
+              <div class="pet-card-photo">
+                <img th:src="${pet.photoUrl != null ? pet.photoUrl : '/images/default-pet.png'}" alt="반려동물 사진">
+              </div>
+              <div class="pet-card-info">
+                <span class="pet-name" th:text="${pet.name}"></span>
+                <span class="pet-species" th:text="${pet.species} + ' - ' + ${pet.breed} + ' | ' + ${pet.gender} + ' | ' + ${pet.age} + '살'"></span>
+
+                <div class="pet-card-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                  <a th:href="@{/member/pet-profile/modify/{id}(id=${pet.id})}" class="btn-modify-small"
+                     style="background-color: #2b44cc; color: white; padding: 8px; border-radius: 6px;
+                      font-size: 13px; font-weight: bold; text-decoration: none; text-align: center; flex: 1;">수정</a>
+
+                <form th:action="@{/member/pet-profile/delete/{id}(id=${pet.id})}" method="post" class="delete-form">
+                  <input type="hidden" name="petId" th:value="${pet.id}">
+                  <button type="submit" class="btn-delete-small">삭제</button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="back-box">
+            <a th:href="@{/member/mypage}" class="btn-back">마이페이지로 돌아가기</a>
+          </div>
+        </div>
+
       </div>
     </div>
+    <script th:inline="javascript">
+      window.onload = function() {
+        var errorMsg = null;
+        if (errorMsg) {
+          alert(errorMsg);
+        }
 
-    <a th:href="@{/member/mypage}" class="btn" style="background-color: #e6e9f2; color: #0d1433; display: inline-block;">마이페이지로 돌아가기</a>
-  </div>
-
-  <div class="right-box">
-    <div class="sub-title">새 반려동물 등록</div>
-
-    <form th:action="@{/member/pet-profile/register}" method="post" th:object="${newPet}">
-      <div class="form-group">
-        <label for="name">이름</label>
-        <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="아이의 이름을 적어주세요">
-        <span class="error-msg" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
-      </div>
-
-      <div class="form-group">
-        <label for="species">종류</label>
-        <input type="text" id="species" th:field="*{species}" class="form-control" placeholder="예: 강아지, 고양이, 토끼">
-        <span class="error-msg" th:if="${#fields.hasErrors('species')}" th:errors="*{species}"></span>
-      </div>
-
-      <div class="form-group">
-        <label for="breed">품종</label>
-        <input type="text" id="breed" th:field="*{breed}" class="form-control" placeholder="예: 말티즈, 코리안숏헤어">
-        <span class="error-msg" th:if="${#fields.hasErrors('breed')}" th:errors="*{breed}"></span>
-      </div>
-
-      <div class="form-group">
-        <label for="age">나이 (살)</label>
-        <input type="number" id="age" th:field="*{age}" class="form-control" placeholder="예: 3">
-        <span class="error-msg" th:if="${#fields.hasErrors('age')}" th:errors="*{age}"></span>
-      </div>
-
-      <button type="submit" class="btn btn-submit">등록하기</button>
-    </form>
-  </div>
-
-</div>
-
-</body>
+        var successMsg = null;
+        if (successMsg) {
+          alert(successMsg);
+        }
+      };
+    </script>
+  </body>
 </html>

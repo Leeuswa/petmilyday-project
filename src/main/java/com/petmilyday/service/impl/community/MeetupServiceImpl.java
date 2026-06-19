@@ -29,28 +29,33 @@ public class MeetupServiceImpl implements MeetupService {
     private final MemberRepository memberRepository;
 
     @Override
+    @Transactional
     public Long registerMeetup(String username, MeetupPostDTO dto) {
-        Member host = memberRepository.findByUsername(username).orElseThrow();
+        Member host = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
-        MeetupPost post = MeetupPost.builder()
+        MeetupPost meetupPost = MeetupPost.builder()
                 .host(host)
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .location(dto.getLocation())
                 .meetupDate(dto.getMeetupDate())
                 .maxParticipants(dto.getMaxParticipants())
+                .currentParticipants(1)
+                .status(com.petmilyday.entity.community.MeetupStatus.RECRUITING)
                 .build();
 
-        MeetupPost savedPost = meetupPostRepository.save(post);
+        meetupPostRepository.save(meetupPost);
 
-        // 방장 자동 참여 처리
+        // 추가 가입 내역 기록 연동
         MeetupParticipant participant = MeetupParticipant.builder()
-                .meetupPost(savedPost)
+                .meetupPost(meetupPost)
                 .member(host)
+                .status("APPROVED")
                 .build();
         meetupParticipantRepository.save(participant);
 
-        return savedPost.getId();
+        return meetupPost.getId();
     }
 
     // 목록 조회 시 마감 상태 실시간 검증 반영
@@ -71,6 +76,8 @@ public class MeetupServiceImpl implements MeetupService {
                             .location(post.getLocation())
                             .meetupDate(post.getMeetupDate())
                             .maxParticipants(post.getMaxParticipants())
+                            .currentParticipants(post.getCurrentParticipants())
+                            .status(post.getStatus().name())
                             .viewCount(post.getViewCount())
                             .createdAt(post.getCreatedAt())
                             .build();
@@ -115,25 +122,77 @@ public class MeetupServiceImpl implements MeetupService {
                 .viewCount(post.getViewCount())
                 .isParticipating(isParticipating)
                 .build();
+
     }
 
+    // 참여 신청 로직
     @Override
-    public void joinMeetup(Long id, String username) {
-        MeetupPost post = meetupPostRepository.findById(id).orElseThrow();
-        Member member = memberRepository.findByUsername(username).orElseThrow();
+    public Long registerParticipant(Long meetupId, String username) {
+        MeetupPost post = meetupPostRepository.findById(meetupId)
+                .orElseThrow(() -> new IllegalArgumentException("모임을 찾을 수 없습니다."));
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
-        if (meetupParticipantRepository.existsByMeetupPostIdAndMemberUsername(id, username)) {
-            throw new IllegalStateException("이미 참여 중인 모임입니다.");
+        if (meetupParticipantRepository.existsByMeetupPostIdAndMemberUsername(meetupId, username)) {
+            throw new IllegalStateException("이미 신청한 모임입니다.");
         }
-
-        // 인원 증가 및 마감 상태 변경
-        post.addParticipant();
 
         MeetupParticipant participant = MeetupParticipant.builder()
                 .meetupPost(post)
                 .member(member)
+                .status("PENDING")
                 .build();
+
         meetupParticipantRepository.save(participant);
+        return participant.getId();
+    }
+
+    // 신청자 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<MeetupParticipant> getApplicants(Long meetupId, String hostUsername) {
+        MeetupPost post = meetupPostRepository.findById(meetupId)
+                .orElseThrow(() -> new IllegalArgumentException("모임을 찾을 수 없습니다."));
+
+        if (!post.getHost().getUsername().equals(hostUsername)) {
+            throw new IllegalStateException("조회 권한이 없습니다.");
+        }
+
+        List<MeetupParticipant> list = meetupParticipantRepository.findByMeetupPostIdOrderByJoinedAtAsc(meetupId);
+
+        list.forEach(participant -> {
+            participant.getMember().getPetProfiles().size();
+        });
+
+        return list;
+    }
+
+    // 신청자 수락 로직
+    @Override
+    public void approveParticipant(Long participantId, String hostUsername) {
+        MeetupParticipant participant = meetupParticipantRepository.findById(participantId)
+                .orElseThrow(() -> new IllegalArgumentException("신청 내역을 찾을 수 없습니다."));
+
+        MeetupPost post = participant.getMeetupPost();
+        if (!post.getHost().getUsername().equals(hostUsername)) {
+            throw new IllegalStateException("수락 권한이 없습니다.");
+        }
+
+        post.addParticipant();
+        participant.approve();
+    }
+
+    // 신청자 거절 로직
+    @Override
+    public void rejectParticipant(Long participantId, String hostUsername) {
+        MeetupParticipant participant = meetupParticipantRepository.findById(participantId)
+                .orElseThrow(() -> new IllegalArgumentException("신청 내역을 찾을 수 없습니다."));
+
+        if (!participant.getMeetupPost().getHost().getUsername().equals(hostUsername)) {
+            throw new IllegalStateException("거절 권한이 없습니다.");
+        }
+
+        meetupParticipantRepository.delete(participant);
     }
 
     @Override
@@ -183,5 +242,58 @@ public class MeetupServiceImpl implements MeetupService {
     public void updateViewCount(Long id) {
         MeetupPost post = meetupPostRepository.findById(id).orElseThrow();
         post.addViewCount();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MeetupPostDTO> getMyMeetups(String username) {
+
+        Member host = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+
+        List<MeetupPost> meetups = meetupPostRepository.findByHostOrderByIdDesc(host);
+
+        return meetups.stream()
+                .map(post -> MeetupPostDTO.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+                        .content(post.getContent())
+                        .location(post.getLocation())
+                        .meetupDate(post.getMeetupDate())
+                        .maxParticipants(post.getMaxParticipants())
+                        .currentParticipants(post.getCurrentParticipants())
+                        .status(post.getStatus().name()) // Enum 타입 String 변환
+                        .hostName(host.getNickname() != null ? host.getNickname() : host.getName())
+                        .hostUsername(host.getUsername())
+                        .viewCount(post.getViewCount())
+                        .createdAt(post.getCreatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<MeetupPostDTO> getParticipatedMeetups(String username) {
+        List<MeetupParticipant> participants = meetupParticipantRepository.findByMemberUsernameOrderByJoinedAtDesc(username);
+
+        return participants.stream()
+                .map(participant -> {
+                    MeetupPost post = participant.getMeetupPost();
+                    return MeetupPostDTO.builder()
+                            .id(post.getId())
+                            .title(post.getTitle())
+                            .content(post.getContent())
+                            .location(post.getLocation())
+                            .meetupDate(post.getMeetupDate())
+                            .maxParticipants(post.getMaxParticipants())
+                            .currentParticipants(post.getCurrentParticipants())
+                            .status(post.getStatus().name())
+                            .hostName(post.getHost().getNickname() != null ? post.getHost().getNickname() : post.getHost().getName())
+                            .hostUsername(post.getHost().getUsername())
+                            .viewCount(post.getViewCount())
+                            .createdAt(post.getCreatedAt())
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }

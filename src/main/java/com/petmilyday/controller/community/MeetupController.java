@@ -3,6 +3,7 @@ package com.petmilyday.controller.community;
 import com.petmilyday.dto.community.MeetupPostDTO;
 import com.petmilyday.dto.community.PageRequestDTO;
 import com.petmilyday.dto.community.PageResponseDTO;
+import com.petmilyday.entity.community.MeetupParticipant;
 import com.petmilyday.service.community.MeetupService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -145,20 +146,62 @@ public class MeetupController {
         return "redirect:/community/meetup/read?id=" + meetupPostDTO.getId();
     }
 
-    // 모임 참여 처리
+    // 참여 신청
     @PostMapping("/join/{id}")
-    public String join(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
+    public String joinMeetup(@PathVariable("id") Long id, Authentication authentication, RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
         try {
-            meetupService.joinMeetup(id, username);
-            redirectAttributes.addFlashAttribute("message", "모임 참여가 완료되었습니다.");
+            // 변경된 서비스 로직 호출
+            meetupService.registerParticipant(id, username);
+            redirectAttributes.addFlashAttribute("successMsg", "모임 참여를 신청했습니다. 방장의 수락을 기다려주세요.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+        }
+        return "redirect:/community/meetup/read?id=" + id;
+    }
+
+    // 방장 전용 신청자 명단 관리 페이지 이동
+    @GetMapping("/manage/{id}")
+    public String manageMeetup(@PathVariable("id") Long id, Authentication authentication, Model model) {
+        String username = authentication.getName();
+        MeetupPostDTO postDTO = meetupService.read(id, username);
+
+        if (postDTO.getHostUsername() == null || !postDTO.getHostUsername().equals(username)) {
+            return "redirect:/community/meetup/list";
         }
 
-        return "redirect:/community/meetup/read?id=" + id;
+        List<MeetupParticipant> applicantList = meetupService.getApplicants(id, username);
+
+        model.addAttribute("meetupPost", postDTO);
+        model.addAttribute("applicantList", applicantList);
+
+        return "community/meetupManage";
+    }
+
+    // 신청자 수락 처리
+    @PostMapping("/approve/{id}")
+    public String approveParticipant(@PathVariable("id") Long participantId, Authentication authentication, RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        try {
+            meetupService.approveParticipant(participantId, username);
+            redirectAttributes.addFlashAttribute("successMsg", "참여 신청을 수락했습니다.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+        }
+        return "redirect:/community/meetup/list";
+    }
+
+    // 신청자 거절 처리
+    @PostMapping("/reject/{id}")
+    public String rejectParticipant(@PathVariable("id") Long participantId, Authentication authentication, RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        try {
+            meetupService.rejectParticipant(participantId, username);
+            redirectAttributes.addFlashAttribute("successMsg", "참여 신청을 거절했습니다.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+        }
+        return "redirect:/community/meetup/list";
     }
 
     // 모임 참여 취소 처리
