@@ -470,22 +470,29 @@
                     let adminAnswerForm = '';
                     if (isAdmin && q.status === 'PENDING') {
                         adminAnswerForm = `
-              <div class="mt-2 p-2 border rounded bg-white">
-                  <textarea id="replyInput-${q.id}" class="form-control form-control-sm mb-1" rows="2" placeholder="관리자 답변을 적어주세요." style="font-size:12px; resize:none;"></textarea>
-                  <div class="text-end"><button class="btn btn-success btn-sm p-1 px-2 fw-bold" style="font-size:11px;" onclick="submitAnswer(${q.id})">답변 등록</button></div>
-              </div>`;
+          <div class="mt-2 p-2 border rounded bg-white">
+              <textarea id="replyInput-${q.id}" class="form-control form-control-sm mb-1" rows="2" placeholder="관리자 답변을 적어주세요." style="font-size:12px; resize:none;"></textarea>
+              <div class="text-end"><button class="btn btn-success btn-sm p-1 px-2 fw-bold" style="font-size:11px;" onclick="submitAnswer(${q.id})">답변 등록</button></div>
+          </div>`;
+                    }
+
+                    let maskedName = q.nickname || '회원';
+                    if (maskedName.length > 1) {
+                        maskedName = maskedName.charAt(0) + '*'.repeat(maskedName.length - 2) + maskedName.charAt(maskedName.length - 1);
+                    } else {
+                        maskedName = '*';
                     }
 
                     qnaContainer.innerHTML += `
-            <div class="pb-3 border-bottom small">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div><strong>Q. ${q.content}</strong> ${statusBadge}</div>
-                    ${adminDeleteBtn}
-                </div>
-                <div class="text-muted" style="font-size:11px;">${q.nickname || '회원'} · ${q.createdAt ? q.createdAt.substring(0,10) : '2026.06.12'}</div>
-                ${answerSection}
-                ${adminAnswerForm}
-            </div>`;
+        <div class="pb-3 border-bottom small">
+            <div class="d-flex justify-content-between align-items-center">
+                <div><strong>Q. ${q.content}</strong> ${statusBadge}</div>
+                ${adminDeleteBtn}
+            </div>
+            <div class="text-muted" style="font-size:11px;">익명 · ${q.createdAt ? q.createdAt.substring(0,10) : '2026.06.12'}</div>
+        ${answerSection}
+        ${adminAnswerForm}
+    </div>`;
                 });
             }).catch(err => console.error("Q&A 로딩 실패:", err));
     }
