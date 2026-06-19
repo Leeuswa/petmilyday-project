@@ -65,7 +65,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         Map response =
                 webClient.post()
                         .uri("/online/v1/payment/ready")
-                        .header("Authorization", "SECRET_KEY_DEV " + secretKey.trim())
+                        .header("Authorization", "SECRET_KEY " + secretKey.trim())
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(params)
                         .retrieve()
@@ -108,19 +108,19 @@ public class KakaoPayServiceImpl implements KakaoPayService {
                         .orElseThrow(() ->
                                 new RuntimeException("게시글 없음"));
 
-        MultiValueMap<String, String> params =
-                new LinkedMultiValueMap<>();
-
-        params.add("cid", "TC0ONETIME");
-        params.add("tid", post.getPaymentKey());
-        params.add("partner_order_id", String.valueOf(post.getId()));
-        params.add("partner_user_id", String.valueOf(post.getBuyerId()));
-        params.add("pg_token", pgToken);
+        Map<String, Object> params = Map.of(
+                "cid", "TC0ONETIME",
+                "tid", post.getPaymentKey(),
+                "partner_order_id", String.valueOf(post.getId()),
+                "partner_user_id", String.valueOf(post.getBuyerId()),
+                "pg_token", pgToken
+        );
 
         webClient.post()
                 .uri("/online/v1/payment/approve")
-                .header("Authorization", "SECRET_KEY_DEV " + secretKey.trim())
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .header("Authorization", "SECRET_KEY " + secretKey.trim())
+                // 🎯 [수정 포인트 2] FORM_URLENCODED에서 APPLICATION_JSON으로 변경!
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(params)
                 .retrieve()
                 .onStatus(
