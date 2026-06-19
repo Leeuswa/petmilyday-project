@@ -1,5 +1,7 @@
 package com.petmilyday.config.jwt;
 
+import com.petmilyday.entity.member.Member;
+import com.petmilyday.repository.member.MemberRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,40 +21,38 @@ import java.nio.charset.StandardCharsets;
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final MemberRepository memberRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
 
-        // 인증된 소셜 유저 객체 꺼내기
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-        // CustomOAuth2UserService에서 주머니에 넣어두었던 db_username 값 가져오기
         String username = (String) oAuth2User.getAttributes().get("db_username");
 
-        // username 없을 때의 예외 처리
         if (username == null) {
-            response.sendRedirect("/member/login?error=" + URLEncoder.encode("소셜 가입 중 오류가 발생했습니다.", StandardCharsets.UTF_8));
+            response.sendRedirect("/member/login?error=" +
+                    URLEncoder.encode("소셜 가입 중 오류가 발생했습니다.", StandardCharsets.UTF_8));
             return;
         }
 
-        // 서비스 권한 체계에 맞춰 권한 정보 지정 (기본 USER)
-        String role = "USER";
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("소셜 로그인 회원을 찾을 수 없습니다."));
 
-        // 무상태 전용 JWT 토큰 문자열 발행
-        String token = jwtTokenProvider.createToken(username, role);
+        String role = member.getRole().name();
 
-        // 발행된 토큰을 타임리프 브라우저가 읽을 수 있도록 쿠키에 저장
+        String token = jwtTokenProvider.createToken(member.getUsername(), role);
+
         Cookie jwtCookie = new Cookie("Authorization", token);
         jwtCookie.setHttpOnly(true);
         jwtCookie.setPath("/");
-        jwtCookie.setMaxAge(60 * 30); // 쿠키 수명 30분
-        jwtCookie.setAttribute("SameSite", "Lax"); // 해커 방지
+        jwtCookie.setMaxAge(60 * 30);
+        jwtCookie.setAttribute("SameSite", "Lax");
 
         response.addCookie(jwtCookie);
 
-        // 인증과 쿠키 설정이 끝났으므로 메인 페이지로 이동
         response.sendRedirect("/");
     }
 }
