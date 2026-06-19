@@ -247,24 +247,20 @@ public class MeetupServiceImpl implements MeetupService {
     @Override
     @Transactional(readOnly = true)
     public List<MeetupPostDTO> getMyMeetups(String username) {
-
-        Member host = memberRepository.findByUsername(username)
+        Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
 
-        List<MeetupPost> meetups = meetupPostRepository.findByHostOrderByIdDesc(host);
+        List<MeetupPost> posts = meetupPostRepository.findByHostOrderByIdDesc(member);
 
-        return meetups.stream()
+        return posts.stream()
                 .map(post -> MeetupPostDTO.builder()
                         .id(post.getId())
                         .title(post.getTitle())
-                        .content(post.getContent())
                         .location(post.getLocation())
                         .meetupDate(post.getMeetupDate())
                         .maxParticipants(post.getMaxParticipants())
                         .currentParticipants(post.getCurrentParticipants())
-                        .status(post.getStatus().name()) // Enum 타입 String 변환
-                        .hostName(host.getNickname() != null ? host.getNickname() : host.getName())
-                        .hostUsername(host.getUsername())
+                        .status(post.getStatus() != null ? post.getStatus().name() : "RECRUITING")
                         .viewCount(post.getViewCount())
                         .createdAt(post.getCreatedAt())
                         .build())
@@ -277,6 +273,14 @@ public class MeetupServiceImpl implements MeetupService {
         List<MeetupParticipant> participants = meetupParticipantRepository.findByMemberUsernameOrderByJoinedAtDesc(username);
 
         return participants.stream()
+                .filter(participant -> {
+                    try {
+                        participant.getMeetupPost().getTitle();
+                        return true;
+                    } catch (jakarta.persistence.EntityNotFoundException e) {
+                        return false;
+                    }
+                })
                 .map(participant -> {
                     MeetupPost post = participant.getMeetupPost();
                     return MeetupPostDTO.builder()
@@ -287,9 +291,9 @@ public class MeetupServiceImpl implements MeetupService {
                             .meetupDate(post.getMeetupDate())
                             .maxParticipants(post.getMaxParticipants())
                             .currentParticipants(post.getCurrentParticipants())
-                            .status(post.getStatus().name())
-                            .hostName(post.getHost().getNickname() != null ? post.getHost().getNickname() : post.getHost().getName())
-                            .hostUsername(post.getHost().getUsername())
+                            .status(post.getStatus() != null ? post.getStatus().name() : "RECRUITING")
+                            .hostName(post.getHost() != null ? (post.getHost().getNickname() != null ? post.getHost().getNickname() : post.getHost().getName()) : "알수없음")
+                            .hostUsername(post.getHost() != null ? post.getHost().getUsername() : "")
                             .viewCount(post.getViewCount())
                             .createdAt(post.getCreatedAt())
                             .build();

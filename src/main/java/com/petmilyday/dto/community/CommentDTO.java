@@ -21,7 +21,6 @@ public class CommentDTO {
     @NotEmpty
     private String content;
 
-    @NotEmpty
     private String writerName; // 화면 표시용
 
     private String writerUsername; // 권한 체크용

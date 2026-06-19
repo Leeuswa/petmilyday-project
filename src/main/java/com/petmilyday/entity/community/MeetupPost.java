@@ -39,7 +39,7 @@ public class MeetupPost {
 
     @Column(name = "current_participants", nullable = false)
     @Builder.Default
-    private int currentParticipants = 1; // 현재 참여 인원 (방장 1인으로 시작)
+    private int currentParticipants = 1; // 방장 포함 1명 시작
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

@@ -1,43 +1,38 @@
-body { margin: 0; padding: 0; font-family: 'Sora', 'Noto Sans KR', sans-serif; background-color: #f0f2f7; }
-.container { max-width: 800px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-.post-header { border-bottom: 2px solid #0d1433; padding-bottom: 15px; margin-bottom: 20px; }
-.post-title { font-size: 26px; font-weight: bold; margin: 0 0 10px 0; color: #0d1433; }
-.post-info { font-size: 14px; color: #3d4670; display: flex; justify-content: space-between; }
-.post-info-right span { margin-left: 15px; }
-.post-content { min-height: 250px; line-height: 1.7; color: #3d4670; font-size: 16px; word-break: break-all; white-space: pre-wrap; padding: 10px 0; }
-.post-actions { text-align: right; border-bottom: 1px solid #d0d5e8; padding-bottom: 20px; margin-bottom: 30px; }
-.btn { padding: 9px 18px; font-size: 14px; font-weight: bold; border-radius: 4px; border: none; cursor: pointer; text-decoration: none; display: inline-block; margin-left: 5px; }
-.btn-list { background-color: #e6e9f2; color: #0d1433; }
-.btn-list:hover { background-color: #d0d5e8; }
-.btn-edit { background-color: #2b44cc; color: white; }
-.btn-edit:hover { background-color: #3d58e0; }
-.btn-delete { background-color: #fceef0; color: #b52844; }
-.btn-delete:hover { background-color: #fabcc5; }
+:root { --pink: #FF7BAC; --pink-light: #FFE4EF; --pink-pale: #FFF5F9; --dark: #2D1B2E; --mid: #6B4C6E; --muted: #A08AA3; --bg: #FFF8FB; }
 
-/* 댓글용 */
-.comment-section { margin-top: 30px; }
-.comment-section h3 { font-size: 18px; color: #0d1433; margin-bottom: 15px; border-bottom: 1px solid #d0d5e8; padding-bottom: 8px; }
-.comment-list { padding: 0; margin: 0; }
-.comment-item { padding: 15px; border-bottom: 1px solid #eaedfa; display: flex; flex-direction: column; gap: 6px; position: relative; }
-.comment-writer { font-weight: bold; color: #0d1433; font-size: 14px; }
-.comment-date { font-weight: normal; color: #8890b8; font-size: 12px; margin-left: 10px; }
-.comment-text { color: #3d4670; font-size: 14px; line-height: 1.5; }
-.comment-buttons { display: flex; gap: 10px; margin-top: 4px; align-items: center; }
-.comment-btn { background: none; border: none; color: #2b44cc; cursor: pointer; font-size: 12px; font-weight: 600; padding: 0; }
-.comment-btn:hover { text-decoration: underline; }
-.comment-btn.del { color: #b52844; }
-.like-btn { background: #f0f2f7; border: 1px solid #eaedfa; border-radius: 20px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: #3d4670; font-weight: bold; transition: background 0.2s; }
-.like-btn:hover { background: #eaedfa; }
-.like-btn.active { background: #fceef0; border-color: #fabcc5; color: #b52844; }
-.comment-item.child { margin-left: 40px; background-color: #f8f9fc; border-left: 3px solid #b8bfdc; border-radius: 0 4px 4px 0; }
-.comment-form { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
-.comment-form textarea { width: 100%; height: 80px; padding: 12px; border: 1px solid #d0d5e8; border-radius: 4px; box-sizing: border-box; resize: none; outline: none; font-family: inherit; }
-.comment-form textarea:focus { border-color: #2b44cc; }
-.comment-submit-btn { align-self: flex-end; padding: 10px 24px; background-color: #0d1433; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-.comment-submit-btn:hover { background-color: #2b44cc; }
-.recomment-form { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; background: #eaedfa; padding: 12px; border-radius: 4px; }
-.recomment-form textarea { width: 100%; height: 60px; padding: 10px; border: 1px solid #b8bfdc; border-radius: 4px; resize: none; outline: none; font-family: inherit; font-size: 13px; }
-.recomment-form textarea:focus { border-color: #2b44cc; }
-.recomment-actions { display: flex; justify-content: flex-end; gap: 8px; }
-.btn-re-submit { padding: 6px 16px; background-color: #0d1433; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
-.btn-re-cancel { padding: 6px 16px; background-color: #ffffff; color: #0d1433; border: 1px solid #d0d5e8; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+body {    background-color: #FFF8FB !important;    background-image:            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.06'%3E🐾%3C/text%3E%3C/svg%3E"),            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.06'%3E🐾%3C/text%3E%3C/svg%3E") !important;    background-position: 0px 0px, 150px 150px !important;    background-size: 300px 300px !important;    background-repeat: repeat !important;    font-family: 'Nunito', 'Sora', sans-serif;    color: #2D1B2E;    overflow-x: hidden;}
+.container { max-width: 800px; margin: 40px auto; background: #fff; padding: 40px; border-radius: 28px; box-shadow: 0 12px 36px rgba(255, 123, 172, 0.08); }
+.post-header { border-bottom: 2px solid var(--pink-light); padding-bottom: 20px; margin-bottom: 25px; }
+.post-title { font-size: 28px; font-weight: 800; margin: 0 0 15px 0; color: var(--dark); }
+.post-info { font-size: 14px; color: var(--mid); font-weight: 600; display: flex; justify-content: space-between; }
+.post-info-right span { margin-left: 15px; }
+.post-content { min-height: 250px; line-height: 1.8; color: var(--dark); font-size: 16px; word-break: break-all; white-space: pre-wrap; padding: 15px 0; font-weight: 500; }
+.post-actions { text-align: right; border-bottom: 2px solid var(--pink-light); padding-bottom: 20px; margin-bottom: 30px; }
+.btn { padding: 10px 20px; border-radius: 12px; font-weight: 800; cursor: pointer; border: none; text-decoration: none; font-size: 14px; transition: 0.2s; display: inline-block; }
+.btn-list { background-color: var(--pink-light); color: var(--pink); }
+.btn-list:hover { background-color: var(--pink); color: white; transform: translateY(-2px); }
+.btn-modify { background-color: var(--pink); color: white; margin-left: 8px; }
+.btn-modify:hover { background-color: #F0558A; transform: translateY(-2px); }
+
+/* 댓글 영역 */
+.comment-section { margin-top: 40px; }
+.comment-section h3 { font-size: 18px; color: var(--dark); margin-bottom: 20px; font-weight: 800; }
+.comment-list { border-top: 2px solid var(--pink-light); }
+.comment-item { padding: 20px 0; border-bottom: 1px solid var(--pink-light); }
+.comment-writer { font-weight: 800; color: var(--dark); margin-bottom: 8px; font-size: 15px; }
+.comment-date { font-size: 12px; color: var(--muted); margin-left: 10px; font-weight: 600; }
+.comment-body { color: var(--mid); line-height: 1.6; font-size: 15px; font-weight: 500; margin-bottom: 10px; }
+.comment-reply-btn { font-size: 13px; color: var(--pink); background: none; border: none; cursor: pointer; font-weight: 800; padding: 0; }
+.comment-reply-btn:hover { text-decoration: underline; }
+
+/* 대댓글 스타일 */
+.comment-item.child { margin-left: 40px; background-color: var(--pink-pale); border-left: 4px solid var(--pink-light); border-radius: 0 16px 16px 0; padding: 20px; }
+.comment-form { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
+.comment-form textarea { width: 100%; height: 90px; padding: 16px; border: 2px solid var(--pink-light); border-radius: 16px; box-sizing: border-box; resize: none; outline: none; font-family: inherit; font-size: 15px; transition: 0.2s; }
+.comment-form textarea:focus { border-color: var(--pink); box-shadow: 0 0 0 4px var(--pink-pale); }
+.comment-submit-btn { align-self: flex-end; padding: 12px 28px; background-color: var(--dark); color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: 800; transition: 0.2s; }
+.comment-submit-btn:hover { background-color: var(--pink); transform: translateY(-2px); }
+
+/* 대댓글 폼 */
+.recomment-form { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; background: var(--pink-pale); padding: 16px; border-radius: 16px; }
+.recomment-form textarea { width: 100%; height: 70px; padding: 12px; border: 2px solid var(--pink-light); border-radius: 12px; resize: none; font-family: inherit; font-size: 14px; }

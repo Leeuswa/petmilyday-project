@@ -2,69 +2,50 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>펫밀리데이 - 모임 상세</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/community/read.css}">
-    <style>
-        .meetup-detail-box { background: #f0f2f7; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #d0d5e8; }
-        .meetup-detail-box p { margin: 8px 0; font-size: 15px; color: #3d4670; }
-        .meetup-detail-box strong { color: #0d1433; }
-        .action-button-zone { margin: 25px 0; }
-        .btn-join { background-color: #2b44cc; color: white; padding: 12px 24px; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; text-align: center; }
-        .btn-leave { background-color: #e74a3b; color: white; padding: 12px 24px; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; text-align: center; }
-        .btn-block { background-color: #858796; color: white; padding: 12px 24px; border-radius: 4px; font-size: 16px; font-weight: 600; text-align: center; }
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        .btn-list, .btn-modify, .btn-remove { padding: 10px 20px; border-radius: 4px; font-weight: bold; text-decoration: none; font-size: 14px; }
-        .btn-list { background-color: #eaedfa; color: #2b44cc; }
-        .btn-modify { background-color: #4e73df; color: white; }
-        .btn-remove { background-color: #e74a3b; color: white; border: none; cursor: pointer; }
-
-        /* 추가된 방장 전용 관리 버튼 스타일 */
-        .btn-manage { background-color: #1cc88a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-size: 16px; font-weight: 600; display: inline-block; text-align: center; margin-bottom: 15px; }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/community/meetupRead.css}">
 </head>
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
 
 <div class="container" th:object="${postDTO}">
-    <h2 th:text="*{title}">모임 제목</h2>
+    <h2 class="page-title" th:text="*{title}"></h2>
 
     <div class="meetup-detail-box">
-        <p><strong>주최자:</strong> <span th:text="*{hostName}">방장</span></p>
-        <p><strong>모임 장소:</strong> <span th:text="*{location}">장소</span></p>
-        <p><strong>모임 일시:</strong> <span th:text="${#temporals.format(postDTO.meetupDate, 'yyyy-MM-dd HH:mm')}">일시</span></p>
-        <p><strong>모임 정원:</strong> <span th:text="*{currentParticipants} + ' / ' + *{maxParticipants} + ' 명'">0/0명</span></p>
+        <p><strong>주최 방장</strong> <span th:text="*{hostName}"></span></p>
+        <p><strong>모임 장소</strong> <span th:text="*{location}"></span></p>
+        <p><strong>모임 일시</strong> <span th:text="${#temporals.format(postDTO.meetupDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+        <p><strong>모임 정원</strong> <span th:text="*{currentParticipants} + ' / ' + *{maxParticipants} + ' 명'"></span></p>
     </div>
 
-    <div class="post-content" th:text="*{content}">
-        모임 상세 설명 본문 내용
-    </div>
+    <div class="post-content" th:text="*{content}" style="padding:20px 5px; min-height:180px;"></div>
 
-    <div th:if="${#authentication.name == postDTO.hostUsername}" style="margin-top: 25px;">
-        <a th:href="@{/community/meetup/manage/{id}(id=*{id})}" class="btn-manage">신청자 명단 관리 페이지 이동</a>
+    <div th:if="${#authentication.name == postDTO.hostUsername}">
+        <a th:href="@{/community/meetup/manage/{id}(id=*{id})}" class="btn-manage-center">신청자 참여 내역 관리하기</a>
     </div>
 
     <div class="action-button-zone" th:unless="${#authentication.name == postDTO.hostUsername}">
         <form th:if="*{isParticipating}" th:action="@{/community/meetup/cancel/{id}(id=*{id})}" method="post">
-            <button type="submit" class="btn-leave" onclick="return confirm('모임 신청을 취소하시겠습니까?');">모임 취소하기</button>
+            <button type="submit" class="btn-leave" onclick="return confirm('모임 참여 신청을 취소하시겠습니까?');">모임 참여 취소하기</button>
         </form>
 
         <form th:if="!*{isParticipating} and *{status == 'RECRUITING'}" th:action="@{/community/meetup/join/{id}(id=*{id})}" method="post">
-            <button type="submit" class="btn-join">모임 신청하기</button>
+            <button type="submit" class="btn-join">모임 참여 신청하기</button>
         </form>
 
-        <div th:if="!*{isParticipating} and *{status == 'CLOSED'}" class="btn-block">인원 마감</div>
+        <div th:if="!*{isParticipating} and *{status == 'CLOSED'}" class="btn-block">모집 정원 마감</div>
     </div>
 
-    <div class="btn-group">
-        <a th:href="@{/community/meetup/list}" class="btn-list" style="text-decoration: none; text-align: center;">목록</a>
-
+    <div class="btn-group" style="text-align:right; margin-top:30px;">
+        <a th:href="@{/community/meetup/list}" class="btn btn-list">목록으로</a>
         <th:block th:if="${#authentication.name == postDTO.hostUsername}">
-            <a th:href="@{/community/meetup/modify(id=*{id})}" class="btn-modify">수정</a>
-            <form th:action="@{/community/meetup/remove}" method="post" style="display: inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+            <a th:href="@{/community/meetup/modify(id=*{id})}" class="btn btn-modify">정보 수정</a>
+            <form th:action="@{/community/meetup/remove}" method="post" style="display: inline;" onsubmit="return confirm('모임을 영구 파기하시겠습니까?');">
                 <input type="hidden" name="id" th:value="*{id}">
-                <button type="submit" class="btn-remove">삭제</button>
+                <button type="submit" class="btn btn-list" style="background-color:#fff; color:var(--pink); border:2px solid var(--pink-light); margin-left:5px;">모임 폐쇄</button>
             </form>
         </th:block>
     </div>
@@ -73,16 +54,10 @@
 <script th:inline="javascript">
     window.onload = function() {
         var successMsg = /*[[${successMsg}]]*/ null;
-        if (successMsg) {
-            alert(successMsg);
-        }
-
+        if (successMsg) alert(successMsg);
         var errorMsg = /*[[${errorMsg}]]*/ null;
-        if (errorMsg) {
-            alert(errorMsg);
-        }
+        if (errorMsg) alert(errorMsg);
     };
 </script>
-
 </body>
 </html>
