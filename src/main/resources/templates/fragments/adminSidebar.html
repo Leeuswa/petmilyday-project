@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+
+<aside class="sidebar" th:fragment="adminSidebar(activeMenu)">
+
+  <div class="logo">
+    <a th:href="@{/hospital/list}"
+       style="text-decoration: none; color: inherit;">
+      Petmily Admin
+    </a>
+  </div>
+
+  <nav class="menu">
+
+    <!-- 관리자 -->
+    <div class="menu-section">
+      <div class="menu-title">관리자</div>
+
+      <a th:href="@{/admin}"
+         th:classappend="${activeMenu == 'dashboard'} ? ' active' : ''">
+        대시보드
+      </a>
+    </div>
+
+    <!-- 회원 -->
+    <div class="menu-section">
+      <div class="menu-title">회원</div>
+
+      <a th:href="@{/admin/members}"
+         th:classappend="${activeMenu == 'members'} ? ' active' : ''">
+        회원 관리
+      </a>
+    </div>
+
+    <!-- 병원 -->
+    <div class="menu-section">
+      <div class="menu-title">병원</div>
+
+      <a th:href="@{/admin/hospitals/}"
+         th:classappend="${activeMenu == 'hospitals'} ? ' active' : ''">
+        병원 관리
+      </a>
+
+      <a th:href="@{/admin/hospital-managers}"
+         th:classappend="${activeMenu == 'hospitalManagers'} ? ' active' : ''">
+        병원 관리자 신청
+      </a>
+
+      <a th:href="@{/admin/reservations/}"
+         th:classappend="${activeMenu == 'reservations'} ? ' active' : ''">
+        예약 관리
+      </a>
+
+      <a th:href="@{/admin/reviews/hospital}"
+         th:classappend="${activeMenu == 'hospitalReviews'} ? ' active' : ''">
+        병원 리뷰 신고 관리
+      </a>
+    </div>
+
+    <!-- 중고거래 -->
+    <div class="menu-section">
+      <div class="menu-title">중고거래</div>
+
+      <a th:href="@{/admin/reports/used-posts}"
+         th:classappend="${activeMenu == 'usedReports'} ? ' active' : ''">
+        중고거래 신고 관리
+      </a>
+    </div>
+
+    <!-- 커뮤니티 -->
+    <div class="menu-section">
+      <div class="menu-title">커뮤니티</div>
+
+      <a th:href="@{/admin/qna}"
+         th:classappend="${activeMenu == 'qna'} ? ' active' : ''">
+        QnA 관리
+      </a>
+    </div>
+
+  </nav>
+</aside>
+
+</body>
+</html>

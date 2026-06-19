@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>petmilyday - AI 자가진단</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          th:href="@{/css/diagnosis/diagnosis-main.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="diagnosis-main-page">
+
+    <div class="main-hero">
+
+        <div class="hero-icon-left">
+            🐾
+        </div>
+
+        <div class="hero-center">
+            <h2>
+                AI 자가진단
+            </h2>
+
+            <p>
+                반려동물 증상 진단, 진단 이력 확인, 동물 관리 가이드를 이용할 수 있습니다.<br>
+                Ollama 기반 AI를 활용해 참고용 진단 결과를 제공합니다.
+            </p>
+        </div>
+
+        <div class="hero-icon-right">
+            🤖
+        </div>
+
+    </div>
+
+    <div class="card-grid">
+
+        <a href="/diagnosis"
+           class="menu-card pink">
+
+            <div class="icon">
+                🤖
+            </div>
+
+            <div class="card-title">
+                AI 자가진단 시작
+            </div>
+
+            <div class="card-desc">
+                반려동물의 증상을 입력하고 AI 기반 참고 진단 결과를 확인합니다.
+            </div>
+
+            <div class="card-arrow">
+                시작하기 →
+            </div>
+
+        </a>
+
+        <a href="/diagnosis/history"
+           class="menu-card yellow">
+
+            <div class="icon">
+                📋
+            </div>
+
+            <div class="card-title">
+                진단 이력
+            </div>
+
+            <div class="card-desc">
+                이전에 진행한 자가진단 결과와 입력 증상을 다시 확인합니다.
+            </div>
+
+            <div class="card-arrow">
+                이력 보기 →
+            </div>
+
+        </a>
+
+        <a href="/ai-guide"
+           class="menu-card mint">
+
+            <div class="icon">
+                🐾
+            </div>
+
+            <div class="card-title">
+                AI 동물 가이드
+            </div>
+
+            <div class="card-desc">
+                품종, 건강 관리, 생활 습관 등 반려동물 관련 정보를 안내받습니다.
+            </div>
+
+            <div class="card-arrow">
+                질문하기 →
+            </div>
+
+        </a>
+
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                🩺
+            </div>
+
+            <div>
+                <div class="stat-title">
+                    총 진단 횟수
+                </div>
+
+                <div class="stat-value"
+                     th:text="${totalDiagnosisCount ?: 0}">
+                    0
+                </div>
+            </div>
+
+        </div>
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                📅
+            </div>
+
+            <div>
+                <div class="stat-title">
+                    최근 진단일
+                </div>
+
+                <div class="stat-value date-value"
+                     th:if="${lastDiagnosisDate != null}"
+                     th:text="${#temporals.format(lastDiagnosisDate,'yyyy-MM-dd')}">
+                </div>
+
+                <div class="stat-value date-value"
+                     th:if="${lastDiagnosisDate == null}">
+                    없음
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="content-layout">
+
+        <main class="content-main">
+
+            <div class="section-title">
+                최근 진단 이력
+            </div>
+
+            <div class="history-box">
+
+                <div th:if="${recentHistories == null or #lists.isEmpty(recentHistories)}"
+                     class="empty-box">
+
+                    <div class="empty-icon">
+                        📋
+                    </div>
+
+                    <div class="empty-title">
+                        아직 진단 이력이 없습니다.
+                    </div>
+
+                    <div class="empty-desc">
+                        반려동물 증상을 입력하고 AI 자가진단을 진행해보세요.
+                    </div>
+
+                </div>
+
+                <div th:each="history : ${recentHistories}"
+                     class="history-item">
+
+                    <div class="history-left">
+
+                        <div class="history-icon">
+                            🐾
+                        </div>
+
+                        <div>
+                            <div class="history-pet"
+                                 th:text="${history.pet.name}">
+                                반려동물
+                            </div>
+
+                            <div class="history-disease"
+                                 th:text="${history.resultDisease}">
+                                의심 질환
+                            </div>
+
+                            <div class="history-date"
+                                 th:text="${#temporals.format(history.createdAt,'yyyy-MM-dd HH:mm')}">
+                                날짜
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="history-more">
+                    <a href="/diagnosis/history"
+                       class="history-link">
+                        전체 이력 보기 →
+                    </a>
+                </div>
+
+            </div>
+
+        </main>
+
+        <aside class="content-side">
+
+            <div class="guide-box">
+
+                <div class="section-title">
+                    AI 자가진단 안내
+                </div>
+
+                <ul>
+                    <li>AI 진단 결과는 참고용이며 실제 수의사의 진료를 대체하지 않습니다.</li>
+                    <li>심각도 HIGH 또는 증상이 지속될 경우 동물병원 방문을 권장합니다.</li>
+                    <li>증상을 구체적으로 입력할수록 정확도가 향상됩니다.</li>
+                    <li>피부, 귀, 눈 등 증상 부위 사진을 함께 업로드하면 도움이 됩니다.</li>
+                </ul>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+<script th:src="@{/js/diagnosis/diagnosis-main.js}"></script>
+
+</body>
+</html>
