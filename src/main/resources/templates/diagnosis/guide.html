@@ -56,7 +56,9 @@
                 AI 가이드 답변
             </div>
 
-            <div th:text="${answer}">
+            <div class="answer-content"
+                 th:text="${#strings.trim(answer)}">
+                AI 답변
             </div>
 
         </div>

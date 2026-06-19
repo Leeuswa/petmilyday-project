@@ -219,9 +219,11 @@
                              th:src="${post.imageUrlList[0]}"
                              th:alt="${post.title}">
 
-                        <span th:if="${post.imageUrlList == null or post.imageUrlList.isEmpty()}">
-                            이미지 없음
-                        </span>
+                        <div th:if="${post.imageUrlList == null or post.imageUrlList.isEmpty()}"
+                             class="no-image-box">
+                            <div class="no-image-icon">🐾</div>
+                            <div class="no-image-text">이미지 없음</div>
+                        </div>
 
                     </div>
 

@@ -167,3 +167,13 @@ body {
     color: #64748b;
     margin: 0;
 }
+
+.hover-card {
+    transition: 0.2s;
+}
+
+.hover-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+    border-color: #c7d2fe;
+}

@@ -61,8 +61,10 @@
                  class="main-image">
 
             <div th:if="${post.imageUrlList == null or post.imageUrlList.isEmpty()}"
-                 class="main-image d-flex justify-content-center align-items-center text-muted">
-                이미지 없음
+                 class="main-image no-detail-image">
+                <div class="no-detail-icon">🐾</div>
+                <div class="no-detail-title">등록된 이미지가 없습니다</div>
+                <div class="no-detail-desc">상품 설명을 확인해주세요.</div>
             </div>
 
         </div>
