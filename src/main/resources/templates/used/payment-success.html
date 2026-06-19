@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>petmilyday - 결제 완료</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -18,46 +18,88 @@
 
 <div th:replace="~{fragments/header :: header}"></div>
 
-<div class="success-container">
+<div class="success-page">
 
-    <div class="success-card">
+    <div class="success-hero">
 
-        <div class="success-header">
-            <div class="success-icon">🎉</div>
+        <div class="hero-icon-left">
+            🐾
+        </div>
 
+        <div class="hero-center">
             <h2>
-                결제 처리가 완료되었습니다
+                결제 완료
             </h2>
 
             <p>
-                거래 상태가 판매완료로 변경되었습니다.
+                결제 처리가 완료되었고 거래 상태가 판매완료로 변경되었습니다.<br>
+                채팅방에서 거래 상대방 매너평가를 진행할 수 있습니다.
             </p>
         </div>
 
-        <div class="success-body">
+        <div class="hero-icon-right">
+            🎉
+        </div>
 
-            <div class="info-row">
-                <div class="label">상품명</div>
-                <div class="value"
-                     th:text="${post.title}">
-                    상품명
+    </div>
+
+    <div class="success-layout">
+
+        <div class="success-card">
+
+            <div class="card-title-area">
+
+                <div class="title-icon">
+                    🎉
                 </div>
+
+                <div>
+                    <h3>
+                        결제 처리가 완료되었습니다
+                    </h3>
+
+                    <p>
+                        거래 상태가 판매완료로 변경되었습니다.
+                    </p>
+                </div>
+
             </div>
 
-            <div class="info-row">
-                <div class="label">결제금액</div>
-                <div class="value price">
-                    <span th:text="${#numbers.formatInteger(post.price,0,'COMMA')}">
-                        0
-                    </span>원
-                </div>
-            </div>
+            <div class="info-box">
 
-            <div class="info-row">
-                <div class="label">거래상태</div>
-                <div class="value">
-                    판매완료
+                <div class="info-row">
+                    <div class="label">
+                        상품명
+                    </div>
+
+                    <div class="value"
+                         th:text="${post.title}">
+                        상품명
+                    </div>
                 </div>
+
+                <div class="info-row">
+                    <div class="label">
+                        결제금액
+                    </div>
+
+                    <div class="value price">
+                        <span th:text="${#numbers.formatInteger(post.price,0,'COMMA')}">
+                            0
+                        </span>원
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="label">
+                        거래상태
+                    </div>
+
+                    <div class="value status-value">
+                        판매완료
+                    </div>
+                </div>
+
             </div>
 
             <div class="status-box">
@@ -71,12 +113,12 @@
             <div class="btn-area">
 
                 <a th:href="@{/used/detail/{id}(id=${post.id})}"
-                   class="btn btn-primary move-btn">
+                   class="move-btn primary-move-btn">
                     게시글 보기
                 </a>
 
                 <a href="/used/list"
-                   class="btn btn-outline-secondary move-btn">
+                   class="move-btn cancel-move-btn">
                     중고거래 목록
                 </a>
 

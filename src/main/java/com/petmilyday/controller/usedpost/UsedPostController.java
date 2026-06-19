@@ -92,6 +92,24 @@ public class UsedPostController {
             Pageable pageable,
             Model model
     ) {
+        Long loginMemberId = null;
+
+        if (authentication != null
+                && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getPrincipal())) {
+
+            String username = authentication.getName();
+
+            Member member =
+                    memberRepository.findByUsername(username)
+                            .orElse(null);
+
+            if (member != null) {
+                loginMemberId = member.getId();
+            }
+        }
+
+        model.addAttribute("memberId", loginMemberId);
 
         // 찜 목록
         if (onlyWish) {
@@ -534,7 +552,8 @@ public class UsedPostController {
             return "redirect:/used/detail/" + id;
         }
 
-        usedPostRepository.delete(post);
+        post.setIsHidden(true);
+        usedPostRepository.save(post);
 
         return "redirect:/used/list";
     }

@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     menuCards.forEach(function (card) {
         card.addEventListener("click", function () {
-            card.style.opacity = "0.7";
+            card.style.opacity = "0.72";
         });
     });
 });
