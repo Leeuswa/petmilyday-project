@@ -1,0 +1,169 @@
+:root {
+    --pink: #FF7BAC;
+    --pink-deep: #F0558A;        /* ← 추가: btn-join:hover에 사용 */
+    --pink-light: #FFE4EF;
+    --pink-pale: #FFF5F9;
+    --dark: #2D1B2E;
+    --mid: #6B4C6E;
+    --muted: #A08AA3;
+    --bg: #FFF8FB;
+}
+
+/* ===== body (read.css에서 통합) ===== */
+body {
+    background-color: #FFF8FB !important;
+    background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.06'%3E🐾%3C/text%3E%3C/svg%3E"),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.06'%3E🐾%3C/text%3E%3C/svg%3E") !important;
+    background-position: 0px 0px, 150px 150px !important;
+    background-size: 300px 300px !important;
+    background-repeat: repeat !important;
+    font-family: 'Nunito', 'Sora', sans-serif;
+    color: #2D1B2E;
+    overflow-x: hidden;
+}
+
+/* ===== 컨테이너 (read.css에서 통합) ===== */
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 40px;
+    border-radius: 28px;
+    box-shadow: 0 12px 36px rgba(255, 123, 172, 0.08);
+}
+
+/* ===== 공통 버튼 (read.css에서 통합) ===== */
+.btn {
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s;
+    display: inline-block;
+}
+
+.btn-list {
+    background-color: var(--pink-light);
+    color: var(--pink);
+}
+
+.btn-list:hover {
+    background-color: var(--pink);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-modify {
+    background-color: var(--pink);
+    color: white;
+    margin-left: 8px;
+}
+
+.btn-modify:hover {
+    background-color: var(--pink-deep);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ===== 모임 상세 정보 박스 (인라인 style에서 통합) ===== */
+.meetup-detail-box {
+    background-color: var(--pink-pale);
+    padding: 25px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+    border: 2px solid var(--pink-light);
+}
+
+.meetup-detail-box p {
+    margin: 10px 0;
+    font-size: 15px;
+    color: var(--mid);
+    font-weight: 600;
+}
+
+.meetup-detail-box strong {
+    color: var(--dark);
+    font-weight: 800;
+    margin-right: 8px;
+}
+
+/* ===== 참여 버튼 영역 (인라인 style에서 통합) ===== */
+.action-button-zone {
+    margin: 25px 0;
+}
+
+/* 참여 신청 버튼 */
+.btn-join {
+    background-color: var(--pink);
+    color: white;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.btn-join:hover {
+    background-color: var(--pink-deep);  /* ← --pink-deep 정의했으므로 이제 정상 작동 */
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* 참여 취소 버튼 */
+.btn-leave {
+    background-color: #ffffff;
+    color: var(--muted);
+    border: 2px solid var(--pink-light);
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.btn-leave:hover {
+    background-color: var(--pink-pale);
+    color: var(--muted);
+}
+
+/* 마감 표시 블록 */
+.btn-block {
+    background-color: var(--muted);
+    color: white;
+    padding: 14px 24px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 800;
+    text-align: center;
+}
+
+/* 신청자 관리 버튼 (방장 전용) */
+.btn-manage-center {
+    background-color: var(--dark);
+    color: white;
+    padding: 14px 24px;
+    text-decoration: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 800;
+    display: block;
+    text-align: center;
+    margin-bottom: 15px;
+    transition: 0.2s;
+}
+
+.btn-manage-center:hover {
+    background-color: var(--pink);
+    color: white;
+}

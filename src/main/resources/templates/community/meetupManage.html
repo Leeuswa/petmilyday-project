@@ -2,59 +2,52 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>펫밀리데이 - 신청자 명단 관리</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        .manage-wrapper { max-width: 850px; margin: 50px auto; font-family: 'Sora', sans-serif; padding: 10px; }
-        .page-header { font-size: 20px; font-weight: bold; margin-bottom: 25px; color: #0d1433; border-bottom: 2px solid #0d1433; padding-bottom: 10px; }
-        .applicant-item { display: flex; background: #ffffff; border: 1px solid #d0d5e8; border-radius: 8px; padding: 20px; margin-bottom: 15px; justify-content: space-between; align-items: center; }
-        .profile-section { display: flex; flex-direction: column; gap: 5px; }
-        .user-info { font-size: 15px; font-weight: bold; color: #0d1433; }
-        .pet-info-summary { background: #f0f2f7; padding: 10px 15px; border-radius: 6px; margin-top: 5px; font-size: 13px; color: #3d4670; }
-        .btn-container { display: flex; gap: 8px; }
-        .btn-action-approve { background-color: #2b44cc; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .btn-action-reject { background-color: #fff; color: #b52844; border: 1px solid #fabcc5; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>펫밀리데이 - 신청자 관리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/community/meetupManage.css}">
 </head>
 <body>
 
 <div th:replace="~{fragments/header :: header}"></div>
 
 <div class="manage-wrapper">
-    <h2 class="page-header">모임 참여 신청 현황 관리</h2>
-    <h4 th:text="'대상 모임 : ' + ${meetupPost.title}" style="color: #666; margin-bottom: 20px;"></h4>
+    <h2 class="page-header">모임 참여 신청자 현황</h2>
+    <h4 th:text="'대상 모임 : ' + ${meetupPost.title}" style="color: var(--mid); margin-top:-10px; margin-bottom: 30px; font-weight:600;"></h4>
 
-    <div th:if="${#lists.isEmpty(applicantList)}" style="text-align: center; color: #888; padding: 50px;">
-        접수된 모임 참여 신청 내역이 없습니다.
+    <div th:if="${#lists.isEmpty(applicantList)}" class="applicant-item" style="justify-content:center; color:var(--muted); padding:40px; font-weight:600;">
+        접수된 참여 대기 및 신청 내역이 없습니다.
     </div>
 
     <div class="applicant-item" th:each="applicant : ${applicantList}">
         <div class="profile-section">
             <div class="user-info">
-                <span th:text="${applicant.member.nickname != null ? applicant.member.nickname : applicant.member.name}">유저명</span>
-                <span th:text="'(' + ${applicant.member.username} + ')'" style="font-size: 12px; color: #888;"></span>
+                <span th:text="${applicant.member.nickname != null && applicant.member.nickname != '' ? applicant.member.nickname : applicant.member.name}"></span>
+                <span th:text="'(' + ${applicant.member.username} + ')'" style="font-size: 13px; color: var(--muted); font-weight:500;"></span>
             </div>
 
             <div class="pet-info-summary">
-                <div style="font-weight: bold; margin-bottom: 3px;">동반 반려동물 프로필</div>
-                <div th:if="${#lists.isEmpty(applicant.member.petProfiles)}">등록된 반려동물이 정보가 없는 유저입니다.</div>
-                <div th:each="pet : ${applicant.member.petProfiles}" th:text="'- ' + ${pet.name} + ' : ' + ${pet.species} + ' / ' + ${pet.breed} + ' / ' + ${pet.gender} + ' / ' + ${pet.age} + '살'"></div>
+                <div style="font-weight: 800; margin-bottom: 5px; color:var(--pink);">동반 예정 반려동물</div>
+                <div th:if="${#lists.isEmpty(applicant.member.petProfiles)}" style="color:var(--muted);">등록된 아이 프로필이 확인되지 않습니다.</div>
+                <div th:each="pet : ${applicant.member.petProfiles}" th:text="'- ' + ${pet.name} + ' (' + ${pet.species} + ' / ' + ${pet.breed} + ' / ' + ${pet.gender} + ' / ' + ${pet.age} + '살)'"></div>
             </div>
         </div>
 
         <div class="btn-container" th:if="${applicant.status == 'PENDING'}">
             <form th:action="@{/community/meetup/approve/{id}(id=${applicant.id})}" method="post">
-                <button type="submit" class="btn-action-approve">수락</button>
+                <button type="submit" class="btn-action-approve">참여 수락</button>
             </form>
-            <form th:action="@{/community/meetup/reject/{id}(id=${applicant.id})}" method="post" onsubmit="return confirm('신청을 거절하시겠습니까?');">
+            <form th:action="@{/community/meetup/reject/{id}(id=${applicant.id})}" method="post" onsubmit="return confirm('정말 거절하시겠습니까?');">
                 <button type="submit" class="btn-action-reject">거절</button>
             </form>
         </div>
 
-        <div th:if="${applicant.status == 'APPROVED'}" style="color: #2b44cc; font-weight: bold; font-size: 13px; padding-right: 10px;">
-            수락 완료
+        <div th:if="${applicant.status == 'APPROVED'}" style="color: var(--pink); font-weight: 800; font-size: 15px; padding-right: 15px;">
+            수락 승인 완료
         </div>
     </div>
+
+    <a th:href="@{/community/meetup/read(id=${meetupPost.id})}" class="btn-return-back">이전 상세글로</a>
 </div>
 
 </body>

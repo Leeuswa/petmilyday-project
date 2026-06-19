@@ -26,8 +26,7 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    // [기능] POST 방식으로 댓글 등록
-    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = {"", "/"}, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Long> register(@Valid @RequestBody CommentDTO commentDTO) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

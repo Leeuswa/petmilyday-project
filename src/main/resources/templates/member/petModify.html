@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
     <title>펫밀리데이 - 반려동물 프로필 수정</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/member/petModify.css}">
 </head>
 <body>
 
+<div th:replace="~{fragments/header :: header}"></div>
+
 <div class="modify-container">
-    <h2 style="margin-bottom: 20px; color: #0d1433; text-align: center;">반려동물 프로필 수정</h2>
+    <h2 class="page-title" style="text-align: center; margin-bottom: 25px;">반려동물 프로필 수정</h2>
 
     <form th:action="@{/member/pet-profile/modify/{id}(id=${petProfileForm.id})}" method="post" th:object="${petProfileForm}" enctype="multipart/form-data">
         <input type="hidden" th:field="*{id}">
@@ -56,9 +57,9 @@
             <input type="file" id="file" name="file" class="form-control" accept="image/*">
         </div>
 
-        <div class="btn-group">
-            <button type="submit" class="btn-save">수정 완료</button>
+        <div class="btn-wrap" style="display: flex; gap: 12px; margin-top: 30px;">
             <a th:href="@{/member/pet-profile}" class="btn-cancel">취소</a>
+            <button type="submit" class="btn-save">수정 완료</button>
         </div>
     </form>
 </div>
