@@ -12,7 +12,7 @@
 <body th:data-base-price="${product?.price != null ? product.price : 0}">
 <div th:replace="~{fragments/header :: header}"></div>
 
-<input type="hidden" id="currentMemberId" th:value="${#authentication != null ? #authentication.name : ''}">
+<input type="hidden" id="currentMemberId" th:value="${loginMemberId != null ? loginMemberId : ''}">
 
 <div class="container py-5 shop-premium-container">
 
@@ -297,7 +297,7 @@
                 const topReviewText = document.getElementById('topReviewText');
                 const topStars = document.getElementById('topStars');
                 const reviewTabBtn = document.getElementById('reviewTabBtn');
-                const currentUsername = document.getElementById('currentMemberId')?.value;
+                const currentMemberIdVal = document.getElementById('currentMemberId')?.value;
 
                 if (!reviewContainer) return;
                 reviewContainer.innerHTML = '';
@@ -314,19 +314,17 @@
                 reviews.forEach(r => {
                     totalRating += r.rating;
                     const formattedDate = r.createdAt ? r.createdAt.substring(0, 10).replace(/-/g, '.') : '2026.06.18';
-                    const imgTag = r.imgUrl ? `<div class="mt-2"><img src="${r.imgUrl}" class="rounded border" style="max-width:120px; max-height:120px; object-fit:cover; cursor: zoom-in;" onclick="openImageModal(this.src)"></div>` : '';
 
-                    let writerName = '';
-                    if (isAdmin) {
-                        writerName = (r.memberId === 1) ? `관리자 (나)` : `회원 (ID: ${r.memberId})`;
-                    } else if (currentUsername) {
-                        writerName = (r.memberId === 1) ? `운영자` : `회원 (ID: ${r.memberId})`;
-                    } else {
-                        writerName = (r.memberId === 1) ? `운영자` : `일반 회원`;
+                    const imgTag = r.reviewImgUrl ? `<div class="mt-2"><img src="${r.reviewImgUrl}" class="rounded border" style="max-width:120px; max-height:120px; object-fit:cover; cursor: zoom-in;" onclick="openImageModal(this.src)"></div>` : '';
+
+
+                    let writerName = r.nickname;
+                    if (r.memberId === 1) {
+                        writerName = isAdmin ? `관리자 (나)` : `운영자`;
                     }
 
                     let deleteBtn = '';
-                    if (isAdmin || currentUsername) {
+                    if (isAdmin || (currentMemberIdVal && String(currentMemberIdVal) === String(r.memberId))) {
                         deleteBtn = `<button class="btn btn-outline-danger btn-sm p-1 px-2 border-0" style="font-size:11px;" onclick="deleteMyReview(${r.id})"><i class="bi bi-trash"></i> 삭제</button>`;
                     }
 

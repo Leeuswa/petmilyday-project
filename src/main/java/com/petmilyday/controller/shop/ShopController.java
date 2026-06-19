@@ -72,27 +72,23 @@ public class ShopController {
 
     // 상품 상세 정보 조회
     @GetMapping("/shop/detail/{id}")
-    public String showProductDetail(@PathVariable("id") Long id,
-                                    Model model,
-                                    Principal principal,
-                                    RedirectAttributes redirectAttributes) {
+    public String productDetail(@PathVariable("id") Long id,
+                                Model model,
+                                java.security.Principal principal) {
 
-        ProductResponseDto product = productService.getProductById(id);
+        com.petmilyday.dto.product.ProductResponseDto productDto = productService.getProductById(id);
 
-        if (product.isDeleted()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "이미 판매가 종료된 상품입니다.");
-            return "redirect:/shop";
-        }
+        model.addAttribute("product", productDto);
 
-        model.addAttribute("product", product);
+        model.addAttribute("isBuyer", true);
 
-        boolean isBuyer = false;
         if (principal != null) {
-            model.addAttribute("loggedInUser", principal.getName());
-            isBuyer = ordersRepository.existsByUsernameAndProductId(principal.getName(), id);
+            String username = principal.getName();
+            com.petmilyday.entity.member.Member currentMember = memberRepository.findByUsername(username).orElse(null);
+            if (currentMember != null) {
+                model.addAttribute("loginMemberId", currentMember.getId());
+            }
         }
-        model.addAttribute("isBuyer", isBuyer);
-
         return "shop/detail";
     }
 
