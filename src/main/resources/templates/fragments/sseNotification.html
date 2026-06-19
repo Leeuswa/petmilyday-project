@@ -40,6 +40,15 @@
                 })
         );
 
+        // 병원 관리자로 승인된 경우, 새 권한 적용을 위해 알림 후 강제 로그아웃
+        if (data.type === "HOSPITAL_MANAGER_APPROVED") {
+          eventSource.close();
+          window.petmilySseConnected = false;
+          alert(data.message);
+          window.location.href = data.url || "/member/logout";
+          return;
+        }
+
         // 알림을 헤더 알림 목록에 추가
         addNotificationToHeader(data);
       });

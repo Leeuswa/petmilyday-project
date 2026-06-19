@@ -125,8 +125,9 @@ public class HospitalManagerServiceImpl implements HospitalManagerService {
                 hospitalManager.getMember().getUsername(),
                 NotificationDTO.builder()
                         .type("HOSPITAL_MANAGER_APPROVED")
-                        .message("병원 관리자 신청이 승인되었습니다.")
-                        .url("/hospitalAdmin/hospital")
+                        .message(hospitalManager.getHospital().getName()
+                                + " 병원 관리자 신청이 승인되었습니다. 권한 적용을 위해 다시 로그인해 주세요.")
+                        .url("/member/logout")
                         .createdAt(LocalDateTime.now())
                         .build()
         );
