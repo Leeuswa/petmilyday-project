@@ -65,7 +65,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         Map response =
                 webClient.post()
                         .uri("/online/v1/payment/ready")
-                        .header("Authorization", "SECRET_KEY " + secretKey)
+                        .header("Authorization", "SECRET_KEY_DEV " + secretKey.trim())
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(params)
                         .retrieve()
@@ -119,7 +119,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
 
         webClient.post()
                 .uri("/online/v1/payment/approve")
-                .header("Authorization", "SECRET_KEY " + secretKey)
+                .header("Authorization", "SECRET_KEY_DEV " + secretKey.trim())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(params)
                 .retrieve()
