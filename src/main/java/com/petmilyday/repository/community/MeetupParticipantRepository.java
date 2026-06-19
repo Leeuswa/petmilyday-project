@@ -19,4 +19,7 @@ public interface MeetupParticipantRepository extends JpaRepository<MeetupPartici
 
     // 특정 회원 참여한 모임 목록 조회 (최신 날짜 기준)
     List<MeetupParticipant> findByMemberUsernameOrderByJoinedAtDesc(String username);
+
+    // 신청자 목록 조회 (방장 전용)
+    List<MeetupParticipant> findByMeetupPostIdOrderByJoinedAtAsc(Long meetupPostId);
 }

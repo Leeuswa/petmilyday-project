@@ -3,6 +3,8 @@ package com.petmilyday.entity.member;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "member")
@@ -10,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@ToString(exclude = "petProfiles")
 public class Member {
 
     @Id
@@ -75,6 +78,10 @@ public class Member {
     @Column(name = "fcm_token")
     private String fcmToken; // FCM 토큰
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default // 빌더 패턴 사용 시 초기화 처리가 유지되도록 설정
+    private List<PetProfile> petProfiles = new ArrayList<>();
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -130,5 +137,4 @@ public class Member {
         this.status = AccountStatus.ACTIVE;
         this.updatedAt = LocalDateTime.now();
     }
-
 }
