@@ -22,4 +22,8 @@ public interface MeetupParticipantRepository extends JpaRepository<MeetupPartici
 
     // 신청자 목록 조회 (방장 전용)
     List<MeetupParticipant> findByMeetupPostIdOrderByJoinedAtAsc(Long meetupPostId);
+
+    @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true)
+    @org.springframework.data.jpa.repository.Query("UPDATE MeetupParticipant p SET p.status = 'APPROVED' WHERE p.id = :id")
+    void forceApproveStatus(@org.springframework.data.repository.query.Param("id") Long id);
 }

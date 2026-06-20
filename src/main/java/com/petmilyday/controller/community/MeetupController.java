@@ -4,6 +4,7 @@ import com.petmilyday.dto.community.MeetupPostDTO;
 import com.petmilyday.dto.community.PageRequestDTO;
 import com.petmilyday.dto.community.PageResponseDTO;
 import com.petmilyday.entity.community.MeetupParticipant;
+import com.petmilyday.repository.community.MeetupParticipantRepository;
 import com.petmilyday.service.community.MeetupService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ import java.util.Map;
 public class MeetupController {
 
     private final MeetupService meetupService;
+    private final MeetupParticipantRepository meetupParticipantRepository;
 
     @GetMapping({"", "/"})
     public String meetupIndex() {
@@ -180,28 +182,42 @@ public class MeetupController {
 
     // 신청자 수락 처리
     @PostMapping("/approve/{id}")
-    public String approveParticipant(@PathVariable("id") Long participantId, Authentication authentication, RedirectAttributes redirectAttributes) {
-        String username = authentication.getName();
+    public String approve(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
-            meetupService.approveParticipant(participantId, username);
+            com.petmilyday.entity.community.MeetupParticipant participant =
+                    meetupParticipantRepository.findById(id)
+                            .orElseThrow(() -> new IllegalArgumentException("신청 내역을 찾을 수 없습니다."));
+            Long meetupPostId = participant.getMeetupPost().getId();
+
+            meetupService.approveParticipant(id);
+
             redirectAttributes.addFlashAttribute("successMsg", "참여 신청을 수락했습니다.");
+
+            return "redirect:/community/meetup/manage/" + meetupPostId;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/community/meetup/list";
         }
-        return "redirect:/community/meetup/list";
     }
 
     // 신청자 거절 처리
     @PostMapping("/reject/{id}")
-    public String rejectParticipant(@PathVariable("id") Long participantId, Authentication authentication, RedirectAttributes redirectAttributes) {
-        String username = authentication.getName();
+    public String reject(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         try {
-            meetupService.rejectParticipant(participantId, username);
+            com.petmilyday.entity.community.MeetupParticipant participant =
+                    meetupParticipantRepository.findById(id)
+                            .orElseThrow(() -> new IllegalArgumentException("신청 내역을 찾을 수 없습니다."));
+            Long meetupPostId = participant.getMeetupPost().getId();
+
+            meetupService.rejectParticipant(id);
+
             redirectAttributes.addFlashAttribute("successMsg", "참여 신청을 거절했습니다.");
+
+            return "redirect:/community/meetup/manage/" + meetupPostId;
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/community/meetup/list";
         }
-        return "redirect:/community/meetup/list";
     }
 
     // 모임 참여 취소 처리

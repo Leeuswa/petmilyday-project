@@ -169,46 +169,40 @@ public class MeetupServiceImpl implements MeetupService {
 
     // 신청자 수락 로직
     @Override
-    public void approveParticipant(Long participantId, String hostUsername) {
-        MeetupParticipant participant = meetupParticipantRepository.findById(participantId)
-                .orElseThrow(() -> new IllegalArgumentException("신청 내역을 찾을 수 없습니다."));
+    @Transactional
+    public void approveParticipant(Long id) {
+        MeetupParticipant participant = meetupParticipantRepository.findById(id).orElseThrow();
+
+        participant.approve();
+        meetupParticipantRepository.save(participant);
 
         MeetupPost post = participant.getMeetupPost();
-        if (!post.getHost().getUsername().equals(hostUsername)) {
-            throw new IllegalStateException("수락 권한이 없습니다.");
-        }
-
         post.addParticipant();
-        participant.approve();
+        meetupPostRepository.save(post);
     }
 
     // 신청자 거절 로직
     @Override
-    public void rejectParticipant(Long participantId, String hostUsername) {
-        MeetupParticipant participant = meetupParticipantRepository.findById(participantId)
-                .orElseThrow(() -> new IllegalArgumentException("신청 내역을 찾을 수 없습니다."));
-
-        if (!participant.getMeetupPost().getHost().getUsername().equals(hostUsername)) {
-            throw new IllegalStateException("거절 권한이 없습니다.");
-        }
+    @Transactional
+    public void rejectParticipant(Long id) {
+        MeetupParticipant participant = meetupParticipantRepository.findById(id).orElseThrow();
 
         meetupParticipantRepository.delete(participant);
     }
 
     @Override
-    public void cancelMeetup(Long id, String username) {
-        MeetupParticipant participant = meetupParticipantRepository.findByMeetupPostIdAndMemberUsername(id, username)
-                .orElseThrow(() -> new IllegalStateException("참여 기록이 없습니다."));
+    @Transactional
+    public void cancelMeetup(Long meetupPostId, String username) {
+        MeetupParticipant participant = meetupParticipantRepository.findByMeetupPostIdAndMemberUsername(meetupPostId, username)
+                .orElseThrow(() -> new IllegalArgumentException("참여 기록이 없습니다."));
 
         MeetupPost post = participant.getMeetupPost();
 
-        // 방장 취소 방지
-        if (post.getHost().getUsername().equals(username)) {
-            throw new IllegalStateException("방장은 참여를 취소할 수 없습니다. 모임을 삭제해 주세요.");
+        // 원래 승인이였는지 확인 후, 인원 감소
+        if ("APPROVED".equals(participant.getStatus())) {
+            post.removeParticipant();
         }
 
-        // 인원 감소 및 상태 롤백 로직 (엔티티에 메서드 필요)
-        post.removeParticipant();
         meetupParticipantRepository.delete(participant);
     }
 
