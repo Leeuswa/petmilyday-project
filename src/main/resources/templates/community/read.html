@@ -14,14 +14,7 @@
 <div th:replace="~{fragments/header :: header}"></div>
 
 <div class="container">
-    <div sec:authorize="isAuthenticated()">
-        <input type="hidden" id="currentUser" th:value="${#authentication.name}">
-    </div>
-    <div sec:authorize="isAnonymous()">
-        <input type="hidden" id="currentUser" value="anonymousUser">
-    </div>
-
-    <input type="hidden" id="currentPostId" th:value="${postDTO.id}">
+    <input type="hidden" id="currentUser" th:value="${#authentication.name != 'anonymousUser' ? #authentication.name : 'anonymousUser'}">
 
     <div class="post-header">
         <h1 class="post-title" th:text="${postDTO.title}">제목</h1>

@@ -15,4 +15,12 @@ public interface MeetupPostRepository extends JpaRepository<MeetupPost, Long> {
     Page<MeetupPost> findAllWithHost(Pageable pageable);
 
     List<MeetupPost> findByHostOrderByIdDesc(Member host);
+
+    @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true)
+    @org.springframework.data.jpa.repository.Query("UPDATE MeetupPost m SET m.currentParticipants = m.currentParticipants + 1 WHERE m.id = :id")
+    void forceAddParticipant(@org.springframework.data.repository.query.Param("id") Long id);
+
+    @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true)
+    @org.springframework.data.jpa.repository.Query("UPDATE MeetupPost m SET m.status = :status WHERE m.id = :id")
+    void forceUpdateStatus(@org.springframework.data.repository.query.Param("id") Long id, @org.springframework.data.repository.query.Param("status") com.petmilyday.entity.community.MeetupStatus status);
 }

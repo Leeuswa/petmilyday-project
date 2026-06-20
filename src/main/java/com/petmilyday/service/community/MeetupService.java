@@ -37,8 +37,7 @@ public interface MeetupService {
     List<MeetupParticipant> getApplicants(Long meetupId, String hostUsername);
 
     // 신청자 수락
-    void approveParticipant(Long participantId, String hostUsername);
-
+    void approveParticipant(Long Id);
     // 신청자 거절
-    void rejectParticipant(Long participantId, String hostUsername);
+    void rejectParticipant(Long Id);
 }
