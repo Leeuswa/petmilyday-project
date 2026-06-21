@@ -76,6 +76,11 @@
          th:classappend="${activeMenu == 'qna'} ? ' active' : ''">
         QnA 관리
       </a>
+
+      <a th:href="@{/admin/community/reports}"
+         th:classappend="${activeMenu == 'communityReports'} ? ' active' : ''">
+        커뮤니티 신고 관리
+      </a>
     </div>
 
   </nav>
