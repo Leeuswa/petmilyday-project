@@ -4,6 +4,8 @@ import com.petmilyday.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "community_post")
@@ -39,6 +41,10 @@ public class CommunityPost {
     private LocalDateTime updatedAt;
 
     private boolean anonymous;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
 
     @PrePersist
     public void prePersist() {

@@ -4,6 +4,8 @@ import com.petmilyday.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "comments")
@@ -31,6 +33,18 @@ public class Comment {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @Builder.Default
+    private List<CommentLike> likes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @Builder.Default
+    private List<Comment> children = new ArrayList<>();
+
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
@@ -39,19 +53,6 @@ public class Comment {
     public void updateContent(String content) {
         this.content = content;
     }
-
-    public void assignMemberAndPost(Member member, CommunityPost post) {
-        this.member = member;
-        this.post = post;
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Comment parent;
-
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private java.util.List<Comment> children = new java.util.ArrayList<>();
 
     public void assignParent(Comment parent) {
         this.parent = parent;

@@ -61,7 +61,6 @@ public class CommentController {
         return resultMap;
     }
 
-    // [기능] DELETE 방식으로 댓글 삭제
     @DeleteMapping("/{id}")
     public Map<String, Long> remove(@PathVariable("id") Long id) {
         commentService.remove(id);
