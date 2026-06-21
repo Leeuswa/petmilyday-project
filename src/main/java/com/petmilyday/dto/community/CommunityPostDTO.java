@@ -31,4 +31,5 @@ public class CommunityPostDTO {
     private LocalDateTime updatedAt;
 
     private boolean anonymous;
+
 }
