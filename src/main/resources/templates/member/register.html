@@ -62,7 +62,7 @@
       </div>
 
       <div class="form-group">
-        <label for="nickname">닉네임</label>
+        <label for="nickname">닉네임<span style="color: red;"> *</span></label>
         <input type="text" id="nickname" th:field="*{nickname}" class="form-control" placeholder="사용하실 닉네임을 적어주세요" required>
         <span class="error-msg" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
       </div>
@@ -71,6 +71,11 @@
         <label for="email">이메일 주소<span style="color: red;"> *</span></label>
         <input type="email" id="email" th:field="*{email}" class="form-control" placeholder="example@petmily.com" required>
         <span class="error-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="detailAddress">전화번호</label>
+        <input type="text" id="phoneNumber" th:field="*{phoneNumber}" class="form-control" placeholder="000-0000-0000 형식으로 입력하세요">
       </div>
 
       <div class="form-group">
@@ -159,6 +164,19 @@
       alert("비밀번호와 비밀번호 확인 칸의 입력값이 서로 다릅니다.");
       document.getElementById("passwordConfirm").focus();
       return false;
+    }
+
+    const phoneInput = document.getElementById("phoneNumber");
+
+    // 전화번호 입력칸이 존재하고, 빈 값이 아닐 때만 검사
+    if (phoneInput && phoneInput.value.trim() !== "") {
+      const phoneRegex = /^\d{2,3}-\d{3,4}-\d{4}$/;
+
+      if (!phoneRegex.test(phoneInput.value)) {
+        alert("전화번호는 하이픈(-)을 포함하여 000-0000-0000 형식으로 입력해 주세요.");
+        phoneInput.focus();
+        return false;
+      }
     }
     return true;
   }
