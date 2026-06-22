@@ -68,6 +68,13 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label">다음 접종 예정일</label>
+                <input type="date"
+                       class="form-control"
+                       th:field="*{nextVaccinationDate}">
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">특이사항</label>
                 <textarea class="form-control"
                           th:field="*{memo}"

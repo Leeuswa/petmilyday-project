@@ -11,6 +11,20 @@
     </a>
   </div>
 
+  <div class="notification-wrap">
+    <button type="button" class="notification-btn">
+      🔔 알림
+      <span id="notification-count" class="notification-count" style="display:none;">0</span>
+    </button>
+
+    <div class="notification-dropdown">
+      <div class="notification-title">알림</div>
+      <div id="notification-list" class="notification-list">
+        <div class="notification-empty">새 알림이 없습니다.</div>
+      </div>
+    </div>
+  </div>
+
   <nav class="menu">
 
     <!-- 관리자 -->
@@ -84,6 +98,8 @@
     </div>
 
   </nav>
+
+  <th:block th:replace="~{fragments/sseNotification :: sseNotification}"></th:block>
 </aside>
 
 </body>

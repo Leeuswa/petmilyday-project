@@ -4,12 +4,28 @@
   <meta charset="UTF-8">
   <title>병원 정보 관리</title>
   <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/hospitalForms.css}">
 </head>
 <body>
 
 <div class="admin-layout">
   <aside class="sidebar">
     <div class="logo">Hospital Admin</div>
+
+    <div class="notification-wrap">
+      <button type="button" class="notification-btn">
+        🔔 알림
+        <span id="notification-count" class="notification-count" style="display:none;">0</span>
+      </button>
+
+      <div class="notification-dropdown">
+        <div class="notification-title">알림</div>
+        <div id="notification-list" class="notification-list">
+          <div class="notification-empty">새 알림이 없습니다.</div>
+        </div>
+      </div>
+    </div>
+
     <nav class="menu">
       <a href="/hospitalAdmin/hospital" class="active">병원 정보 관리</a>
       <a href="/hospitalAdmin/reservations">예약 관리</a>
@@ -22,104 +38,122 @@
         <h2>병원 정보 관리</h2>
         <p>담당 병원의 세부정보와 운영시간을 관리합니다.</p>
       </div>
-      <a href="/hospitalAdmin/hospital/modify" class="btn btn-primary">수정</a>
+      <a href="/hospitalAdmin/hospital/modify" class="btn btn-primary">✏️ 수정</a>
     </div>
 
-    <div class="card">
+    <div th:if="${message}" class="alert">
+      <p th:text="${message}"></p>
+    </div>
 
-      <div th:if="${message}" class="alert">
-        <p th:text="${message}"></p>
-      </div>
+    <div th:if="${globalError}" class="alert alert-danger">
+      <p th:text="${globalError}"></p>
+    </div>
 
-      <div class="form-grid">
+    <div class="hf-page">
 
-        <div class="form-group">
-          <label class="form-label">병원명</label>
-          <input type="text" class="form-control" th:value="${hospitalDTO.name}" readonly>
+      <div class="hf-card">
+        <div class="hf-card-head">
+          <span class="icon">🏥</span>
+          <div>
+            <strong th:text="${hospitalDTO.name}">병원명</strong>
+            <span>병원 기본정보</span>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">전화번호</label>
-          <input type="text" class="form-control" th:value="${hospitalDTO.phone}" readonly>
-        </div>
+        <div class="hf-card-body">
+          <div class="hf-info-grid">
 
-        <div class="form-group full">
-          <label class="form-label">주소</label>
-          <input type="text" class="form-control" th:value="${hospitalDTO.address}" readonly>
-        </div>
+            <div class="hf-info-item">
+              <span class="hf-info-label">전화번호</span>
+              <span class="hf-info-value" th:text="${hospitalDTO.phone}">02-0000-0000</span>
+            </div>
 
-        <div class="form-group">
-          <label class="form-label">응급진료 여부</label>
-          <input type="text"
-                 class="form-control"
-                 th:value="${hospitalDTO.isEmergency ? '응급진료 가능' : '응급진료 불가'}"
-                 readonly>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">진료과목</label>
-          <input type="text" class="form-control" th:value="${hospitalDTO.department}" readonly>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">예약 간격</label>
-          <input type="text"
-                 class="form-control"
-                 th:value="${hospitalDTO.slotIntervalMin + '분'}"
-                 readonly>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">시간대별 최대 예약 수</label>
-          <input type="text"
-                 class="form-control"
-                 th:value="${hospitalDTO.maxPerSlot + '명'}"
-                 readonly>
-        </div>
-
-      </div>
-
-      <div class="form-group full" style="margin-top: 30px;">
-        <h3 style="margin-bottom: 16px;">운영시간</h3>
-
-        <table class="table">
-          <thead>
-          <tr>
-            <th>요일</th>
-            <th>오픈 시간</th>
-            <th>마감 시간</th>
-            <th>휴무 여부</th>
-          </tr>
-          </thead>
-
-          <tbody>
-          <tr th:each="hour : ${hospitalDTO.hours}">
-            <td>
-              <span th:switch="${hour.dayOfWeek}">
-                <span th:case="0">월요일</span>
-                <span th:case="1">화요일</span>
-                <span th:case="2">수요일</span>
-                <span th:case="3">목요일</span>
-                <span th:case="4">금요일</span>
-                <span th:case="5">토요일</span>
-                <span th:case="6">일요일</span>
+            <div class="hf-info-item">
+              <span class="hf-info-label">응급진료 여부</span>
+              <span>
+                <span th:if="${hospitalDTO.isEmergency}" class="hf-pill hf-pill-on">🚨 응급진료 가능</span>
+                <span th:unless="${hospitalDTO.isEmergency}" class="hf-pill hf-pill-off">응급진료 불가</span>
               </span>
-            </td>
-            <td th:text="${hour.openTime}">09:00</td>
-            <td th:text="${hour.closeTime}">18:00</td>
-            <td th:text="${hour.isClosed ? '휴무' : '운영'}">운영</td>
-          </tr>
+            </div>
 
-          <tr th:if="${hospitalDTO.hours == null or hospitalDTO.hours.isEmpty()}">
-            <td colspan="4">등록된 운영시간이 없습니다.</td>
-          </tr>
-          </tbody>
-        </table>
+            <div class="hf-info-item full">
+              <span class="hf-info-label">주소</span>
+              <span class="hf-info-value" th:text="${hospitalDTO.address}">주소</span>
+            </div>
+
+            <div class="hf-info-item">
+              <span class="hf-info-label">진료과목</span>
+              <span class="hf-info-value" th:text="${hospitalDTO.department}">진료과목</span>
+            </div>
+
+            <div class="hf-info-item">
+              <span class="hf-info-label">예약 간격</span>
+              <span class="hf-info-value" th:text="${hospitalDTO.slotIntervalMin + '분'}">30분</span>
+            </div>
+
+            <div class="hf-info-item">
+              <span class="hf-info-label">시간대별 최대 예약 수</span>
+              <span class="hf-info-value" th:text="${hospitalDTO.maxPerSlot + '명'}">3명</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="hf-card">
+        <div class="hf-card-head">
+          <span class="icon">🕒</span>
+          <div>
+            <strong>운영시간</strong>
+            <span>요일별 진료 시간을 확인합니다.</span>
+          </div>
+        </div>
+
+        <div class="hf-card-body">
+          <table class="hf-hours-table">
+            <thead>
+            <tr>
+              <th>요일</th>
+              <th>오픈 시간</th>
+              <th>마감 시간</th>
+              <th>휴무 여부</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="hour : ${hospitalDTO.hours}">
+              <td>
+                <span th:switch="${hour.dayOfWeek}">
+                  <span th:case="0">월요일</span>
+                  <span th:case="1">화요일</span>
+                  <span th:case="2">수요일</span>
+                  <span th:case="3">목요일</span>
+                  <span th:case="4">금요일</span>
+                  <span th:case="5">토요일</span>
+                  <span th:case="6">일요일</span>
+                </span>
+              </td>
+              <td th:text="${hour.openTime}">09:00</td>
+              <td th:text="${hour.closeTime}">18:00</td>
+              <td>
+                <span th:if="${hour.isClosed}" class="hf-day-closed">휴무</span>
+                <span th:unless="${hour.isClosed}" class="hf-day-open">운영</span>
+              </td>
+            </tr>
+
+            <tr th:if="${hospitalDTO.hours == null or hospitalDTO.hours.isEmpty()}">
+              <td colspan="4">등록된 운영시간이 없습니다.</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
   </main>
 </div>
+
+<div th:replace="~{fragments/sseNotification :: sseNotification}"></div>
 
 </body>
 </html>

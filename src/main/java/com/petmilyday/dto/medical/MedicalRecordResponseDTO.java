@@ -31,6 +31,8 @@ public class MedicalRecordResponseDTO {
 
     private String vaccineName;     // 백신명
 
+    private LocalDate nextVaccinationDate;  // 다음 접종 예정일
+
     private String memo;            // 특이사항
 
     private String pdfUrl;          // PDF URL

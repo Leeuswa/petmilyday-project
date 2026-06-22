@@ -118,6 +118,15 @@ public class HospitalManagerServiceImpl implements HospitalManagerService {
         HospitalManager hospitalManager = hospitalManagerRepository.findById(hospitalManagerId)
                 .orElseThrow(() -> new RuntimeException("신청 정보가 없습니다."));
 
+        // 한 회원은 한 병원의 관리자만 될 수 있음
+        boolean alreadyApprovedElsewhere = hospitalManagerRepository
+                .findByMemberIdAndStatus(hospitalManager.getMember().getId(), HospitalManagerStatus.APPROVED)
+                .isPresent();
+
+        if (alreadyApprovedElsewhere) {
+            throw new RuntimeException("해당 회원은 이미 다른 병원의 관리자로 승인되어 있습니다.");
+        }
+
         hospitalManager.approve();
         hospitalManager.getMember().changeRole(Role.HOSPITAL_ADMIN);
 
