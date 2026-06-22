@@ -131,16 +131,19 @@
 
         <div class="d-flex flex-column gap-2 sub-scroll-area" th:if="${subscriptionList != null and !subscriptionList.isEmpty()}">
           <th:block th:each="sub : ${subscriptionList}">
-            <div class="card border p-3 bg-light rounded-3 subscription-inner-item" th:if="${sub.status == 'ACTIVE'}">
+            <div class="card border p-3 bg-light rounded-3 subscription-inner-item" th:if="${sub.status == 'ACTIVE' or sub.isDeleted}">
+
               <span th:if="${sub.isDeleted}" class="text-danger fw-bold small">
-                <i class="bi bi-exclamation-circle-fill" style="font-size: 6px; vertical-align: middle;"></i> 판매 종료
-              </span>
+        <i class="bi bi-exclamation-circle-fill" style="font-size: 6px; vertical-align: middle;"></i> 판매 종료
+      </span>
               <span th:unless="${sub.isDeleted}" class="text-primary fw-bold small">
-                <i class="bi bi-circle-fill" style="font-size: 6px; vertical-align: middle;"></i> 구독 중
-              </span>
+        <i class="bi bi-circle-fill" style="font-size: 6px; vertical-align: middle;"></i> 구독 중
+      </span>
 
               <div class="fw-bold text-dark text-truncate my-1 sub-item-title" th:text="${sub.productName}"></div>
+
               <span class="text-muted small sub-item-date" th:if="${!sub.isDeleted and sub.nextDeliveryDate != null}" th:text="${sub.cycleDays} + '일 주기 · ' + ${sub.nextDeliveryDate.getMonthValue()} + '.' + ${sub.nextDeliveryDate.getDayOfMonth()} + ' 배송'"></span>
+              <span class="text-muted small sub-item-date" th:if="${sub.isDeleted}">판매 종료된 상품입니다.</span>
             </div>
           </th:block>
         </div>

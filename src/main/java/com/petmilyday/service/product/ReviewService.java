@@ -25,17 +25,17 @@ public class ReviewService {
     // 리뷰 등록
     @Transactional
     public ProductReview registerReview(String username, Long memberId, ReviewWriteDto dto) {
-        // 1. 실제 상품 구매 이력이 있는지 검증
+        // 실제 상품 구매 이력이 있는지 검증
         if (!ordersRepository.existsByUsernameAndProductId(username, dto.getProductId())) {
             throw new IllegalArgumentException("해당 상품을 구매한 회원만 리뷰를 작성할 수 있습니다.");
         }
 
-        // 2. 이미 리뷰를 썼는지 검증
+        // 이미 리뷰를 썼는지 검증
         if (reviewRepository.existsByOrderId(dto.getOrderId())) {
             throw new IllegalStateException("이미 해당 주문 건에 대한 리뷰를 작성하셨습니다.");
         }
 
-        // 3. 리뷰 데이터 세팅 및 저장
+        // 리뷰 데이터 세팅 및 저장
         ProductReview review = new ProductReview();
         review.setMemberId(memberId);
         review.setProductId(dto.getProductId());

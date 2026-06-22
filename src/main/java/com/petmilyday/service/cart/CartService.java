@@ -26,7 +26,7 @@ public class CartService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
 
-    // 💡 [수정] Long userId 대신 String username을 받아서 진짜 회원 ID 매핑
+    // Long userId 대신 String username을 받아서 진짜 회원 ID 매핑
     @Transactional
     public void addCart(String username, CartRequestDto requestDto) {
         Member member = memberRepository.findByUsername(username)
@@ -53,7 +53,7 @@ public class CartService {
         }
     }
 
-    // 💡 [수정] 장바구니 목록 조회도 로그인한 유저네임 기반으로 변경
+    // 장바구니 목록 조회도 로그인한 유저네임 기반으로 변경
     public List<CartItemResponseDto> getCartItems(String username) {
         Member member = memberRepository.findByUsername(username).orElse(null);
         if (member == null) return List.of();
@@ -79,7 +79,7 @@ public class CartService {
         cartItemRepository.deleteAllById(cartItemIds);
     }
 
-    // 💡 [수정] 장바구니 상단 카운트 조회도 유저네임 기반으로 변경
+    // 장바구니 상단 카운트 조회도 유저네임 기반으로 변경
     @Transactional(readOnly = true)
     public int getCartItemCount(String username) {
         Member member = memberRepository.findByUsername(username).orElse(null);

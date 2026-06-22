@@ -38,7 +38,7 @@ public class Product {
     @Column(name = "pet_species", length = 50)
     private String petSpecies;
 
-    // =============== [상세페이지 연동 컬럼 추가] ===============
+    // 상세페이지 연동 컬럼 추가
     @Column(name = "material", length = 100)
     private String material;
 
@@ -47,7 +47,6 @@ public class Product {
 
     @Column(name = "origin", length = 100)
     private String origin;
-    // ========================================================
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;

@@ -59,7 +59,7 @@ public class OrderService {
                 OrderItem firstItem = orders.getOrderItems().get(0);
                 dto.setQuantity(firstItem.getQuantity());
 
-                // 💡 핵심: 첫 번째 상품의 삭제 여부를 가져와서 DTO에 세팅
+                // 첫 번째 상품의 삭제 여부를 가져와서 DTO에 세팅
                 dto.setDeleted(firstItem.getProduct().isDeleted());
             } else {
                 dto.setQuantity(1);
