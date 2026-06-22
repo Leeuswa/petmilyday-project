@@ -35,7 +35,12 @@
     <form th:action="@{/member/register}" th:object="${registerRequest}" method="post" onsubmit="return validateForm()">
       <div class="form-group">
         <label for="username">아이디</label>
-        <input type="text" id="username" th:field="*{username}" class="form-control" placeholder="영문, 숫자 조합 4자에서 12자" required>
+
+        <div style="display: flex; gap: 8px; align-items: stretch;">
+          <input type="text" id="username" th:field="*{username}" class="form-control" placeholder="영문, 숫자 조합 4~20자" required style="margin-bottom: 0;">
+          <button type="button" class="auth-btn" style="width: auto; min-width: 100px; padding: 0 15px; font-size: 14px; white-space: nowrap; margin: 0; border-radius: 16px;" onclick="checkUsernameDuplicate()">중복 확인</button>
+        </div>
+        <input type="hidden" id="isUsernameChecked" value="false">
         <span class="error-msg" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
       </div>
 
@@ -68,6 +73,21 @@
         <span class="error-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
       </div>
 
+      <div class="form-group">
+        <label for="address">주소</label>
+        <input type="text" id="address" th:field="*{address}" class="form-control" placeholder="시/군/구 주소를 입력하세요">
+      </div>
+
+      <div class="form-group">
+        <label for="detailAddress">상세 주소</label>
+        <input type="text" id="detailAddress" th:field="*{detailAddress}" class="form-control" placeholder="나머지 상세 주소를 입력하세요">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 25px;">
+        <label for="bio">한 줄 소개</label>
+        <textarea id="bio" th:field="*{bio}" class="form-control" style="resize: none; height: 90px;" placeholder="나와 나의 반려동물을 소개해 주세요! (최대 100자)"></textarea>
+      </div>
+
       <button type="submit" class="auth-btn">반려인 회원가입 완료</button>
     </form>
   </div>
@@ -78,6 +98,59 @@
 </div>
 
 <script th:inline="javascript">
+  function checkUsernameDuplicate() {
+    const usernameInput = document.getElementById("username");
+    const username = usernameInput.value.trim();
+
+    if (!username) {
+      alert("아이디를 입력해 주세요.");
+      usernameInput.focus();
+      return;
+    }
+
+    const tokenElement = document.querySelector("meta[name='_csrf']");
+    const headerElement = document.querySelector("meta[name='_csrf_header']");
+    const token = tokenElement ? tokenElement.getAttribute("content") : "";
+    const header = headerElement ? headerElement.getAttribute("content") : "";
+
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    if (header && token) {
+      headers[header] = token;
+    }
+
+    fetch(`/member/check-username?username=${encodeURIComponent(username)}`, {
+      method: "GET",
+      headers: headers
+    })
+            .then(response => response.json())
+            .then(isDuplicated => {
+              if (isDuplicated) {
+                alert("이미 사용 중인 아이디입니다. 다른 아이디를 입력해 주세요.");
+                document.getElementById("isUsernameChecked").value = "false";
+              } else {
+                alert("사용 가능한 아이디입니다!");
+                document.getElementById("isUsernameChecked").value = "true";
+                usernameInput.readOnly = true;
+                usernameInput.style.backgroundColor = "var(--pink-pale)";
+              }
+            })
+            .catch(error => {
+              console.error("중복 확인 통신 에러:", error);
+              alert("중복 확인 통신 중 에러가 발생했습니다.");
+            });
+  }
+
+  document.getElementById("registerForm").addEventListener("submit", function(e) {
+    const isUsernameChecked = document.getElementById("isUsernameChecked").value;
+    if (isUsernameChecked !== "true") {
+      e.preventDefault();
+      alert("아이디 중복 확인을 먼저 완료해 주세요.");
+    }
+  });
+
   function validateForm() {
     const pw = document.getElementById("password").value;
     const pwConfirm = document.getElementById("passwordConfirm").value;

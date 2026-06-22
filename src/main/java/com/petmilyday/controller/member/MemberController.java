@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -103,9 +102,8 @@ public class MemberController {
     // 아이디 중복 확인
     @GetMapping("/check-username")
     @ResponseBody
-    public org.springframework.http.ResponseEntity<Boolean> checkUsername(@RequestParam("username") String username) {
-        boolean isDuplicate = memberService.checkUsername(username);
-        return org.springframework.http.ResponseEntity.ok(isDuplicate);
+    public boolean checkUsername(@RequestParam("username") String username) {
+        return memberService.checkUsername(username);
     }
 
     // 로그아웃 요청

@@ -93,7 +93,7 @@
       <th:block sec:authorize="isAuthenticated()">
 
         <span class="gnb-username">
-          <span sec:authentication="name"></span>님
+          <span th:text="${loggedInUser}"></span>님
         </span>
 
         <div class="notification-wrap">

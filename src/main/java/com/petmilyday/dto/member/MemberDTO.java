@@ -44,6 +44,9 @@ public class MemberDTO {
         private String address;
 
         private String detailAddress;
+
+        @Size(max = 100, message = "한 줄 소개는 100자 이내여야 합니다.")
+        private String bio;
     }
 
     @Getter
