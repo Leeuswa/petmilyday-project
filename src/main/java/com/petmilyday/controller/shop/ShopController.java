@@ -108,7 +108,7 @@ public class ShopController {
             List<SubscriptionResponseDto> subList = subscriptionService.getAllSubscriptions(principal.getName());
             model.addAttribute("subscriptionList", subList);
 
-            System.out.println("🚩 구독 리스트 사이즈: " + subList.size());
+            System.out.println("구독 리스트 사이즈: " + subList.size());
             for(SubscriptionResponseDto sub : subList) {
                 System.out.println(">> 상품명: " + sub.getProductName() + ", 상태: " + sub.getStatus());
             }

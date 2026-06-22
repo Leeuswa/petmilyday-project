@@ -110,27 +110,27 @@ public class ProductService {
 
         // [디버깅 프린트 1] 컨트롤러에서 파일이 넘어왔는지 검사
         System.out.println("=========================================");
-        System.out.println("🚩 [수정 디버깅] 현재 수정할 상품 ID: " + id);
+        System.out.println("현재 수정할 상품 ID: " + id);
         if (file == null) {
-            System.out.println("🚨 [경고] 넘어온 MultipartFile 객체 자체가 null이야!");
+            System.out.println("넘어온 MultipartFile 객체 자체가 null");
         } else {
-            System.out.println("📂 [확인] 파일 파라미터명: " + file.getName());
-            System.out.println("📂 [확인] 실제 파일명: " + file.getOriginalFilename());
-            System.out.println("📂 [확인] 파일 크기: " + file.getSize() + " bytes");
-            System.out.println("📂 [확인] 파일 비어있음 여부(isEmpty): " + file.isEmpty());
+            System.out.println("파일 파라미터명: " + file.getName());
+            System.out.println("실제 파일명: " + file.getOriginalFilename());
+            System.out.println("파일 크기: " + file.getSize() + " bytes");
+            System.out.println("파일 비어있음 여부(isEmpty): " + file.isEmpty());
         }
 
         if (file != null && !file.isEmpty()) {
-            System.out.println("🚀 [진입] file.isEmpty()가 false이므로 S3 업로드를 시도합니다.");
+            System.out.println("file.isEmpty()가 false이므로 S3 업로드를 시도합니다.");
 
             String newImgUrl = s3UploadService.uploadFile(file);
 
             //  [디버깅 프린트 2] S3가 준 결과값 확인
-            System.out.println("✨ [완료] S3에서 새로 발급해준 이미지 URL: " + newImgUrl);
+            System.out.println("S3에서 새로 발급해준 이미지 URL: " + newImgUrl);
 
             product.setImgUrl(newImgUrl);
         } else {
-            System.out.println("🛑 [패스] 파일이 비어있거나 null이라서 S3 업로드 로직을 건너뜁니다. (기존 주소 유지)");
+            System.out.println("파일이 비어있거나 null이라서 S3 업로드 로직을 건너뜁니다. (기존 주소 유지)");
         }
         System.out.println("=========================================");
 
@@ -146,7 +146,7 @@ public class ProductService {
         product.setOrigin(dto.getOrigin());
     }
 
-    // 🎯 [여기 추가!] 관리자용 상품 정렬 및 페이징 조회 로직 구현
+    // 관리자용 상품 정렬 및 페이징 조회 로직 구현
     public Page<Product> getAdminProductPage(int page, int size, String sortType) {
         Sort sort = Sort.by(Sort.Direction.DESC, "id"); // 기본 정렬: 최신 등록순
 

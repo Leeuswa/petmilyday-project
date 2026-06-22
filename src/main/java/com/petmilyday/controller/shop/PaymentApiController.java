@@ -168,9 +168,9 @@ public class PaymentApiController {
 
                         Long usersCartId = userCart.getId();
                         cartItemRepository.deleteAllByCartId(usersCartId);
-                        System.out.println("🛒 결제 완료: 해당 유저의 장바구니 아이템 전체 삭제 성공!");
+                        System.out.println("결제 완료: 해당 유저의 장바구니 아이템 전체 삭제 성공!");
                     } catch (Exception e) {
-                        System.err.println("❌ 장바구니 비우기 실패: " + e.getMessage());
+                        System.err.println("장바구니 비우기 실패: " + e.getMessage());
                     }
                 }
             } else {

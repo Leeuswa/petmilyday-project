@@ -34,7 +34,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .collect(Collectors.toList());
     }
 
-    // 💡 인터페이스에 추가한 메서드 구현!
+    // 인터페이스에 추가한 메서드 구현
     @Override
     public List<SubscriptionResponseDto> getAllSubscriptions(String username) {
         return subscriptionRepository.findByMemberUsernameOrderByCreatedAtDesc(username)

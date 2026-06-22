@@ -157,7 +157,7 @@ public class SubscriptionApiController {
             String sid = "";
             if (approveResBody != null && approveResBody.get("sid") != null) {
                 sid = approveResBody.get("sid").toString();
-                System.out.println("🔥 정기결제 빌링키 sid 발급 성공: " + sid);
+                System.out.println("정기결제 빌링키 sid 발급 성공: " + sid);
             }
 
             String username = principal.getName();
@@ -220,7 +220,7 @@ public class SubscriptionApiController {
             session.removeAttribute("deliveryMemo");
 
         } catch (Exception e) {
-            System.err.println("❌ 정기구독 최종 승인 단계 실패 로그:");
+            System.err.println("정기구독 최종 승인 단계 실패 로그:");
             e.printStackTrace();
         }
 
@@ -239,10 +239,10 @@ public class SubscriptionApiController {
 
             subscription.setStatus(SubscriptionStatus.CANCELLED);
             subscriptionRepository.saveAndFlush(subscription);
-            System.out.println("✅ 구독 해지 완료! 구독 ID: " + subId);
+            System.out.println("구독 해지 완료! 구독 ID: " + subId);
 
         } catch (Exception e) {
-            System.err.println("❌ 구독 해지 실패:");
+            System.err.println("구독 해지 실패:");
             e.printStackTrace();
         }
 
@@ -261,10 +261,10 @@ public class SubscriptionApiController {
             subscription.setNextDeliveryDate(LocalDate.now().plusDays(cycleDays));
 
             subscriptionRepository.saveAndFlush(subscription);
-            System.out.println("✅ 구독 주기 변경 완료! 구독 ID: " + subId + " -> 변경된 주기: " + cycleDays + "일");
+            System.out.println("구독 주기 변경 완료! 구독 ID: " + subId + " -> 변경된 주기: " + cycleDays + "일");
 
         } catch (Exception e) {
-            System.err.println("❌ 주기 변경 실패:");
+            System.err.println("주기 변경 실패:");
             e.printStackTrace();
         }
 

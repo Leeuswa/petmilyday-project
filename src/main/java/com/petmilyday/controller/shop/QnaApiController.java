@@ -1,4 +1,4 @@
-package com.petmilyday.controller.api;
+package com.petmilyday.controller.shop;
 
 import com.petmilyday.service.shop.ProductQnaService;
 import lombok.RequiredArgsConstructor;
