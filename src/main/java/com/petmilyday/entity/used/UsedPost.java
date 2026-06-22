@@ -71,6 +71,9 @@ public class UsedPost {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "pulled_up_at")
+    private LocalDateTime pulledUpAt;
+
     // memberId 반환용
     public Long getMemberId() {
         return (this.member != null) ? this.member.getId() : null;

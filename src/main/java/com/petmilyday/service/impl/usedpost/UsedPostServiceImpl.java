@@ -81,6 +81,8 @@ public class UsedPostServiceImpl implements UsedPostService {
             String region,
             ItemCondition condition,
             Boolean offerAccepted,
+            Integer minPrice,
+            Integer maxPrice,
             Pageable pageable
     ) {
 
@@ -90,6 +92,9 @@ public class UsedPostServiceImpl implements UsedPostService {
                 region,
                 condition,
                 offerAccepted,
+                minPrice,
+                maxPrice,
+                LocalDateTime.now().minusHours(24),
                 pageable
         );
     }
@@ -310,6 +315,8 @@ public class UsedPostServiceImpl implements UsedPostService {
             String region,
             ItemCondition condition,
             Boolean offerAccepted,
+            Integer minPrice,
+            Integer maxPrice,
             Pageable pageable
     ) {
 
@@ -319,6 +326,9 @@ public class UsedPostServiceImpl implements UsedPostService {
                         region,
                         condition,
                         offerAccepted,
+                        minPrice,
+                        maxPrice,
+                        LocalDateTime.now().minusHours(24),
                         pageable
                 )
                 .map(post -> {
@@ -358,5 +368,28 @@ public class UsedPostServiceImpl implements UsedPostService {
                         pageable
                 )
                 .map(UsedPostDTO::new);
+    }
+
+    @Override
+    @Transactional
+    public void pullUp(Long postId, Long memberId) {
+
+        UsedPost post =
+                usedPostRepository.findById(postId)
+                        .orElseThrow(() ->
+                                new RuntimeException("게시글 없음"));
+
+        if (post.getMember() == null
+                || !post.getMember().getId().equals(memberId)) {
+            throw new RuntimeException("작성자만 끌어올리기할 수 있습니다.");
+        }
+
+        if (post.getStatus() != UsedPostStatus.SELLING) {
+            throw new RuntimeException("판매중 게시글만 끌어올리기할 수 있습니다.");
+        }
+
+        post.setPulledUpAt(LocalDateTime.now());
+
+        usedPostRepository.save(post);
     }
 }

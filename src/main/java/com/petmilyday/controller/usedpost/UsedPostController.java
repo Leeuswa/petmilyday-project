@@ -86,6 +86,8 @@ public class UsedPostController {
             @RequestParam(required = false) String region,
             @RequestParam(required = false) ItemCondition condition,
             @RequestParam(required = false) Boolean offerAccepted,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
             @RequestParam(required = false, defaultValue = "false") boolean onlyWish,
             Authentication authentication,
             @PageableDefault(size = 6, sort = "id", direction = Sort.Direction.DESC)
@@ -145,6 +147,8 @@ public class UsedPostController {
             model.addAttribute("region", region);
             model.addAttribute("condition", condition);
             model.addAttribute("offerAccepted", offerAccepted);
+            model.addAttribute("minPrice", minPrice);
+            model.addAttribute("maxPrice", maxPrice);
 
             addPagingAttributes(model, result, pageable);
 
@@ -168,6 +172,20 @@ public class UsedPostController {
             offerAccepted = null;
         }
 
+        if (minPrice != null && minPrice < 0) {
+            minPrice = null;
+        }
+
+        if (maxPrice != null && maxPrice < 0) {
+            maxPrice = null;
+        }
+
+        if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+            Integer temp = minPrice;
+            minPrice = maxPrice;
+            maxPrice = temp;
+        }
+
         Page<UsedPostDTO> posts =
                 usedPostService.searchListDto(
                         keyword,
@@ -175,6 +193,8 @@ public class UsedPostController {
                         region,
                         condition,
                         offerAccepted,
+                        minPrice,
+                        maxPrice,
                         pageable
                 );
 
@@ -186,6 +206,8 @@ public class UsedPostController {
         model.addAttribute("condition", condition);
         model.addAttribute("offerAccepted", offerAccepted);
         model.addAttribute("onlyWish", onlyWish);
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
 
         addPagingAttributes(model, posts, pageable);
 
@@ -554,6 +576,28 @@ public class UsedPostController {
 
         post.setIsHidden(true);
         usedPostRepository.save(post);
+
+        return "redirect:/used/list";
+    }
+
+    @PostMapping("/used/pull-up/{id}")
+    public String pullUp(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
+
+        if (authentication == null) {
+            return "redirect:/member/login";
+        }
+
+        String username = authentication.getName();
+
+        Member member =
+                memberRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RuntimeException("회원 없음"));
+
+        usedPostService.pullUp(id, member.getId());
 
         return "redirect:/used/list";
     }
