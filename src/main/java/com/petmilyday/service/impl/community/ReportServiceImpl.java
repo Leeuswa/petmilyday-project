@@ -107,7 +107,7 @@ public class ReportServiceImpl {
 
             NotificationDTO notificationDTO = NotificationDTO.builder()
                     .message(message)
-                    .url("/mypage/notifications")
+                    .url("list")
                     .build();
 
             notificationService.sendToUser(targetUser.getUsername(), notificationDTO);
