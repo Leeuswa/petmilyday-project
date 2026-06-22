@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>병원 등록</title>
   <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/hospitalForms.css}">
 </head>
 <body>
 
@@ -20,10 +21,19 @@
       <a th:href="@{/admin/hospitals/}" class="btn btn-outline">목록</a>
     </div>
 
-    <div class="card">
+    <div class="hf-card">
+      <div class="hf-card-head">
+        <span class="icon">🏥</span>
+        <div>
+          <strong>병원 기본정보</strong>
+          <span>병원명, 연락처, 위치 정보를 입력하세요.</span>
+        </div>
+      </div>
+
       <form th:action="@{/admin/hospitals/register}"
             th:object="${hospitalDTO}"
-            method="post">
+            method="post"
+            class="hf-card-body">
 
         <div class="form-grid">
 

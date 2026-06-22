@@ -141,6 +141,10 @@ body {
     background: linear-gradient(135deg, #f0fffb, #ffffff);
 }
 
+.menu-card.purple {
+    background: linear-gradient(135deg, #f7f2ff, #ffffff);
+}
+
 .icon {
     width: 56px;
     height: 56px;
@@ -159,6 +163,10 @@ body {
 
 .menu-card.mint .icon {
     background: var(--mint-light);
+}
+
+.menu-card.purple .icon {
+    background: var(--purple-light);
 }
 
 .card-title {

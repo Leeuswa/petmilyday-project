@@ -2,85 +2,127 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>관리자 - 커뮤니티 신고 제어 센터</title>
+  <title>커뮤니티 신고 관리</title>
   <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
-  <style>
-    .admin-layout { display: flex; min-height: 100vh; background-color: #f4f7f6; }
-    .main-content { flex: 1; padding: 40px; }
-    .content-card { background: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); padding: 30px; }
-    .custom-table { width: 100%; border-collapse: collapse; }
-    .custom-table th, .custom-table td { padding: 16px; text-align: center; border-bottom: 1px solid #e9ecef; }
-    .custom-table th { background-color: #f8f9fa; font-weight: 700; color: #495057; }
-
-    /* 다형성 상태 뱃지 스타일 */
-    .badge-pending { color: #d9534f; background: #fdf3f2; padding: 6px 12px; border-radius: 6px; font-weight: 700; }
-    .badge-deleted { color: #6c757d; background: #e9ecef; padding: 6px 12px; border-radius: 6px; font-weight: 700; }
-    .badge-maintained { color: #28a745; background: #eef8f0; padding: 6px 12px; border-radius: 6px; font-weight: 700; }
-
-    /* 조치 액션 버튼 그룹 */
-    .action-group { display: flex; gap: 8px; justify-content: center; }
-    .btn-action-del { padding: 6px 12px; background-color: #e74c3c; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
-    .btn-action-keep { padding: 6px 12px; background-color: #2ecc71; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
-    .btn-action-del:hover { background-color: #c0392b; }
-    .btn-action-keep:hover { background-color: #27ae60; }
-  </style>
+  <link rel="stylesheet" th:href="@{/css/admin/communityReport.css}">
 </head>
 <body>
 
 <div class="admin-layout">
-  <div th:replace="~{fragments/adminSidebar :: adminSidebar('communityReports')}"></div>
 
-  <div class="main-content">
-    <h2 style="font-size: 26px; font-weight: 800; color: #2c3e50; margin-bottom: 10px;">🚨 커뮤니티 의심 게시물 승인/제어</h2>
-    <p style="color: #6c757d; margin-bottom: 30px;">신고 목적을 대조 검토 후 데이터를 삭제 처리하거나 건전한 게시글로 판명 시 유지 조치를 확정합니다.</p>
+  <aside th:replace="~{fragments/adminSidebar :: adminSidebar('communityReports')}"></aside>
 
-    <div class="content-card">
-      <table class="custom-table">
-        <thead>
-        <tr>
-          <th>번호</th>
-          <th>신고자</th>
-          <th>구분</th>
-          <th>내용 요약 및 대조</th>
-          <th>신고 사유</th>
-          <th>처리 상태</th>
-          <th>관리자 운영 조치</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="report : ${reports}">
-          <td th:text="${report.id}">1</td>
-          <td th:text="${report.reporterUsername}" style="font-weight: 600;">user1</td>
-          <td>
-            <span th:if="${report.targetType == 'POST'}" style="color: #2b44cc; font-weight: 700;">게시글</span>
-            <span th:if="${report.targetType == 'COMMENT'}" style="color: #e67e22; font-weight: 700;">댓글</span>
-          </td>
-          <td style="text-align: left;">
-            <a th:if="${report.targetType == 'POST'}" th:href="@{/community/read(id=${report.targetId})}" th:text="${report.targetContentSummary}" target="_blank" style="color: #34495e; text-decoration: none; font-weight: 600; text-decoration: underline;"></a>
-            <span th:if="${report.targetType == 'COMMENT'}" th:text="${report.targetContentSummary}" style="color: #34495e;"></span>
-          </td>
-          <td th:text="${report.reason}">사유</td>
-          <td>
-            <span th:if="${report.status == 'PENDING'}" class="badge-pending">접수 대기</span>
-            <span th:if="${report.status == 'DELETED'}" class="badge-deleted">삭제 조치 완료</span>
-            <span th:if="${report.status == 'MAINTAINED'}" class="badge-maintained">게시 유지 확정</span>
-          </td>
-          <td>
-            <div th:if="${report.status == 'PENDING'}" class="action-group">
-              <form th:action="@{/admin/community/reports/{id}/delete(id=${report.id})}" method="post" style="margin:0;">
-                <button type="submit" class="btn-action-del" onclick="return confirm('해당 글을 무조건 삭제하고 작성자에게 경고 알림을 보냅니까?')">삭제 처리</button>
-              </form>
-              <form th:action="@{/admin/community/reports/{id}/maintain(id=${report.id})}" method="post" style="margin:0;">
-                <button type="submit" class="btn-action-keep" onclick="return confirm('의심 무죄로 판명하고 가시성을 유지합니까?')">유지 처리</button>
-              </form>
-            </div>
-            <span th:if="${report.status != 'PENDING'}" style="color: #adb5bd;">조치 종료</span>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+  <main class="content">
+
+    <div class="page-header">
+      <div class="page-title-box">
+        <h2>커뮤니티 신고 관리</h2>
+        <p>신고된 게시글/댓글을 확인하고 삭제 또는 게시 유지 처리를 할 수 있습니다.</p>
+      </div>
     </div>
-  </div>
+
+    <div class="summary-box">
+      <div class="summary-item">
+        <span class="summary-label">전체 신고 수</span>
+        <strong class="summary-value" th:text="${#lists.size(reports)}">0</strong>
+      </div>
+
+      <div class="summary-item">
+        <span class="summary-label">접수 대기</span>
+        <strong class="summary-value"
+                th:text="${#lists.size(reports.?[status == 'PENDING'])}">0</strong>
+      </div>
+
+      <div class="summary-item">
+        <span class="summary-label">처리 완료</span>
+        <strong class="summary-value"
+                th:text="${#lists.size(reports.?[status != 'PENDING'])}">0</strong>
+      </div>
+    </div>
+
+    <div class="report-card">
+
+      <div th:if="${message}" class="alert">
+        <p th:text="${message}"></p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>신고번호</th>
+            <th>신고자</th>
+            <th>구분</th>
+            <th>내용 요약</th>
+            <th>신고 사유</th>
+            <th>신고일</th>
+            <th>상태</th>
+            <th>관리</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr th:if="${#lists.isEmpty(reports)}">
+            <td colspan="8" class="empty-row">
+              신고된 게시글/댓글이 없습니다.
+            </td>
+          </tr>
+
+          <tr th:each="report : ${reports}">
+            <td th:text="${report.id}">1</td>
+
+            <td class="reporter-name" th:text="${report.reporterUsername}">user1</td>
+
+            <td>
+              <span th:if="${report.targetType == 'POST'}" class="target-type-post">게시글</span>
+              <span th:if="${report.targetType == 'COMMENT'}" class="target-type-comment">댓글</span>
+            </td>
+
+            <td class="report-content">
+              <a th:if="${report.targetType == 'POST'}"
+                 th:href="@{/community/read(id=${report.targetId})}"
+                 th:text="${report.targetContentSummary}"
+                 target="_blank">내용 요약</a>
+              <span th:if="${report.targetType == 'COMMENT'}"
+                    th:text="${report.targetContentSummary}">내용 요약</span>
+            </td>
+
+            <td th:text="${report.reason}">사유</td>
+
+            <td th:text="${#temporals.format(report.createdAt, 'yyyy-MM-dd HH:mm')}">
+              2026-06-16 12:00
+            </td>
+
+            <td>
+              <span th:if="${report.status == 'PENDING'}" class="badge badge-danger">접수 대기</span>
+              <span th:if="${report.status == 'DELETED'}" class="badge badge-gray">삭제 처리됨</span>
+              <span th:if="${report.status == 'MAINTAINED'}" class="badge badge-success">게시 유지</span>
+            </td>
+
+            <td>
+              <div th:if="${report.status == 'PENDING'}" class="action-area">
+                <form th:action="@{/admin/community/reports/{id}/delete(id=${report.id})}" method="post" style="display:inline;">
+                  <button type="submit" class="btn-sm btn-danger"
+                          onclick="return confirm('해당 글을 삭제하고 작성자에게 알림을 보냅니까?')">
+                    삭제 처리
+                  </button>
+                </form>
+                <form th:action="@{/admin/community/reports/{id}/maintain(id=${report.id})}" method="post" style="display:inline;">
+                  <button type="submit" class="btn-sm btn-primary"
+                          onclick="return confirm('게시물을 유지 처리하시겠습니까?')">
+                    유지 처리
+                  </button>
+                </form>
+              </div>
+              <span th:if="${report.status != 'PENDING'}" style="color:#9ca3af;">조치 완료</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
 </div>
 
 </body>

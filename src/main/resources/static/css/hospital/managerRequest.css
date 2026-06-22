@@ -1,0 +1,120 @@
+.request-wrap {
+  max-width: 560px;
+  margin: 48px auto;
+}
+
+.request-card {
+  background: #ffffff;
+  border: 1px solid var(--h-border);
+  border-radius: var(--h-r-xl, 20px);
+  box-shadow: 0 16px 40px rgba(45, 27, 46, 0.08);
+  overflow: hidden;
+}
+
+.request-head {
+  padding: 28px 30px;
+  background: linear-gradient(135deg, var(--h-pink), var(--h-pink-deep));
+  color: #ffffff;
+}
+
+.request-head .icon {
+  font-size: 30px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.request-head h3 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.request-head .hospital-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 7px 14px;
+  border-radius: var(--h-r-pill);
+  background: rgba(255, 255, 255, 0.22);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.request-body {
+  padding: 30px;
+}
+
+.request-field {
+  margin-bottom: 20px;
+}
+
+.request-field label {
+  display: block;
+  margin-bottom: 7px;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: var(--h-mid);
+}
+
+.request-field .form-control {
+  border: 2px solid var(--h-border);
+  border-radius: var(--h-r);
+  padding: 11px 14px;
+  font-size: 14.5px;
+  transition: border-color 0.15s ease;
+}
+
+.request-field .form-control:focus {
+  border-color: var(--h-pink);
+  box-shadow: 0 0 0 3px var(--h-pink-light);
+}
+
+.request-notice {
+  display: flex;
+  gap: 10px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  border-radius: var(--h-r);
+  background: var(--h-sky-light);
+  color: var(--h-mid);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.request-submit {
+  width: 100%;
+  padding: 13px 0;
+  border: none;
+  border-radius: var(--h-r-pill);
+  background: linear-gradient(135deg, var(--h-pink), var(--h-pink-deep));
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(255, 85, 138, 0.32);
+  transition: transform 0.15s ease;
+}
+
+.request-submit:hover {
+  transform: translateY(-1px);
+}
+
+.request-back {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 11px 0;
+  text-align: center;
+  border: 2px solid var(--h-border);
+  border-radius: var(--h-r-pill);
+  color: var(--h-mid);
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.request-back:hover {
+  border-color: var(--h-pink);
+  color: var(--h-pink-deep);
+}

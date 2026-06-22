@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>petmilyday - AI 사료 추천</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          th:href="@{/css/diagnosis/diagnosis-guide.css}">
+    <link rel="stylesheet"
+          th:href="@{/css/diagnosis/diagnosis-form.css}">
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="guide-page">
+
+    <div class="guide-hero">
+
+        <div class="hero-icon-left">
+            🐾
+        </div>
+
+        <div class="hero-center">
+            <h2>
+                AI 사료 추천
+            </h2>
+
+            <p>
+                등록한 반려동물 정보를 바탕으로 AI가 적합한 사료 종류를 추천합니다.<br>
+                소화불량, 알레르기 같은 특이사항을 입력하면 더 정확한 추천을 받을 수 있습니다.
+            </p>
+        </div>
+
+        <a href="/ai-diagnosis"
+           class="hero-back-btn">
+            ← 메인으로
+        </a>
+
+        <div class="hero-icon-right">
+            🍖
+        </div>
+
+    </div>
+
+    <div class="guide-layout">
+
+        <main class="guide-main">
+
+            <div class="guide-card">
+
+                <div class="section-header">
+                    <h4>
+                        반려동물 정보 입력
+                    </h4>
+
+                    <p>
+                        반려동물을 선택하고 특이사항이 있으면 함께 적어주세요.
+                    </p>
+                </div>
+
+                <form th:action="@{/food-guide}"
+                      method="post"
+                      id="foodGuideForm">
+
+                    <div class="form-group">
+
+                        <label class="form-label">
+                            반려동물 선택
+                        </label>
+
+                        <select class="form-select"
+                                name="petId"
+                                required>
+
+                            <option value="">
+                                선택하세요
+                            </option>
+
+                            <option th:each="pet : ${pets}"
+                                    th:value="${pet.id}"
+                                    th:selected="${selectedPetId != null and selectedPetId == pet.id}"
+                                    th:text="${pet.name}">
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <label class="form-label">
+                        특이사항 / 증상 (선택)
+                    </label>
+
+                    <textarea name="conditionText"
+                              class="question-box"
+                              id="conditionBox"
+                              maxlength="500"
+                              placeholder="예: 소화가 잘 안 되고 사료를 먹으면 가끔 토해요."
+                              th:text="${conditionText}"></textarea>
+
+                    <button type="submit"
+                            class="submit-btn"
+                            id="foodGuideSubmitBtn">
+                        AI 사료 추천 요청
+                    </button>
+
+                </form>
+
+                <div th:if="${answer != null}"
+                     class="answer-box">
+
+                    <div class="answer-title">
+                        AI 사료 추천 결과
+                    </div>
+
+                    <div class="answer-content"
+                         th:text="${#strings.trim(answer)}">
+                        AI 답변
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+        <aside class="guide-side">
+
+            <div class="side-card pink-card">
+
+                <div class="side-title">
+                    입력 팁
+                </div>
+
+                <ul>
+                    <li>소화, 피부, 알레르기 등 특이사항을 적어주세요.</li>
+                    <li>현재 먹이고 있는 사료가 있다면 함께 적어도 좋습니다.</li>
+                </ul>
+
+            </div>
+
+            <div class="side-card mint-card">
+
+                <div class="side-title">
+                    안내사항
+                </div>
+
+                <p>
+                    AI 추천은 참고용 정보입니다. 사료를 변경하기 전이나 증상이 지속되면 동물병원 상담을 권장합니다.
+                </p>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+</body>
+</html>

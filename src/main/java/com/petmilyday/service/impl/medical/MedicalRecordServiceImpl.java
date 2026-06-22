@@ -2,9 +2,11 @@ package com.petmilyday.service.impl.medical;
 
 import com.petmilyday.dto.medical.MedicalRecordResponseDTO;
 import com.petmilyday.entity.medical.MedicalRecord;
+import com.petmilyday.entity.medical.Vaccination;
 import com.petmilyday.entity.reservation.Reservation;
 import com.petmilyday.entity.reservation.ReservationStatus;
 import com.petmilyday.repository.medical.MedicalRecordRepository;
+import com.petmilyday.repository.medical.VaccinationRepository;
 import com.petmilyday.repository.reservation.ReservationRepository;
 import com.petmilyday.service.medical.MedicalRecordService;
 import jakarta.transaction.Transactional;
@@ -24,6 +26,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
 
    private final MedicalRecordRepository medicalRecordRepository;
     private final ReservationRepository reservationRepository;
+    private final VaccinationRepository vaccinationRepository;
    private final ModelMapper modelMapper;
 
     @Override
@@ -64,6 +67,23 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
                 .build();
 
         medicalRecordRepository.save(medicalRecord);
+
+        // 예방접종을 진행한 경우, 예방접종 기록도 함께 생성
+        if (Boolean.TRUE.equals(medicalRecord.getVaccinated())
+                && medicalRecord.getVaccineName() != null
+                && !medicalRecord.getVaccineName().isBlank()) {
+
+            Vaccination vaccination = Vaccination.builder()
+                    .pet(reservation.getPet())
+                    .vaccineName(medicalRecord.getVaccineName())
+                    .vaccinatedDate(medicalRecord.getVisitDate())
+                    .nextDate(dto.getNextVaccinationDate() != null
+                            ? dto.getNextVaccinationDate()
+                            : medicalRecord.getVisitDate().plusYears(1))
+                    .build();
+
+            vaccinationRepository.save(vaccination);
+        }
 
         reservation.done();
     }

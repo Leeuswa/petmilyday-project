@@ -143,7 +143,7 @@ public class DiagnosisServiceImpl implements DiagnosisService {
         if (aiError) {
             disease = "판단불가";
             severity = "LOW";
-            recommend = "AI 진단 응답을 불러오는 중 문제가 발생했습니다. Ollama 실행 상태를 확인하거나 잠시 후 다시 시도해주세요.";
+            recommend = "AI 진단 응답을 불러오는 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.";
         } else {
             disease = normalizeDisease(disease, symptomText);
             severity = normalizeSeverity(severity, symptomText);

@@ -10,6 +10,9 @@
 
   <link rel="stylesheet" th:href="@{/css/main/header.css}">
 
+  <div th:if="${successMsg}" class="flash-banner flash-success" th:text="${successMsg}"></div>
+  <div th:if="${globalError}" class="flash-banner flash-error" th:text="${globalError}"></div>
+
   <nav class="gnb">
     <a th:href="@{/}" class="logo">
       <span class="logo-paw">🐾</span>

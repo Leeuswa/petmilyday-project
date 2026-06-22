@@ -71,7 +71,7 @@ public class AiGuideServiceImpl implements AiGuideService {
                     AI 가이드 응답을 불러오는 중 문제가 발생했습니다.
 
                     관리 방법:
-                    Ollama 실행 상태를 확인하거나 잠시 후 다시 시도해주세요.
+                    잠시 후 다시 시도해주세요.
                     질문을 조금 더 구체적으로 입력하면 더 안정적인 답변을 받을 수 있습니다.
 
                     주의사항:
