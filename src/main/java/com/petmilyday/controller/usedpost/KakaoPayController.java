@@ -2,7 +2,6 @@ package com.petmilyday.controller.usedpost;
 
 import com.petmilyday.entity.member.Member;
 import com.petmilyday.entity.used.UsedPost;
-import com.petmilyday.entity.used.UsedPostStatus;
 import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.repository.used.UsedPostRepository;
 import com.petmilyday.service.usedpost.KakaoPayService;
@@ -73,42 +72,6 @@ public class KakaoPayController {
     public String fail() {
 
         return "redirect:/used/list";
-    }
-
-    // 테스트 결제 완료
-    @GetMapping("/payment/test-success")
-    public String testSuccess(
-            @RequestParam Long postId,
-            Authentication authentication,
-            Model model
-    ) {
-
-        if (authentication == null) {
-            return "redirect:/member/login";
-        }
-
-        String username = authentication.getName();
-
-        Member member =
-                memberRepository.findByUsername(username)
-                        .orElseThrow();
-
-        UsedPost post =
-                usedPostRepository.findById(postId)
-                        .orElseThrow();
-
-        post.setBuyerId(member.getId());
-        post.setStatus(UsedPostStatus.SOLD);
-
-        if (post.getPaymentKey() == null || post.getPaymentKey().isBlank()) {
-            post.setPaymentKey("TEST-" + System.currentTimeMillis());
-        }
-
-        usedPostRepository.save(post);
-
-        model.addAttribute("post", post);
-
-        return "used/payment-success";
     }
 
     // 결제 승인 처리

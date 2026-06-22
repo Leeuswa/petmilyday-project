@@ -30,6 +30,8 @@ public interface UsedPostService {
             String region,
             ItemCondition condition,
             Boolean offerAccepted,
+            Integer minPrice,
+            Integer maxPrice,
             Pageable pageable
     );
 
@@ -61,6 +63,8 @@ public interface UsedPostService {
             String region,
             ItemCondition condition,
             Boolean offerAccepted,
+            Integer minPrice,
+            Integer maxPrice,
             Pageable pageable
     );
 
@@ -68,4 +72,6 @@ public interface UsedPostService {
             Long memberId,
             Pageable pageable
     );
+
+    void pullUp(Long postId, Long memberId);
 }

@@ -248,16 +248,6 @@ body {
     color: white;
 }
 
-.mint-pay-btn {
-    background: var(--mint-light);
-    color: #057a60;
-    border: 1px solid rgba(6, 214, 160, 0.28);
-}
-
-.mint-pay-btn:hover {
-    color: #057a60;
-}
-
 .cancel-pay-btn {
     background: white;
     color: var(--mid);

@@ -122,11 +122,33 @@
 
         </div>
 
+        <div class="price-filter-row">
+
+            <input type="number"
+                   name="minPrice"
+                   class="price-filter-input"
+                   placeholder="최소 가격"
+                   min="0"
+                   th:value="${minPrice}">
+
+            <span class="price-wave">
+                ~
+            </span>
+
+            <input type="number"
+                   name="maxPrice"
+                   class="price-filter-input"
+                   placeholder="최대 가격"
+                   min="0"
+                   th:value="${maxPrice}">
+
+        </div>
+
         <div class="chip-row">
 
             <a th:href="@{/used/list}"
                class="chip"
-               th:classappend="${condition == null and (offerAccepted == null or offerAccepted == false) and onlyWish != true} ? ' active'">
+               th:classappend="${condition == null and (offerAccepted == null or offerAccepted == false) and onlyWish != true and minPrice == null and maxPrice == null} ? ' active'">
                 전체
             </a>
 
@@ -134,7 +156,9 @@
                     keyword=${keyword},
                     category=${category},
                     region=${region},
-                    condition='NEW'
+                    condition='NEW',
+                    minPrice=${minPrice},
+                    maxPrice=${maxPrice}
                 )}"
                class="chip"
                th:classappend="${condition != null and condition.name() == 'NEW'} ? ' active'">
@@ -145,7 +169,9 @@
                     keyword=${keyword},
                     category=${category},
                     region=${region},
-                    condition='LIKE_NEW'
+                    condition='LIKE_NEW',
+                    minPrice=${minPrice},
+                    maxPrice=${maxPrice}
                 )}"
                class="chip"
                th:classappend="${condition != null and condition.name() == 'LIKE_NEW'} ? ' active'">
@@ -156,7 +182,9 @@
                     keyword=${keyword},
                     category=${category},
                     region=${region},
-                    condition='USED'
+                    condition='USED',
+                    minPrice=${minPrice},
+                    maxPrice=${maxPrice}
                 )}"
                class="chip"
                th:classappend="${condition != null and condition.name() == 'USED'} ? ' active'">
@@ -167,14 +195,20 @@
                     keyword=${keyword},
                     category=${category},
                     region=${region},
-                    offerAccepted=true
+                    offerAccepted=true,
+                    minPrice=${minPrice},
+                    maxPrice=${maxPrice}
                 )}"
                class="chip chip-mint"
                th:classappend="${offerAccepted == true} ? ' active'">
                 가격제안가능
             </a>
 
-            <a th:href="@{/used/list(onlyWish=true)}"
+            <a th:href="@{/used/list(
+                    onlyWish=true,
+                    minPrice=${minPrice},
+                    maxPrice=${maxPrice}
+                )}"
                class="chip"
                th:classappend="${onlyWish == true} ? ' active'">
                 찜한 게시글
@@ -196,31 +230,50 @@
 
                 <div class="side-list">
 
-                    <a th:href="@{/used/list}"
+                    <a th:href="@{/used/list(
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice}
+                        )}"
                        class="side-link"
                        th:classappend="${category == null or category == ''} ? ' active'">
                         전체
                     </a>
 
-                    <a th:href="@{/used/list(category='사료/간식')}"
+                    <a th:href="@{/used/list(
+                            category='사료/간식',
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice}
+                        )}"
                        class="side-link"
                        th:classappend="${category == '사료/간식'} ? ' active'">
                         사료/간식
                     </a>
 
-                    <a th:href="@{/used/list(category='장난감')}"
+                    <a th:href="@{/used/list(
+                            category='장난감',
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice}
+                        )}"
                        class="side-link"
                        th:classappend="${category == '장난감'} ? ' active'">
                         장난감
                     </a>
 
-                    <a th:href="@{/used/list(category='의류')}"
+                    <a th:href="@{/used/list(
+                            category='의류',
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice}
+                        )}"
                        class="side-link"
                        th:classappend="${category == '의류'} ? ' active'">
                         의류
                     </a>
 
-                    <a th:href="@{/used/list(category='가구/매트')}"
+                    <a th:href="@{/used/list(
+                            category='가구/매트',
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice}
+                        )}"
                        class="side-link"
                        th:classappend="${category == '가구/매트'} ? ' active'">
                         가구/매트
@@ -236,13 +289,21 @@
 
                 <div class="side-list">
 
-                    <a th:href="@{/used/list(offerAccepted=true)}"
+                    <a th:href="@{/used/list(
+                            offerAccepted=true,
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice}
+                        )}"
                        class="side-link"
                        th:classappend="${offerAccepted == true} ? ' active'">
                         가격제안 가능
                     </a>
 
-                    <a th:href="@{/used/list(onlyWish=true)}"
+                    <a th:href="@{/used/list(
+                            onlyWish=true,
+                            minPrice=${minPrice},
+                            maxPrice=${maxPrice}
+                        )}"
                        class="side-link"
                        th:classappend="${onlyWish == true} ? ' active'">
                         찜한 게시글
@@ -354,11 +415,15 @@
                                         카테고리
                                     </span>
 
-                                    <button type="button"
-                                            class="list-wish-btn"
-                                            th:data-post-id="${post.id}">
-                                        ♡
-                                    </button>
+                                    <div class="post-action-buttons">
+
+                                        <button type="button"
+                                                class="list-wish-btn"
+                                                th:data-post-id="${post.id}">
+                                            ♡
+                                        </button>
+
+                                    </div>
 
                                 </div>
 
@@ -442,7 +507,9 @@
                                    region=${region},
                                    condition=${condition},
                                    offerAccepted=${offerAccepted},
-                                   onlyWish=${onlyWish}
+                                   onlyWish=${onlyWish},
+                                   minPrice=${minPrice},
+                                   maxPrice=${maxPrice}
                                )}">
                                 이전
                             </a>
@@ -461,7 +528,9 @@
                                    region=${region},
                                    condition=${condition},
                                    offerAccepted=${offerAccepted},
-                                   onlyWish=${onlyWish}
+                                   onlyWish=${onlyWish},
+                                   minPrice=${minPrice},
+                                   maxPrice=${maxPrice}
                                )}"
                                th:text="${i + 1}">
                             </a>
@@ -479,7 +548,9 @@
                                    region=${region},
                                    condition=${condition},
                                    offerAccepted=${offerAccepted},
-                                   onlyWish=${onlyWish}
+                                   onlyWish=${onlyWish},
+                                   minPrice=${minPrice},
+                                   maxPrice=${maxPrice}
                                )}">
                                 다음
                             </a>

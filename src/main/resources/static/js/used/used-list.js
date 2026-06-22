@@ -100,3 +100,29 @@ function updateListWishUI(button, isWished) {
         button.setAttribute("aria-label", "찜하기");
     }
 }
+
+const pullUpButtons = document.querySelectorAll(".list-pull-up-btn");
+
+pullUpButtons.forEach(function (button) {
+    button.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const postId = button.dataset.postId;
+
+        if (!postId) {
+            return;
+        }
+
+        if (!confirm("이 게시글을 끌어올리시겠습니까?")) {
+            return;
+        }
+
+        const form = document.createElement("form");
+        form.method = "post";
+        form.action = "/used/pull-up/" + postId;
+
+        document.body.appendChild(form);
+        form.submit();
+    });
+});
