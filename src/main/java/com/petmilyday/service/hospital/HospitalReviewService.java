@@ -33,5 +33,5 @@ public interface HospitalReviewService {
     Page<HospitalReviewResponseDTO> myReivewListPage(String username, int page);
 
     //리뷰 신고기능
-    Long reportReview(Long reviewId);
+    Long reportReview(Long reviewId, String username);
 }

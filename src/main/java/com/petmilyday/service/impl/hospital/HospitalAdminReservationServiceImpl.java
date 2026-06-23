@@ -81,10 +81,12 @@ public class HospitalAdminReservationServiceImpl implements HospitalAdminReserva
     // 예약 승인
     @Override
     @Transactional
-    public void approveReservation(Long reservationId) {
+    public void approveReservation(Long reservationId, String username) {
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RuntimeException("예약이 없습니다."));
+
+        validateHospitalOwnership(reservation, username);
 
         // 승인 처리는 예약이 유지되는 상태이므로 대기번호를 재정렬하지 않는다.
         reservation.approve();
@@ -103,12 +105,14 @@ public class HospitalAdminReservationServiceImpl implements HospitalAdminReserva
     // 예약 거절
     @Override
     @Transactional
-    public void rejectReservation(Long reservationId) {
+    public void rejectReservation(Long reservationId, String username) {
 
         log.info("병원관리자 예약 거절 실행 - reservationId: {}", reservationId);
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RuntimeException("예약이 없습니다."));
+
+        validateHospitalOwnership(reservation, username);
 
         if (reservation.getStatus() == ReservationStatus.CANCEL) {
             throw new RuntimeException("이미 취소된 예약입니다.");
@@ -154,6 +158,22 @@ public class HospitalAdminReservationServiceImpl implements HospitalAdminReserva
         );
 
         log.info("병원관리자 예약 거절 완료 - reservationId: {}", reservationId);
+    }
+
+    // 로그인한 병원 관리자가 해당 예약의 담당 병원 소속인지 검증
+    // (다른 병원 예약을 ID만 바꿔서 승인/거절하는 것을 방지)
+    private void validateHospitalOwnership(Reservation reservation, String username) {
+
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("회원이 없습니다."));
+
+        HospitalManager hospitalManager = hospitalManagerRepository
+                .findByMemberIdAndStatus(member.getId(), HospitalManagerStatus.APPROVED)
+                .orElseThrow(() -> new RuntimeException("승인된 병원 관리자가 아닙니다."));
+
+        if (!hospitalManager.getHospital().getId().equals(reservation.getHospital().getId())) {
+            throw new RuntimeException("해당 예약에 접근할 권한이 없습니다.");
+        }
     }
 
     // 실시간 대기열 재정렬

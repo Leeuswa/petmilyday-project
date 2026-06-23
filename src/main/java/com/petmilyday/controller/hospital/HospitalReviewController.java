@@ -132,10 +132,11 @@ public class HospitalReviewController {
     // 리뷰 신고
     @PostMapping("/report/{reviewId}")
     public String reviewReport(@PathVariable Long reviewId,
+                               Authentication authentication,
                                RedirectAttributes redirectAttributes) {
 
         try {
-            Long hospitalId = hospitalReviewService.reportReview(reviewId);
+            Long hospitalId = hospitalReviewService.reportReview(reviewId, authentication.getName());
 
             redirectAttributes.addFlashAttribute(
                     "message",

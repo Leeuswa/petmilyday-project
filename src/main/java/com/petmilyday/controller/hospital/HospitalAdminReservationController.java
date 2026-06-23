@@ -38,9 +38,10 @@ public class HospitalAdminReservationController {
     // 예약 승인
     @PostMapping("/{id}/approve")
     public String approveReservation(@PathVariable Long id,
+                                     Authentication authentication,
                                      RedirectAttributes redirectAttributes) {
 
-        hospitalAdminReservationService.approveReservation(id);
+        hospitalAdminReservationService.approveReservation(id, authentication.getName());
 
         redirectAttributes.addFlashAttribute("message", "예약을 승인했습니다.");
 
@@ -50,9 +51,10 @@ public class HospitalAdminReservationController {
     // 예약 거절
     @PostMapping("/{id}/reject")
     public String rejectReservation(@PathVariable Long id,
+                                    Authentication authentication,
                                     RedirectAttributes redirectAttributes) {
 
-        hospitalAdminReservationService.rejectReservation(id);
+        hospitalAdminReservationService.rejectReservation(id, authentication.getName());
 
         redirectAttributes.addFlashAttribute("message", "예약을 거절했습니다.");
 
