@@ -57,7 +57,8 @@ public class ReservationServiceImpl implements ReservationService {
     @Transactional
     public void reservationRegister(ReservationRequestDTO dto, String loginId) {
 
-        Hospital hospital = hospitalRepository.findById(dto.getHospitalId())
+
+        Hospital hospital = hospitalRepository.findByIdForUpdate(dto.getHospitalId())
                 .orElseThrow(() -> new RuntimeException("병원을 찾을 수 없습니다."));
 
         Member member = memberRepository.findByUsername(loginId)
@@ -67,7 +68,6 @@ public class ReservationServiceImpl implements ReservationService {
                 .orElseThrow(() -> new RuntimeException("반려 동물을 찾을 수 없습니다."));
 
         // 현재 시간대의 예약 수 조회
-        // 이 값을 기준으로 대기번호를 부여한다.
         long currentCount = reservationRepository.countAvailableSlot(
                 dto.getHospitalId(),
                 dto.getReserveDate(),

@@ -168,10 +168,14 @@ public class HospitalReviewServiceImpl implements HospitalReviewService {
     //리뷰 신고 기능
     @Override
     @Transactional
-    public Long reportReview(Long reviewId) {
+    public Long reportReview(Long reviewId, String username) {
 
         HospitalReview review = hospitalReviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
+
+        if (review.getMember().getUsername().equals(username)) {
+            throw new RuntimeException("본인이 작성한 리뷰는 신고할 수 없습니다.");
+        }
 
         review.report();
 
