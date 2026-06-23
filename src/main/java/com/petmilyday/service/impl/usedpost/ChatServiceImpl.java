@@ -1,5 +1,6 @@
 package com.petmilyday.service.impl.usedpost;
 
+import com.petmilyday.dto.notification.NotificationDTO;
 import com.petmilyday.dto.usedpost.ChatMessageDTO;
 import com.petmilyday.dto.usedpost.ChatRoomListDTO;
 import com.petmilyday.dto.usedpost.UsedPostDTO;
@@ -12,8 +13,10 @@ import com.petmilyday.repository.chat.ChatMessageRepository;
 import com.petmilyday.repository.chat.ChatRoomRepository;
 import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.repository.used.UsedPostRepository;
+import com.petmilyday.service.notification.NotificationService;
 import com.petmilyday.service.usedpost.ChatService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,12 +28,14 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class ChatServiceImpl implements ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UsedPostRepository usedPostRepository;
     private final MemberRepository memberRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -105,6 +110,8 @@ public class ChatServiceImpl implements ChatService {
         msg.setIsRead(false);
 
         chatMessageRepository.save(msg);
+
+        notifyOpponent(roomId, senderId, message);
     }
 
     @Override
@@ -121,6 +128,53 @@ public class ChatServiceImpl implements ChatService {
         msg.setIsRead(false);
 
         chatMessageRepository.save(msg);
+
+        notifyOpponent(dto.getRoomId(), dto.getSenderId(), dto.getMessage());
+    }
+
+    // 채팅 메시지를 받는 상대방에게 실시간 알림 전송
+    private void notifyOpponent(Long roomId, Long senderId, String message) {
+
+        ChatRoom room = chatRoomRepository.findById(roomId).orElse(null);
+
+        if (room == null || room.getBuyerId() == null || room.getSellerId() == null) {
+            return;
+        }
+
+        Long recipientId =
+                room.getBuyerId().equals(senderId) ? room.getSellerId() : room.getBuyerId();
+
+        Member recipient = memberRepository.findById(recipientId).orElse(null);
+
+        if (recipient == null) {
+            return;
+        }
+
+        Member sender = memberRepository.findById(senderId).orElse(null);
+
+        String senderName =
+                sender != null && sender.getNickname() != null && !sender.getNickname().isBlank()
+                        ? sender.getNickname()
+                        : "상대방";
+
+        String preview =
+                message != null && message.length() > 30
+                        ? message.substring(0, 30) + "..."
+                        : message;
+
+        try {
+            notificationService.sendToUser(
+                    recipient.getUsername(),
+                    NotificationDTO.builder()
+                            .type("NEW_CHAT_MESSAGE")
+                            .message(senderName + "님이 메시지를 보냈습니다: " + preview)
+                            .url("/chat/room/" + roomId)
+                            .createdAt(LocalDateTime.now())
+                            .build()
+            );
+        } catch (Exception e) {
+            log.warn("채팅 알림 전송 실패 - roomId: {}, recipient: {}", roomId, recipient.getUsername(), e);
+        }
     }
 
     @Override

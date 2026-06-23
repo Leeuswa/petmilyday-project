@@ -71,4 +71,17 @@ public class MedicalRecord {
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public void update(String diagnosis, String treatment, String prescription,
+                        Boolean vaccinated, String vaccineName, String memo,
+                        String pdfUrl, LocalDate visitDate) {
+        this.diagnosis = diagnosis;
+        this.treatment = treatment;
+        this.prescription = prescription;
+        this.vaccinated = vaccinated != null ? vaccinated : false;
+        this.vaccineName = vaccineName;
+        this.memo = memo;
+        this.pdfUrl = pdfUrl;
+        this.visitDate = visitDate;
+    }
 }

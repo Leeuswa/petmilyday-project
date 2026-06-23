@@ -8,7 +8,7 @@
 <body>
 <div th:fragment="header">
 
-  <link rel="stylesheet" th:href="@{/css/main/header.css}">
+  <link rel="stylesheet" th:href="@{/css/main/header.css(v=5)}">
 
   <div th:if="${successMsg}" class="flash-banner flash-success" th:text="${successMsg}"></div>
   <div th:if="${globalError}" class="flash-banner flash-error" th:text="${globalError}"></div>
@@ -19,69 +19,83 @@
       pet<em>mily</em>day
     </a>
 
-    <a th:href="@{/}" class="nav-link">홈</a>
+    <button type="button"
+            class="nav-toggle"
+            id="navToggle"
+            aria-label="메뉴 열기"
+            aria-expanded="false"
+            aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
 
-    <div class="dropdown">
-      <span class="nav-link dropbtn">동물병원 예약</span>
-      <div class="dropdown-content">
+    <div class="nav-links" id="navLinks">
 
-        <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
-           th:href="@{/hospitalAdmin/hospital}">
-          병원 정보 관리
-        </a>
+      <a th:href="@{/}" class="nav-link">홈</a>
 
-        <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
-           th:href="@{/hospitalAdmin/reservations}">
-          병원 예약 관리
-        </a>
+      <div class="dropdown">
+        <span class="nav-link dropbtn">동물병원 예약</span>
+        <div class="dropdown-content">
 
-        <hr sec:authorize="hasRole('HOSPITAL_ADMIN')">
+          <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
+             th:href="@{/hospitalAdmin/hospital}">
+            병원 정보 관리
+          </a>
 
-        <a th:href="@{/hospital/list}">
-          병원 검색/예약
-        </a>
+          <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
+             th:href="@{/hospitalAdmin/reservations}">
+            병원 예약 관리
+          </a>
 
-        <a sec:authorize="isAuthenticated()"
-           th:href="@{/reservation/list}">
-          내 예약 목록
-        </a>
+          <hr sec:authorize="hasRole('HOSPITAL_ADMIN')">
 
-        <a sec:authorize="isAuthenticated()"
-           th:href="@{/reservation/medical-records}">
-          내 동물 진료기록
-        </a>
+          <a th:href="@{/hospital/list}">
+            병원 검색/예약
+          </a>
 
-        <a sec:authorize="isAuthenticated()"
-           th:href="@{/vaccination/myVaccination}">
-          내 동물 예방접종
-        </a>
+          <a sec:authorize="isAuthenticated()"
+             th:href="@{/reservation/list}">
+            내 예약 목록
+          </a>
 
-        <a sec:authorize="isAuthenticated()"
-           th:href="@{/review/myReview}">
-          내가 쓴 병원 리뷰
-        </a>
+          <a sec:authorize="isAuthenticated()"
+             th:href="@{/reservation/medical-records}">
+            내 동물 진료기록
+          </a>
 
+          <a sec:authorize="isAuthenticated()"
+             th:href="@{/vaccination/myVaccination}">
+            내 동물 예방접종
+          </a>
+
+          <a sec:authorize="isAuthenticated()"
+             th:href="@{/review/myReview}">
+            내가 쓴 병원 리뷰
+          </a>
+
+        </div>
       </div>
-    </div>
 
-    <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a>
+      <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a>
 
-    <div class="dropdown">
-      <a th:href="@{/shop}" class="nav-link dropbtn">동물용품샵</a>
+      <div class="dropdown">
+        <a th:href="@{/shop}" class="nav-link dropbtn">동물용품샵</a>
 
-      <div class="dropdown-content" sec:authorize="hasRole('ADMIN')">
-        <a th:href="@{/admin/shop/list}">상품 목록 및 관리</a>
-        <a th:href="@{/admin/shop/new}">새 상품 등록</a>
+        <div class="dropdown-content" sec:authorize="hasRole('ADMIN')">
+          <a th:href="@{/admin/shop/list}">상품 목록 및 관리</a>
+          <a th:href="@{/admin/shop/new}">새 상품 등록</a>
+        </div>
       </div>
-    </div>
 
-    <div class="dropdown">
-      <span class="nav-link dropbtn">게시판</span>
-      <div class="dropdown-content">
-        <a th:href="@{/community/list}">일반 게시판</a>
-        <a th:href="@{/used}">중고거래</a>
-        <a th:href="@{/community/meetup/list}">모임 게시판</a>
+      <div class="dropdown">
+        <span class="nav-link dropbtn">커뮤니티</span>
+        <div class="dropdown-content">
+          <a th:href="@{/community/list}">일반 게시판</a>
+          <a th:href="@{/community/meetup/list}">모임 게시판</a>
+        </div>
       </div>
+
+      <a th:href="@{/used}" class="nav-link">중고거래</a>
+
     </div>
 
     <div class="gnb-spacer"></div>
@@ -145,6 +159,56 @@
   <th:block sec:authorize="isAuthenticated()">
     <th:block th:replace="~{fragments/sseNotification :: sseNotification}"></th:block>
   </th:block>
+
+  <script>
+    (function () {
+      if (window.petmilyHeaderNavInit) return;
+      window.petmilyHeaderNavInit = true;
+
+      var toggle = document.getElementById('navToggle');
+      var navLinks = document.getElementById('navLinks');
+
+      if (toggle && navLinks) {
+        toggle.addEventListener('click', function () {
+          var isOpen = navLinks.classList.toggle('open');
+          toggle.classList.toggle('open', isOpen);
+          toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+      }
+
+      // 좁은 화면에서는 하위 메뉴(동물병원 예약/동물용품샵/커뮤니티)를 탭으로 열고 닫는다
+      document.querySelectorAll('.dropdown > .dropbtn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          var dropdown = btn.parentElement;
+          var willOpen = !dropdown.classList.contains('open');
+
+          document.querySelectorAll('.dropdown.open').forEach(function (open) {
+            if (open !== dropdown) open.classList.remove('open');
+          });
+
+          dropdown.classList.toggle('open', willOpen);
+        });
+      });
+
+      // 메뉴 바깥을 클릭하면 열려있던 하위 메뉴/모바일 메뉴를 닫는다
+      document.addEventListener('click', function (e) {
+        document.querySelectorAll('.dropdown.open').forEach(function (open) {
+          if (!open.contains(e.target)) {
+            open.classList.remove('open');
+          }
+        });
+
+        if (navLinks && toggle
+            && navLinks.classList.contains('open')
+            && !navLinks.contains(e.target)
+            && !toggle.contains(e.target)) {
+          navLinks.classList.remove('open');
+          toggle.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    })();
+  </script>
 
 </div>
 </body>
