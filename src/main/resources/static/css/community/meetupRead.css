@@ -1,6 +1,6 @@
 :root {
     --pink: #FF7BAC;
-    --pink-deep: #F0558A;        /* ← 추가: btn-join:hover에 사용 */
+    --pink-deep: #F0558A;
     --pink-light: #FFE4EF;
     --pink-pale: #FFF5F9;
     --dark: #2D1B2E;
@@ -9,7 +9,7 @@
     --bg: #FFF8FB;
 }
 
-/* ===== body (read.css에서 통합) ===== */
+/* body */
 body {
     background-color: #FFF8FB !important;
     background-image:
@@ -23,7 +23,20 @@ body {
     overflow-x: hidden;
 }
 
-/* ===== 컨테이너 (read.css에서 통합) ===== */
+/* 게시글 상단 (타이틀 및 신고버튼) */
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--pink-light);
+}
+.page-title {
+    margin: 0;
+}
+
+/* 컨테이너 */
 .container {
     max-width: 800px;
     margin: 40px auto;
@@ -33,7 +46,7 @@ body {
     box-shadow: 0 12px 36px rgba(255, 123, 172, 0.08);
 }
 
-/* ===== 공통 버튼 (read.css에서 통합) ===== */
+/* 공통 버튼 */
 .btn {
     padding: 10px 20px;
     border-radius: 12px;
@@ -69,7 +82,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* ===== 모임 상세 정보 박스 (인라인 style에서 통합) ===== */
+/* 모임 상세 정보 박스 */
 .meetup-detail-box {
     background-color: var(--pink-pale);
     padding: 25px;
@@ -91,7 +104,7 @@ body {
     margin-right: 8px;
 }
 
-/* ===== 참여 버튼 영역 (인라인 style에서 통합) ===== */
+/* 참여 버튼 영역 */
 .action-button-zone {
     margin: 25px 0;
 }
@@ -167,3 +180,26 @@ body {
     background-color: var(--pink);
     color: white;
 }
+
+/* 댓글 영역 */
+.comment-section { margin-top: 40px; }
+.comment-section h3 { font-size: 18px; color: var(--dark); margin-bottom: 20px; font-weight: 800; }
+.comment-list { border-top: 2px solid var(--pink-light); }
+.comment-item { padding: 20px 0; border-bottom: 1px solid var(--pink-light); }
+.comment-writer { font-weight: 800; color: var(--dark); margin-bottom: 8px; font-size: 15px; }
+.comment-date { font-size: 12px; color: var(--muted); margin-left: 10px; font-weight: 600; }
+.comment-body { color: var(--mid); line-height: 1.6; font-size: 15px; font-weight: 500; margin-bottom: 10px; }
+.comment-reply-btn { font-size: 13px; color: var(--pink); background: none; border: none; cursor: pointer; font-weight: 800; padding: 0; }
+.comment-reply-btn:hover { text-decoration: underline; }
+
+/* 대댓글 스타일 */
+.comment-item.child { margin-left: 40px; background-color: var(--pink-pale); border-left: 4px solid var(--pink-light); border-radius: 0 16px 16px 0; padding: 20px; }
+.comment-form { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
+.comment-form textarea { width: 100%; height: 90px; padding: 16px; border: 2px solid var(--pink-light); border-radius: 16px; box-sizing: border-box; resize: none; outline: none; font-family: inherit; font-size: 15px; transition: 0.2s; }
+.comment-form textarea:focus { border-color: var(--pink); box-shadow: 0 0 0 4px var(--pink-pale); }
+.comment-submit-btn { align-self: flex-end; padding: 12px 28px; background-color: var(--dark); color: white; border: none; border-radius: 16px; cursor: pointer; font-weight: 800; transition: 0.2s; }
+.comment-submit-btn:hover { background-color: var(--pink); transform: translateY(-2px); }
+
+/* 대댓글 폼 */
+.recomment-form { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; background: var(--pink-pale); padding: 16px; border-radius: 16px; }
+.recomment-form textarea { width: 100%; height: 70px; padding: 12px; border: 2px solid var(--pink-light); border-radius: 12px; resize: none; font-family: inherit; font-size: 14px; }

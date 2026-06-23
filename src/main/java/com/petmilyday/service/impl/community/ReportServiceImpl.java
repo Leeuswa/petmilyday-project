@@ -2,13 +2,9 @@ package com.petmilyday.service.impl.community;
 
 import com.petmilyday.dto.community.ReportDTO;
 import com.petmilyday.dto.notification.NotificationDTO;
-import com.petmilyday.entity.community.Report;
-import com.petmilyday.entity.community.CommunityPost;
-import com.petmilyday.entity.community.Comment;
+import com.petmilyday.entity.community.*;
 import com.petmilyday.entity.member.Member;
-import com.petmilyday.repository.community.CommentRepository;
-import com.petmilyday.repository.community.CommunityPostRepository;
-import com.petmilyday.repository.community.ReportRepository;
+import com.petmilyday.repository.community.*;
 import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +20,11 @@ import java.util.stream.Collectors;
 public class ReportServiceImpl {
 
     private final ReportRepository reportRepository;
-    private final MemberRepository memberRepository; // ⭐ 삭제되었던 멤버 레포지토리 복구
+    private final MemberRepository memberRepository;
     private final CommunityPostRepository communityPostRepository;
     private final CommentRepository commentRepository;
+    private final MeetupPostRepository meetupPostRepository;
+    private final MeetupCommentRepository meetupCommentRepository;
     private final NotificationService notificationService;
 
     // 신고하기 등록
@@ -45,31 +43,37 @@ public class ReportServiceImpl {
     }
 
     // 전체 신고 목록 조회 (관리자)
-    @Transactional(readOnly = true)
     public List<ReportDTO.Response> getReportList() {
-        return reportRepository.findAllByOrderByStatusAscIdDesc().stream().map(report -> {
-            String summary = "존재하지 않는 글/댓글";
-            try {
-                if ("POST".equals(report.getTargetType())) {
-                    summary = "[게시글] " + communityPostRepository.findById(report.getTargetId()).orElseThrow().getTitle();
-                } else if ("COMMENT".equals(report.getTargetType())) {
-                    summary = "[댓글] " + commentRepository.findById(report.getTargetId()).orElseThrow().getContent();
-                }
-            } catch (Exception e) {
-                summary = "이미 삭제된 항목입니다.";
-            }
+        return reportRepository.findAllByOrderByStatusAscIdDesc().stream()
+                .map(report -> {
+                    ReportDTO.Response dto = ReportDTO.Response.builder()
+                            .id(report.getId())
+                            .reporterUsername(report.getReporter().getUsername())
+                            .targetType(report.getTargetType())
+                            .targetId(report.getTargetId())
+                            .reason(report.getReason())
+                            .status(report.getStatus())
+                            .createdAt(report.getCreatedAt())
+                            .build();
 
-            return ReportDTO.Response.builder()
-                    .id(report.getId())
-                    .reporterUsername(report.getReporter().getUsername())
-                    .targetType(report.getTargetType())
-                    .targetId(report.getTargetId())
-                    .reason(report.getReason())
-                    .status(report.getStatus())
-                    .createdAt(report.getCreatedAt())
-                    .targetContentSummary(summary)
-                    .build();
-        }).collect(Collectors.toList());
+                    // 처리 분기
+                    if ("POST".equals(report.getTargetType())) {
+                        communityPostRepository.findById(report.getTargetId())
+                                .ifPresent(post -> dto.setTargetContentSummary("[일반글] " + post.getTitle()));
+                    } else if ("COMMENT".equals(report.getTargetType())) {
+                        commentRepository.findById(report.getTargetId())
+                                .ifPresent(comment -> dto.setTargetContentSummary("[일반댓글] " + comment.getContent()));
+                    } else if ("MEETUP_POST".equals(report.getTargetType())) {
+                        meetupPostRepository.findById(report.getTargetId())
+                                .ifPresent(meetupPost -> dto.setTargetContentSummary("[모임글] " + meetupPost.getTitle()));
+                    } else if ("MEETUP_COMMENT".equals(report.getTargetType())) {
+                        meetupCommentRepository.findById(report.getTargetId())
+                                .ifPresent(meetupComment -> dto.setTargetContentSummary("[모임댓글] " + meetupComment.getContent()));
+                    }
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     // 신고 글 삭제 처리 및 알림 발송
@@ -80,7 +84,8 @@ public class ReportServiceImpl {
         Member targetUser = null;
         String contentTitle = "";
 
-        if ("POST".equals(report.getTargetType())) {
+
+        if ("POST".equals(report.getTargetType())) { // 일반 게시글
             CommunityPost post = communityPostRepository.findById(report.getTargetId()).orElse(null);
             if (post != null) {
                 targetUser = post.getMember();
@@ -88,13 +93,29 @@ public class ReportServiceImpl {
 
                 communityPostRepository.delete(post);
             }
-        } else if ("COMMENT".equals(report.getTargetType())) {
+        } else if ("COMMENT".equals(report.getTargetType())) { // 일반 댓글
             Comment comment = commentRepository.findById(report.getTargetId()).orElse(null);
             if (comment != null) {
                 targetUser = comment.getMember();
                 contentTitle = comment.getContent();
 
                 commentRepository.delete(comment);
+            }
+        } else if ("MEETUP_POST".equals(report.getTargetType())) { // 모임 게시글
+            MeetupPost meetupPost = meetupPostRepository.findById(report.getTargetId()).orElse(null);
+            if (meetupPost != null) {
+                targetUser = meetupPost.getHost(); // 모임 방장
+                contentTitle = meetupPost.getTitle();
+
+                meetupPostRepository.delete(meetupPost);
+            }
+        } else if ("MEETUP_COMMENT".equals(report.getTargetType())) { // 모임 댓글
+            MeetupComment meetupComment = meetupCommentRepository.findById(report.getTargetId()).orElse(null);
+            if (meetupComment != null) {
+                targetUser = meetupComment.getMember();
+                contentTitle = meetupComment.getContent();
+
+                meetupCommentRepository.delete(meetupComment);
             }
         }
 
@@ -121,6 +142,7 @@ public class ReportServiceImpl {
 
         Member targetUser = null;
         String contentTitle = "";
+        String url = ""; // 알림 클릭 시 이동할 경로
 
         if ("POST".equals(report.getTargetType())) {
             CommunityPost post = communityPostRepository.findById(report.getTargetId()).orElse(null);
@@ -134,6 +156,20 @@ public class ReportServiceImpl {
                 targetUser = comment.getMember();
                 contentTitle = comment.getContent();
             }
+        } else if ("MEETUP_POST".equals(report.getTargetType())) { // 모임 게시글
+            MeetupPost meetupPost = meetupPostRepository.findById(report.getTargetId()).orElse(null);
+            if (meetupPost != null) {
+                targetUser = meetupPost.getHost(); // 모임 방장
+                contentTitle = meetupPost.getTitle();
+                url = "/community/meetup/read?id=" + report.getTargetId();
+            }
+        } else if ("MEETUP_COMMENT".equals(report.getTargetType())) { // 모임 댓글
+            MeetupComment meetupComment = meetupCommentRepository.findById(report.getTargetId()).orElse(null);
+            if (meetupComment != null) {
+                targetUser = meetupComment.getMember();
+                contentTitle = meetupComment.getContent();
+                url = "/community/meetup/read?id=" + meetupComment.getMeetupPost().getId();
+            }
         }
 
         report.updateStatusToMaintained(); // 신고 상태를 MAINTAINED로 변경
@@ -145,7 +181,7 @@ public class ReportServiceImpl {
 
             NotificationDTO notificationDTO = NotificationDTO.builder()
                     .message(message)
-                    .url("/community/read?id=" + report.getTargetId())
+                    .url(url)
                     .build();
 
             notificationService.sendToUser(targetUser.getUsername(), notificationDTO);

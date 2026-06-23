@@ -4,6 +4,8 @@ import com.petmilyday.entity.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "meetup_post")
@@ -30,6 +32,12 @@ public class MeetupPost {
 
     @Column(nullable = false, length = 255)
     private String location;
+
+    @OneToMany(mappedBy = "meetupPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<MeetupComment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "meetupPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<MeetupParticipant> participants = new ArrayList<>();
 
     @Column(name = "meetup_date", nullable = false)
     private LocalDateTime meetupDate;
