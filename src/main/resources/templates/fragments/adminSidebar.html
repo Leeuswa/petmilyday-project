@@ -80,16 +80,16 @@
          th:classappend="${activeMenu == 'usedReports'} ? ' active' : ''">
         중고거래 신고 관리
       </a>
-    </div>
-
-    <!-- 커뮤니티 -->
-    <div class="menu-section">
-      <div class="menu-title">커뮤니티</div>
 
       <a th:href="@{/admin/qna}"
          th:classappend="${activeMenu == 'qna'} ? ' active' : ''">
         QnA 관리
       </a>
+    </div>
+
+    <!-- 커뮤니티 -->
+    <div class="menu-section">
+      <div class="menu-title">커뮤니티</div>
 
       <a th:href="@{/admin/community/reports}"
          th:classappend="${activeMenu == 'communityReports'} ? ' active' : ''">

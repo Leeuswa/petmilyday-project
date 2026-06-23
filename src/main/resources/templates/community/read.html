@@ -73,6 +73,8 @@
 
     // 댓글 목록
     function loadComments() {
+        const currentUser = document.getElementById("currentUser") ? document.getElementById("currentUser").value : 'anonymousUser';
+
         fetch("/comments/list/" + postId)
             .then(response => response.json())
             .then(pageResponse => {
@@ -105,9 +107,17 @@
                     <span>${heartIcon}</span> <span>${comment.likeCount}</span>
                 </button>
 
-                ${!isChild ? `<button type="button" class="comment-reply-btn" onclick="showReCommentForm(${comment.id})" style="font-size:13px; color:var(--pink); background:none; border:none; cursor:pointer; font-weight:800; padding:0;">답글</button>` : ''}
+                ${!isChild && currentUser !== 'anonymousUser' ? `
+                    <button type="button" class="comment-reply-btn" onclick="showReCommentForm(${comment.id})" style="font-size:13px; color:var(--pink); background:none; border:none; cursor:pointer; font-weight:800; padding:0;">답글</button>
+                ` : ''}
 
-                <button type="button" onclick="sendReport('COMMENT', ${comment.id})" style="font-size:13px; color:#E53935; background:none; border:none; cursor:pointer; font-weight:800; padding:0;">신고</button>
+                ${currentUser === comment.writerUsername ? `
+                    <button type="button" onclick="deleteComment(${comment.id})" style="font-size:13px; color:var(--muted); background:none; border:none; cursor:pointer; font-weight:800; padding:0;">삭제</button>
+                ` : ''}
+
+                ${currentUser !== 'anonymousUser' && currentUser !== comment.writerUsername ? `
+                    <button type="button" onclick="sendReport('COMMENT', ${comment.id})" style="font-size:13px; color:#E53935; background:none; border:none; cursor:pointer; font-weight:800; padding:0;">신고</button>
+                ` : ''}
 
             </div>
         </div>
@@ -203,6 +213,28 @@
                 }
             })
             .catch(error => console.error("통신 장애:", error));
+    }
+
+    function deleteComment(commentId) {
+        if (!confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
+
+        const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+
+        fetch("/comments/" + commentId, {
+            method: "DELETE",
+            headers: {
+                [header]: token
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    loadComments(); // 댓글 목록 새로고침
+                } else {
+                    alert("댓글 삭제 권한이 없거나 실패했습니다.");
+                }
+            })
+            .catch(error => console.error("댓글 삭제 통신 에러:", error));
     }
 
     // 좋아요 토글
