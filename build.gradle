@@ -78,8 +78,6 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
     implementation platform("org.springframework.ai:spring-ai-bom:1.0.0")
-    // 서버 배포 시 로컬 Ollama를 쓸 수 없어 Claude(Anthropic)로 전환 - 기존 의존성은 주석 처리
-    // implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
     implementation 'org.springframework.ai:spring-ai-starter-model-anthropic'
 }
 

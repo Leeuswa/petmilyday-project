@@ -432,10 +432,11 @@
                 진료기록 작성
               </a>
 
-              <span th:if="${reservation.status == 'DONE'}"
-                    class="done-text">
-                진료완료
-              </span>
+              <a th:if="${reservation.status == 'DONE'}"
+                 th:href="@{/hospitalAdmin/medicalRecords/modify/{reservationId}(reservationId=${reservation.id})}"
+                 class="btn btn-outline-primary btn-sm btn-action">
+                진료기록 수정
+              </a>
 
               <span th:if="${reservation.status == 'CANCEL'}"
                     class="cancel-text">

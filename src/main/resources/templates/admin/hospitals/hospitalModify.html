@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>병원 수정</title>
   <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/hospitalForms.css}">
 </head>
 <body>
 
@@ -20,10 +21,19 @@
       <a th:href="@{/admin/hospitals/}" class="btn btn-outline">목록</a>
     </div>
 
-    <div class="card">
+    <div class="hf-card">
+      <div class="hf-card-head">
+        <span class="icon">🏥</span>
+        <div>
+          <strong th:text="${hospitalDTO.name}">병원명</strong>
+          <span>병원명, 연락처, 위치 정보를 수정하세요.</span>
+        </div>
+      </div>
+
       <form th:action="@{/admin/hospitals/{id}/modify(id=${hospitalDTO.id})}"
             th:object="${hospitalDTO}"
-            method="post">
+            method="post"
+            class="hf-card-body">
 
         <div class="form-grid">
 
@@ -81,7 +91,7 @@
 
         </div>
 
-        <div class="actions">
+        <div class="hf-actions">
           <a th:href="@{/admin/hospitals/{id}(id=${hospitalDTO.id})}"
              class="btn btn-gray">
             취소

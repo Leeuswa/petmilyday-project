@@ -1,5 +1,6 @@
 package com.petmilyday.service.product;
 
+import com.petmilyday.dto.notification.NotificationDTO;
 import com.petmilyday.dto.product.ProductRequestDto;
 import com.petmilyday.dto.product.ProductResponseDto;
 import com.petmilyday.entity.product.Product;
@@ -7,7 +8,9 @@ import com.petmilyday.entity.shop.Subscription;
 import com.petmilyday.entity.shop.SubscriptionStatus;
 import com.petmilyday.repository.product.ProductRepository;
 import com.petmilyday.repository.shop.SubscriptionRepository;
+import com.petmilyday.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,17 +19,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Log4j2
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final S3UploadService s3UploadService;
+    private final NotificationService notificationService;
 
     // 전체 상품 조회 (삭제 제외)
     public List<ProductResponseDto> getAllProducts() {
@@ -65,9 +71,28 @@ public class ProductService {
         // 해당 상품을 구독 중인 활성 구독자 조회
         List<Subscription> activeSubscriptions = subscriptionRepository.findByProductAndStatus(product, SubscriptionStatus.ACTIVE);
 
-        // 구독 취소 (알림 로직 제거)
+        // 구독 취소 및 구독자 알림
         for (Subscription sub : activeSubscriptions) {
             sub.setStatus(SubscriptionStatus.CANCELLED);
+            notifySubscriptionCancelled(sub, product);
+        }
+    }
+
+    // 판매종료로 구독이 취소된 사용자에게 알림 전송
+    private void notifySubscriptionCancelled(Subscription subscription, Product product) {
+        try {
+            notificationService.sendToUser(
+                    subscription.getMember().getUsername(),
+                    NotificationDTO.builder()
+                            .type("SUBSCRIPTION_PRODUCT_DISCONTINUED")
+                            .message(product.getName() + " 상품이 판매종료되어 정기구독이 취소되었습니다.")
+                            .url("/shop/subscription")
+                            .createdAt(LocalDateTime.now())
+                            .build()
+            );
+        } catch (Exception e) {
+            log.warn("정기구독 판매종료 알림 전송 실패 - subscriptionId: {}, member: {}",
+                    subscription.getId(), subscription.getMember().getUsername(), e);
         }
     }
 
