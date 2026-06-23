@@ -43,31 +43,37 @@ public class ReportServiceImpl {
     }
 
     // 전체 신고 목록 조회 (관리자)
-    @Transactional(readOnly = true)
     public List<ReportDTO.Response> getReportList() {
-        return reportRepository.findAllByOrderByStatusAscIdDesc().stream().map(report -> {
-            String summary = "존재하지 않는 글/댓글";
-            try {
-                if ("POST".equals(report.getTargetType())) {
-                    summary = "[게시글] " + communityPostRepository.findById(report.getTargetId()).orElseThrow().getTitle();
-                } else if ("COMMENT".equals(report.getTargetType())) {
-                    summary = "[댓글] " + commentRepository.findById(report.getTargetId()).orElseThrow().getContent();
-                }
-            } catch (Exception e) {
-                summary = "이미 삭제된 항목입니다.";
-            }
+        return reportRepository.findAllByOrderByStatusAscIdDesc().stream()
+                .map(report -> {
+                    ReportDTO.Response dto = ReportDTO.Response.builder()
+                            .id(report.getId())
+                            .reporterUsername(report.getReporter().getUsername())
+                            .targetType(report.getTargetType())
+                            .targetId(report.getTargetId())
+                            .reason(report.getReason())
+                            .status(report.getStatus())
+                            .createdAt(report.getCreatedAt())
+                            .build();
 
-            return ReportDTO.Response.builder()
-                    .id(report.getId())
-                    .reporterUsername(report.getReporter().getUsername())
-                    .targetType(report.getTargetType())
-                    .targetId(report.getTargetId())
-                    .reason(report.getReason())
-                    .status(report.getStatus())
-                    .createdAt(report.getCreatedAt())
-                    .targetContentSummary(summary)
-                    .build();
-        }).collect(Collectors.toList());
+                    // 처리 분기
+                    if ("POST".equals(report.getTargetType())) {
+                        communityPostRepository.findById(report.getTargetId())
+                                .ifPresent(post -> dto.setTargetContentSummary("[일반글] " + post.getTitle()));
+                    } else if ("COMMENT".equals(report.getTargetType())) {
+                        commentRepository.findById(report.getTargetId())
+                                .ifPresent(comment -> dto.setTargetContentSummary("[일반댓글] " + comment.getContent()));
+                    } else if ("MEETUP_POST".equals(report.getTargetType())) {
+                        meetupPostRepository.findById(report.getTargetId())
+                                .ifPresent(meetupPost -> dto.setTargetContentSummary("[모임글] " + meetupPost.getTitle()));
+                    } else if ("MEETUP_COMMENT".equals(report.getTargetType())) {
+                        meetupCommentRepository.findById(report.getTargetId())
+                                .ifPresent(meetupComment -> dto.setTargetContentSummary("[모임댓글] " + meetupComment.getContent()));
+                    }
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     // 신고 글 삭제 처리 및 알림 발송

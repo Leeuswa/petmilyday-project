@@ -103,6 +103,16 @@
   font-weight: 700;
 }
 
+.target-type-meetupPost {
+  color: #2b44cc;
+  font-weight: 700;
+}
+
+.target-type-meetupComment {
+  color: #e67e22;
+  font-weight: 700;
+}
+
 .report-content {
   max-width: 260px;
   color: #4b5563;

@@ -68,7 +68,7 @@
 
     <div class="comment-section">
         <h3>댓글</h3>
-        <div id="comment-list-container" class="comment-list"></div>
+        <div id="comment-list-container" class="comment-list" style="list-style: none; padding-left: 0;"></ul></div>
 
         <div class="comment-form">
             <textarea id="new-comment-text" placeholder="우리 아이들을 위한 따뜻한 댓글을 남겨주세요."></textarea>
@@ -122,13 +122,13 @@
                                 ${comment.likedByCurrentUser ? '❤️' : '🤍'} <span id="like-count-${comment.id}">${comment.likeCount}</span>
                             </button>
 
-                            ${!isChild && currentUser !== 'anonymousUser' ? `<button onclick="showReplyForm(${comment.id})" style="border:none; background:none; cursor:pointer; color: #666;">답글 달기</button>` : ''}
+                            ${!isChild && currentUser !== 'anonymousUser' ? `<button onclick="showReCommentForm(${comment.id})" style="border:none; background:none; cursor:pointer; color: #666;">답글 달기</button>` : ''}
 
                             ${currentUser === comment.writerUsername ? `<button onclick="deleteComment(${comment.id})" style="border:none; background:none; cursor:pointer; color: #999;">삭제</button>` : ''}
 
                             ${currentUser !== 'anonymousUser' && currentUser !== comment.writerUsername ? `<button onclick="sendReport('MEETUP_COMMENT', ${comment.id})" style="border:none; background:none; cursor:pointer; color: #ff4d4d; margin-left: auto;">🚨 신고</button>` : ''}
                         </div>
-                        <div id="reply-form-${comment.id}" style="display: none; margin-top: 15px; gap: 10px;"></div>
+                        <div id="recomment-form-${comment.id}" style="display: none; margin-top: 15px; gap: 10px;"></div>
                     </li>
                 `;
                     commentList.insertAdjacentHTML('beforeend', html);
@@ -137,73 +137,89 @@
             .catch(error => console.error("댓글 로딩 에러:", error));
     }
 
-    // 댓글/대댓글 저장 (✅ URL 경로 소문자로 통일)
-    function showReplyForm(parentId) {
-        const formDiv = document.getElementById(`reply-form-${parentId}`);
+    // 대댓글 폼 열기
+    function showReCommentForm(parentId) {
+        const formDiv = document.getElementById(`recomment-form-${parentId}`);
 
-        // 창이 닫혀있거나 상태가 없다면 -> 열기 (원클릭!)
         if (formDiv.style.display === "none" || formDiv.style.display === "") {
             formDiv.style.display = "flex";
             formDiv.innerHTML = `
-            <input type="text" id="reply-input-${parentId}" class="form-control" style="flex: 1; padding: 8px; border-radius: 4px;" placeholder="대댓글을 입력하세요">
+            <input type="text" id="recomment-input-${parentId}" class="form-control" style="flex: 1; padding: 8px; border-radius: 4px;" placeholder="대댓글을 입력하세요">
             <button onclick="submitReply(${parentId})" class="btn btn-sm" style="background: var(--pink); color: white; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer;">등록</button>
         `;
         } else {
-            // 이미 열려있다면 -> 닫기
             formDiv.style.display = "none";
             formDiv.innerHTML = "";
         }
     }
 
-    // 대댓글 폼 열기
-    function showReCommentForm(parentId) {
-        const container = document.getElementById(`recomment-form-container-${parentId}`);
-        if(container.innerHTML.trim() !== "") {
-            container.innerHTML = "";
-            return;
-        }
-
-        container.innerHTML = `
-            <div class="recomment-form" style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">
-                <textarea id="recomment-text-${parentId}" style="width:100%; height:70px; padding:12px; border:2px solid var(--pink-light); border-radius:12px; outline:none; resize:none; font-family:inherit; font-size:14px;" placeholder="답글 내용을 입력해주세요."></textarea>
-                <div style="display:flex; justify-content:flex-end; gap:8px;">
-                    <button type="button" onclick="document.getElementById('recomment-form-container-${parentId}').innerHTML=''" style="background:#ffffff; color:var(--muted); border:2px solid var(--pink-light); padding:8px 16px; border-radius:12px; font-weight:700; cursor:pointer;">취소</button>
-                    <button type="button" onclick="submitReComment(${parentId})" style="background:var(--pink); color:#ffffff; border:none; padding:8px 16px; border-radius:12px; font-weight:700; cursor:pointer;">등록</button>
-                </div>
-            </div>
-        `;
+    // CSRF 토큰 가져오기 (Spring Security POST 요청 시 필수)
+    function getCsrfToken() {
+        return {
+            token: document.querySelector("meta[name='_csrf']").getAttribute("content"),
+            header: document.querySelector("meta[name='_csrf_header']").getAttribute("content")
+        };
     }
 
-    // 대댓글 전송
-    function submitReComment(parentId) {
-        const contentInput = document.getElementById(`recomment-text-${parentId}`);
-        const content = contentInput.value.trim();
-        if(!content) {
-            alert("답글 내용을 입력해주세요.");
-            return;
-        }
+    // 1. 누락되었던 메인 댓글 저장 함수 추가
+    function saveComment(data) {
+        const csrf = getCsrfToken();
 
-        const data = {
-            postId: parseInt(postId, 10),
-            content: content,
-            parentId: parseInt(parentId, 10)
-        };
-
-        fetch("/comments/", {
+        fetch(`/meetup-comments`, { // API 엔드포인트는 실제 서버 설정에 맞게 조정하세요
             method: "POST",
-            headers: getAuthHeaders(),
+            headers: {
+                "Content-Type": "application/json",
+                [csrf.header]: csrf.token
+            },
             body: JSON.stringify(data)
         })
             .then(async response => {
-                if(response.ok) {
-                    document.getElementById(`recomment-form-container-${parentId}`).innerHTML = "";
-                    loadComments();
+                if (response.ok) {
+                    document.getElementById("new-comment-text").value = ""; // 입력창 초기화
+                    loadComments(); // 댓글 목록 새로고침
                 } else {
                     const errorText = await response.text();
-                    alert(`대댓글 등록 실패 (상태코드: ${response.status})\n서버 에러 원인: ${errorText}`);
+                    alert(`댓글 등록 실패: ${errorText}`);
                 }
             })
-            .catch(error => console.error("통신 장애:", error));
+            .catch(error => console.error("댓글 등록 통신 에러:", error));
+    }
+
+    // 2. 누락되었던 대댓글(답글) 등록 함수 추가
+    function submitReply(parentId) {
+        const inputElement = document.getElementById(`recomment-input-${parentId}`);
+        const content = inputElement.value.trim();
+
+        if (!content) {
+            alert("대댓글 내용을 입력해주세요.");
+            return;
+        }
+
+        const csrf = getCsrfToken();
+        const data = {
+            meetupPostId: meetupPostId, // 전역 변수 활용
+            content: content,
+            parentId: parentId
+        };
+
+        fetch(`/meetup-comments`, { // API 엔드포인트는 실제 서버 설정에 맞게 조정하세요
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                [csrf.header]: csrf.token
+            },
+            body: JSON.stringify(data)
+        })
+            .then(async response => {
+                if (response.ok) {
+                    document.getElementById(`recomment-form-${parentId}`).innerHTML = ""; // 폼 닫기
+                    loadComments(); // 댓글 목록 새로고침
+                } else {
+                    const errorText = await response.text();
+                    alert(`대댓글 등록 실패: ${errorText}`);
+                }
+            })
+            .catch(error => console.error("대댓글 등록 통신 에러:", error));
     }
 
     // 댓글 삭제 (✅ URL 경로 소문자로 통일)

@@ -22,7 +22,7 @@ public class Report {
     private Member reporter; // 신고자
 
     @Column(name = "target_type", nullable = false, length = 20)
-    private String targetType; // "POST" 또는 "COMMENT"
+    private String targetType; // "POST", "COMMENT", "MEETUP_POST", "MEETUP_POST"
 
     @Column(name = "target_id", nullable = false)
     private Long targetId; // 대상 글번호 또는 댓글번호

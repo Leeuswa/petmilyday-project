@@ -74,17 +74,10 @@
             <td class="reporter-name" th:text="${report.reporterUsername}">user1</td>
 
             <td>
-              <span th:if="${report.targetType == 'POST'}" class="target-type-post">게시글</span>
-              <span th:if="${report.targetType == 'COMMENT'}" class="target-type-comment">댓글</span>
-            </td>
-
-            <td class="report-content">
-              <a th:if="${report.targetType == 'POST'}"
-                 th:href="@{/community/read(id=${report.targetId})}"
-                 th:text="${report.targetContentSummary}"
-                 target="_blank">내용 요약</a>
-              <span th:if="${report.targetType == 'COMMENT'}"
-                    th:text="${report.targetContentSummary}">내용 요약</span>
+              <span th:if="${report.targetType == 'POST'}" class="target-type-post">일반 게시글</span>
+              <span th:if="${report.targetType == 'COMMENT'}" class="target-type-comment">일반 댓글</span>
+              <span th:if="${report.targetType == 'MEETUP_POST'}" class="target-type-meetupPost">모임 게시글</span>
+              <span th:if="${report.targetType == 'MEETUP_COMMENT'}" class="target-type-meetupComment">모임 댓글</span>
             </td>
 
             <td th:text="${report.reason}">사유</td>
