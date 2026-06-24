@@ -177,3 +177,38 @@ body {
 .text-purple {
     color: #9B72CF !important;
 }
+
+#shopPagination {
+    gap: 6px !important;
+}
+#shopPagination .page-item .page-link {
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #6B4C6E !important;
+    background-color: #ffffff !important;
+    border: 1px solid rgba(255,123,172,.15) !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    transition: all 0.2s ease !important;
+}
+#shopPagination .page-item .page-link:hover {
+    background-color: #FFE4EF !important;
+    color: #F0558A !important;
+    border-color: rgba(255,123,172,.3) !important;
+}
+#shopPagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #FF7BAC, #F0558A) !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 4px 10px rgba(255,85,138,.2) !important;
+}
+#shopPagination .page-item.disabled .page-link {
+    background-color: #f8f9fa !important;
+    color: #dee2e6 !important;
+    border-color: #e9ecef !important;
+    opacity: 0.5 !important;
+}

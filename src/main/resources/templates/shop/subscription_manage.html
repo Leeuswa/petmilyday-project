@@ -27,7 +27,7 @@
     </div>
 
     <div class="d-flex flex-column gap-3" th:if="${subscriptionList != null and !subscriptionList.isEmpty()}">
-        <div th:each="sub : ${subscriptionList}" class="card shop-card p-4 bg-white">
+        <div th:each="sub : ${subscriptionList}" class="card shop-card p-4 bg-white sub-card-item">
             <div class="row align-items-center g-3">
 
                 <div class="col-auto">
@@ -54,7 +54,6 @@
                         결제 금액: <strong class="text-dark" th:text="${#numbers.formatInteger(sub.productPrice, 3, 'COMMA')} + '원'"></strong> (수량: [[${sub.quantity}]]개)
                     </p>
 
-                    <!-- 🎯 [UI 업그레이드] ACTIVE 상태일 때만 주기 및 다음 결제일 정보를 노출하도록 차단 제어 -->
                     <div class="info-label text-muted" th:if="${sub.status == 'ACTIVE'}">
                         <i class="bi bi-arrow-repeat"></i> 주기: <span class="text-dark fw-medium" th:text="${sub.cycleDays} + '일 주기'"></span>
                         <span class="mx-2 text-black-50">|</span>
@@ -89,6 +88,13 @@
 
             </div>
         </div>
+
+        <div class="d-flex justify-content-center mt-4 w-100">
+            <nav aria-label="Subscription Page Navigation">
+                <ul class="pagination pagination-sm mb-0" id="shopPagination">
+                </ul>
+            </nav>
+        </div>
     </div>
 
     <div class="card shop-card p-5 text-center bg-white" th:if="${subscriptionList == null or subscriptionList.isEmpty()}">
@@ -103,6 +109,53 @@
 
 <script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
 <script th:inline="javascript">
+
+    const ITEMS_PER_PAGE = 5;
+    let currentPage = 1;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderSubscriptionPage(1);
+    });
+
+    function renderSubscriptionPage(page) {
+        currentPage = page;
+        const subItems = Array.from(document.querySelectorAll('.sub-card-item'));
+        const totalItems = subItems.length;
+        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE) || 1;
+
+        const startIndex = (page - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+
+        subItems.forEach((item, idx) => {
+            if (idx >= startIndex && idx < endIndex) {
+                item.style.setProperty('display', '', 'important');
+            } else {
+                item.style.setProperty('display', 'none', 'important');
+            }
+        });
+
+        const paginationUl = document.getElementById('shopPagination');
+        if (!paginationUl) return;
+        paginationUl.innerHTML = '';
+
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${page === 1 ? 'disabled' : ''}`;
+        prevLi.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="renderSubscriptionPage(1)">«</a>`;
+        paginationUl.appendChild(prevLi);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageLi = document.createElement('li');
+            pageLi.className = `page-item ${i === page ? 'active' : ''}`;
+            pageLi.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="renderSubscriptionPage(${i})">${i}</a>`;
+            paginationUl.appendChild(pageLi);
+        }
+
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${page === totalPages ? 'disabled' : ''}`;
+        nextLi.innerHTML = `<a class="page-link" href="javascript:void(0)" onclick="renderSubscriptionPage(${totalPages})">»</a>`;
+        paginationUl.appendChild(nextLi);
+    }
+
     function submitCycle(subId) {
         const newCycle = prompt("변경할 주기를 입력하세요 (예: 14, 30, 60):", "30");
         if (!newCycle) return;
