@@ -8,7 +8,7 @@
 <body>
 <div th:fragment="header">
 
-  <link rel="stylesheet" th:href="@{/css/main/header.css(v=5)}">
+  <link rel="stylesheet" th:href="@{/css/main/header.css(v=11)}">
 
   <div th:if="${successMsg}" class="flash-banner flash-success" th:text="${successMsg}"></div>
   <div th:if="${globalError}" class="flash-banner flash-error" th:text="${globalError}"></div>
@@ -32,7 +32,11 @@
 
       <a th:href="@{/}" class="nav-link">홈</a>
 
-      <div class="dropdown">
+      <!-- 비로그인: 하위 메뉴가 '병원 검색/예약' 하나뿐이라 드롭다운 없이 바로 링크로 -->
+      <a th:href="@{/hospital/list}" class="nav-link" sec:authorize="isAnonymous()">동물병원 예약</a>
+
+      <!-- 로그인: 내 예약/진료기록 등 메뉴가 있어 드롭다운 유지 -->
+      <div class="dropdown" sec:authorize="isAuthenticated()">
         <span class="nav-link dropbtn">동물병원 예약</span>
         <div class="dropdown-content">
 
@@ -52,23 +56,19 @@
             병원 검색/예약
           </a>
 
-          <a sec:authorize="isAuthenticated()"
-             th:href="@{/reservation/list}">
+          <a th:href="@{/reservation/list}">
             내 예약 목록
           </a>
 
-          <a sec:authorize="isAuthenticated()"
-             th:href="@{/reservation/medical-records}">
+          <a th:href="@{/reservation/medical-records}">
             내 동물 진료기록
           </a>
 
-          <a sec:authorize="isAuthenticated()"
-             th:href="@{/vaccination/myVaccination}">
+          <a th:href="@{/vaccination/myVaccination}">
             내 동물 예방접종
           </a>
 
-          <a sec:authorize="isAuthenticated()"
-             th:href="@{/review/myReview}">
+          <a th:href="@{/review/myReview}">
             내가 쓴 병원 리뷰
           </a>
 
@@ -77,14 +77,18 @@
 
       <a th:href="@{/ai-diagnosis}" class="nav-link">AI 자가진단</a>
 
-      <div class="dropdown">
+      <!-- 관리자: 상품 관리 메뉴가 있어 드롭다운 유지 -->
+      <div class="dropdown" sec:authorize="hasRole('ADMIN')">
         <a th:href="@{/shop}" class="nav-link dropbtn">동물용품샵</a>
 
-        <div class="dropdown-content" sec:authorize="hasRole('ADMIN')">
+        <div class="dropdown-content">
           <a th:href="@{/admin/shop/list}">상품 목록 및 관리</a>
           <a th:href="@{/admin/shop/new}">새 상품 등록</a>
         </div>
       </div>
+
+      <!-- 그 외: 하위 메뉴가 없어 드롭다운 없이 바로 링크로 -->
+      <a th:href="@{/shop}" class="nav-link" sec:authorize="!hasRole('ADMIN')">동물용품샵</a>
 
       <div class="dropdown">
         <span class="nav-link dropbtn">커뮤니티</span>

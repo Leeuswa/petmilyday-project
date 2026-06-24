@@ -41,13 +41,19 @@ public class AdminHospitalController {
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("hospitalDTO") AdminHospitalDTO dto,
                            BindingResult bindingResult,
+                           Model model,
                            RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             return "admin/hospitals/hospitalForm";
         }
 
-        adminHospitalService.register(dto);
+        try {
+            adminHospitalService.register(dto);
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            return "admin/hospitals/hospitalForm";
+        }
 
         redirectAttributes.addFlashAttribute("message", "병원이 등록되었습니다.");
 
@@ -79,13 +85,19 @@ public class AdminHospitalController {
     public String modify(@PathVariable Long hospitalId,
                          @Valid @ModelAttribute("hospitalDTO") AdminHospitalDTO dto,
                          BindingResult bindingResult,
+                         Model model,
                          RedirectAttributes redirectAttributes) {
 
         if (bindingResult.hasErrors()) {
             return "admin/hospitals/hospitalModify";
         }
 
-        adminHospitalService.modify(hospitalId, dto);
+        try {
+            adminHospitalService.modify(hospitalId, dto);
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            return "admin/hospitals/hospitalModify";
+        }
 
         redirectAttributes.addFlashAttribute("message", "병원 정보가 수정되었습니다.");
 

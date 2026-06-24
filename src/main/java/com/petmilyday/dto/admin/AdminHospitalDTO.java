@@ -22,14 +22,9 @@ public class AdminHospitalDTO {
     @NotBlank(message = "주소를 입력해주세요.")
     private String address;
 
-    @NotNull(message = "위도를 입력해주세요.")
-    @DecimalMin(value = "33.0", message = "위도 값이 너무 작습니다.")
-    @DecimalMax(value = "39.0", message = "위도 값이 너무 큽니다.")
+    // 주소를 기반으로 서버에서 자동으로 채워지므로 사용자 입력값에 대한 검증은 하지 않음
     private BigDecimal latitude;
 
-    @NotNull(message = "경도를 입력해주세요.")
-    @DecimalMin(value = "124.0", message = "경도 값이 너무 작습니다.")
-    @DecimalMax(value = "132.0", message = "경도 값이 너무 큽니다.")
     private BigDecimal longitude;
 
     @NotBlank(message = "전화번호를 입력해주세요.")
