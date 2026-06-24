@@ -132,3 +132,18 @@
   gap: 10px;
   margin-top: 4px;
 }
+
+.address-search-row {
+  display: flex;
+  gap: 8px;
+}
+
+.address-search-row .form-control {
+  flex: 1;
+  background: #f9fafb;
+}
+
+.address-search-row .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}

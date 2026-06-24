@@ -30,12 +30,20 @@ public class HospitalController {
     @GetMapping("/list")
     public String hospitalList(HospitalRequestDTO dto,
                                @RequestParam(defaultValue = "0") int page,
+                               Authentication authentication,
                                Model model) {
 
-        log.info("병원 목록 조회 요청 - keyword: {}, isEmergency: {}, department: {}",
-                dto.getKeyword(), dto.getIsEmergency(), dto.getDepartment());
+        // /hospital/list는 비로그인 사용자도 볼 수 있는 페이지라 익명 인증("anonymousUser")인 경우를 구분해야 한다.
+        boolean isLoggedIn = authentication != null
+                && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getName());
 
-        Page<HospitalResponseDTO> hospitalPage = hospitalService.hospitalListPage(dto, page);
+        String username = isLoggedIn ? authentication.getName() : null;
+
+        log.info("병원 목록 조회 요청 - keyword: {}, isEmergency: {}, department: {}, region: {}",
+                dto.getKeyword(), dto.getIsEmergency(), dto.getDepartment(), dto.getRegion());
+
+        Page<HospitalResponseDTO> hospitalPage = hospitalService.hospitalListPage(dto, page, username);
 
         log.info("병원 목록 조회 결과 - 총 {}개", hospitalPage.getTotalElements());
 

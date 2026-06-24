@@ -42,7 +42,7 @@
             <form th:action="@{/hospital/list}" method="get">
                 <div class="row g-3 align-items-end">
 
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label fw-bold">
                             병원명 검색
                         </label>
@@ -61,6 +61,24 @@
                     </div>
 
                     <div class="col-md-3">
+                        <label class="form-label fw-bold">
+                            지역/주소로 근처 병원 찾기
+                        </label>
+
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-geo-alt"></i>
+                            </span>
+
+                            <input type="text"
+                                   class="form-control"
+                                   name="region"
+                                   placeholder="예: 노원구 (비워두면 내 주소 기준)"
+                                   th:value="${searchDTO.region}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
                         <label class="form-label fw-bold">
                             진료과
                         </label>
@@ -93,7 +111,7 @@
                         </select>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-2">
                         <div class="form-check form-switch mt-4">
                             <input class="form-check-input"
                                    type="checkbox"
@@ -226,7 +244,8 @@
                     page=${currentPage - 1},
                     keyword=${searchDTO.keyword},
                     department=${searchDTO.department},
-                    isEmergency=${searchDTO.isEmergency}
+                    isEmergency=${searchDTO.isEmergency},
+                    region=${searchDTO.region}
                )}">
                 이전
             </a>
@@ -237,7 +256,8 @@
                     page=${pageNum},
                     keyword=${searchDTO.keyword},
                     department=${searchDTO.department},
-                    isEmergency=${searchDTO.isEmergency}
+                    isEmergency=${searchDTO.isEmergency},
+                    region=${searchDTO.region}
                )}"
                th:classappend="${pageNum == currentPage} ? ' active' : ''"
                th:text="${pageNum + 1}">
@@ -250,7 +270,8 @@
                     page=${currentPage + 1},
                     keyword=${searchDTO.keyword},
                     department=${searchDTO.department},
-                    isEmergency=${searchDTO.isEmergency}
+                    isEmergency=${searchDTO.isEmergency},
+                    region=${searchDTO.region}
                )}">
                 다음
             </a>

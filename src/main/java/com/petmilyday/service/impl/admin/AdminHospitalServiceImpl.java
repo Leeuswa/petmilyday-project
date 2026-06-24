@@ -1,9 +1,11 @@
 package com.petmilyday.service.impl.admin;
 
 import com.petmilyday.dto.admin.AdminHospitalDTO;
+import com.petmilyday.dto.geocoding.GeoPointDTO;
 import com.petmilyday.entity.hospital.Hospital;
 import com.petmilyday.repository.hospital.HospitalRepository;
 import com.petmilyday.service.admin.AdminHospitalService;
+import com.petmilyday.service.geocoding.GeocodingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -24,16 +26,19 @@ public class AdminHospitalServiceImpl implements AdminHospitalService {
 
     private final HospitalRepository hospitalRepository;
     private final ModelMapper modelMapper;
+    private final GeocodingService geocodingService;
 
     // 병원 기본정보 등록 - 메인 관리자
     @Override
     public void register(AdminHospitalDTO dto) {
 
+        GeoPointDTO geoPoint = geocodingService.geocode(dto.getAddress());
+
         Hospital hospital = Hospital.builder()
                 .name(dto.getName())
                 .address(dto.getAddress())
-                .latitude(dto.getLatitude())
-                .longitude(dto.getLongitude())
+                .latitude(geoPoint.getLatitude())
+                .longitude(geoPoint.getLongitude())
                 .phone(dto.getPhone())
 
                 // 병원 세부정보 기본값
@@ -92,11 +97,13 @@ public class AdminHospitalServiceImpl implements AdminHospitalService {
         Hospital hospital = hospitalRepository.findById(hospitalId)
                 .orElseThrow(() -> new RuntimeException("등록된 병원이 없습니다."));
 
+        GeoPointDTO geoPoint = geocodingService.geocode(dto.getAddress());
+
         hospital.updateBasicInfo(
                 dto.getName(),
                 dto.getAddress(),
-                dto.getLatitude(),
-                dto.getLongitude(),
+                geoPoint.getLatitude(),
+                geoPoint.getLongitude(),
                 dto.getPhone()
         );
     }
