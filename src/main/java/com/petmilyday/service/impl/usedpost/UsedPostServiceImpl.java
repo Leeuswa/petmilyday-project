@@ -237,10 +237,56 @@ public class UsedPostServiceImpl implements UsedPostService {
     @Transactional
     public void edit(
             Long id,
-            UsedPostDTO dto
-    ) {
+            UsedPostDTO dto,
+            List<MultipartFile> files
+    ) throws IOException {
 
-        update(id, dto);
+        UsedPost post =
+                usedPostRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException("게시글 없음"));
+
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+        post.setPrice(dto.getPrice());
+        post.setRegion(dto.getRegion());
+        post.setCategory(dto.getCategory());
+        post.setItemCondition(dto.getItemCondition());
+
+        post.setOfferAccepted(
+                Boolean.TRUE.equals(dto.getOfferAccepted())
+        );
+
+        post.setUpdatedAt(LocalDateTime.now());
+
+        boolean hasNewImage =
+                files != null
+                        && files.stream().anyMatch(file -> file != null && !file.isEmpty());
+
+        if (hasNewImage) {
+
+            imgRepository.deleteByUsedPost_Id(post.getId());
+
+            for (MultipartFile file : files) {
+
+                if (file == null || file.isEmpty()) {
+                    continue;
+                }
+
+                String imageUrl =
+                        s3UploadService.uploadFile(file);
+
+                UsedPostImg img =
+                        UsedPostImg.builder()
+                                .imgUrl(imageUrl)
+                                .usedPost(post)
+                                .build();
+
+                imgRepository.save(img);
+            }
+        }
+
+        usedPostRepository.save(post);
     }
 
     // 상태 변경
