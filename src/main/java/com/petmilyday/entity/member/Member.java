@@ -37,7 +37,7 @@ public class Member {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber; // 전화번호
 
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     private String address; // 주소
 
     @Column(name = "detail_address", length = 100)
