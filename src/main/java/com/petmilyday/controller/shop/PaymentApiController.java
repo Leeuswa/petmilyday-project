@@ -61,9 +61,9 @@ public class PaymentApiController {
             body.put("total_amount", totalAmount);
             body.put("tax_free_amount", 0);
 
-            body.put("approval_url", "http://localhost:8080/api/payment/success");
-            body.put("cancel_url", "http://localhost:8080/api/payment/cancel");
-            body.put("fail_url", "http://localhost:8080/api/payment/fail");
+            body.put("approval_url", "http://54.180.150.46:8080/api/payment/success");
+            body.put("cancel_url", "http://54.180.150.46:8080/api/payment/cancel");
+            body.put("fail_url", "http://54.180.150.46:8080/api/payment/fail");
 
             String mainAddress = params.get("deliveryAddress") != null ? params.get("deliveryAddress").toString() : "";
             String detailAddress = params.get("detailAddress") != null ? params.get("detailAddress").toString() : "";
