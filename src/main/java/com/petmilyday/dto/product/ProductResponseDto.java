@@ -19,6 +19,7 @@ public class ProductResponseDto {
     private String material;
     private String sizeInfo;
     private String origin;
+    private String descImgUrl;
 
     private boolean isDeleted;
 
@@ -37,5 +38,6 @@ public class ProductResponseDto {
         this.sizeInfo = entity.getSizeInfo();
         this.origin = entity.getOrigin();
         this.isDeleted = entity.isDeleted();
+        this.descImgUrl = entity.getDescImgUrl();
     }
 }
