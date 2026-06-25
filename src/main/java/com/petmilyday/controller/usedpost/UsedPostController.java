@@ -414,8 +414,10 @@ public class UsedPostController {
     public String edit(
             @PathVariable Long id,
             @ModelAttribute UsedPostDTO dto,
+            @RequestParam(value = "images", required = false)
+            List<MultipartFile> files,
             Authentication authentication
-    ) {
+    ) throws IOException {
 
         UsedPostDTO post =
                 usedPostService.getDetail(id);
@@ -435,7 +437,7 @@ public class UsedPostController {
             return "redirect:/used/detail/" + id;
         }
 
-        usedPostService.edit(id, dto);
+        usedPostService.edit(id, dto, files);
 
         return "redirect:/used/detail/" + id;
     }

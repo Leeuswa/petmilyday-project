@@ -44,7 +44,7 @@ public interface UsedPostService {
 
     void update(Long id, UsedPostDTO dto);
 
-    void edit(Long id, UsedPostDTO dto);
+    void edit(Long id, UsedPostDTO dto, List<MultipartFile> files) throws IOException;
 
     void changeStatus(Long id, UsedPostStatus status);
 

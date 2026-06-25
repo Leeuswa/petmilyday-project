@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UsedPostImgRepository extends JpaRepository<UsedPostImg, Long> {
+
+    void deleteByUsedPost_Id(Long usedPostId);
 }
