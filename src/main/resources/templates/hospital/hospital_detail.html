@@ -201,11 +201,13 @@
                                         2026-06-18
                                     </span>
 
-                                    <form th:if="${review.isReported != true}"
+                                    <form th:if="${review.isReported != true and (#authentication == null or !#authentication.name.equals(review.memberUsername))}"
                                           th:action="@{/review/report/{reviewId}(reviewId=${review.id})}"
                                           method="post"
                                           sec:authorize="isAuthenticated()"
                                           style="display:inline;">
+
+                                        <input type="hidden" name="hospitalId" th:value="${hospital.id}">
 
                                         <button type="submit"
                                                 class="btn btn-sm btn-outline-danger"
@@ -218,13 +220,9 @@
                             </div>
 
                             <div class="star-rating mb-1">
-                                <span th:each="i : ${#numbers.sequence(1, review.rating)}">
-                                    <i class="bi bi-star-fill"></i>
-                                </span>
-
-                                <span th:each="i : ${#numbers.sequence(review.rating + 1, 5)}">
-                                    <i class="bi bi-star"></i>
-                                </span>
+                                <i th:each="i : ${#numbers.sequence(1, 5)}"
+                                   th:class="${i <= review.rating} ? 'bi bi-star-fill' : 'bi bi-star'">
+                                </i>
                             </div>
 
                             <p class="review-content"

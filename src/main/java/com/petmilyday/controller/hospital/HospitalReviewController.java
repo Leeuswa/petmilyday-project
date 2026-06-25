@@ -132,18 +132,19 @@ public class HospitalReviewController {
     // 리뷰 신고
     @PostMapping("/report/{reviewId}")
     public String reviewReport(@PathVariable Long reviewId,
+                               @RequestParam(required = false) Long hospitalId,
                                Authentication authentication,
                                RedirectAttributes redirectAttributes) {
 
         try {
-            Long hospitalId = hospitalReviewService.reportReview(reviewId, authentication.getName());
+            Long reportedHospitalId = hospitalReviewService.reportReview(reviewId, authentication.getName());
 
             redirectAttributes.addFlashAttribute(
                     "message",
                     "리뷰가 신고되었습니다."
             );
 
-            return "redirect:/hospital/" + hospitalId;
+            return "redirect:/hospital/" + reportedHospitalId;
 
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute(
@@ -151,7 +152,9 @@ public class HospitalReviewController {
                     e.getMessage()
             );
 
-            return "redirect:/hospital/list";
+            return hospitalId != null
+                    ? "redirect:/review/list/" + hospitalId
+                    : "redirect:/hospital/list";
         }
     }
 

@@ -21,7 +21,7 @@ public interface ReservationService {
     Page<ReservationResponseDTO> reservationListPage(String username, int page);
 
     // 예약 취소
-    void reservationCancel(Long reservationId, String cancelReason);
+    void reservationCancel(Long reservationId, String cancelReason, String username);
 
     List<ReservationSlotDto> getAvailableSlots(
             Long hospitalId,

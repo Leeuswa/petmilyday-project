@@ -20,35 +20,31 @@
   <div class="page-wrap">
 
     <!-- 상단 제목 -->
-    <div class="page-title-card">
-      <div class="d-flex justify-content-between align-items-center gap-3">
-        <div class="title-area">
-          <h3>
-            <i class="bi bi-chat-square-heart"></i>
-            내가 작성한 병원 리뷰
-          </h3>
+    <div class="pm-list-page-header">
+      <div>
+        <h3>
+          <i class="bi bi-chat-square-heart"></i>
+          내가 작성한 병원 리뷰
+        </h3>
 
-          <p>
-            동물병원 진료 후 작성한 리뷰를 한눈에 확인할 수 있습니다.
-          </p>
-        </div>
+        <p>
+          동물병원 진료 후 작성한 리뷰를 한눈에 확인할 수 있습니다.
+        </p>
+      </div>
 
-        <div class="summary-card">
-          <span>전체 리뷰</span>
-          <strong>
-            <span th:text="${reviewPage.totalElements}">0</span>개
-          </strong>
-        </div>
+      <div class="pm-list-summary pm-list-summary--purple">
+        <span>전체 리뷰</span>
+        <strong>
+          <span th:text="${reviewPage.totalElements}">0</span>개
+        </strong>
       </div>
     </div>
 
     <!-- 작성한 리뷰가 없을 때 -->
     <div th:if="${#lists.isEmpty(reviewPage.content)}"
-         class="empty-card">
+         class="pm-list-empty">
 
-      <div class="empty-icon">
-        <i class="bi bi-chat-left-text"></i>
-      </div>
+      <i class="bi bi-chat-left-text pm-list-empty-icon"></i>
 
       <h5 class="fw-bold mb-2">
         작성한 리뷰가 없습니다.
@@ -66,7 +62,7 @@
 
     <!-- 리뷰 목록 -->
     <div th:each="review : ${reviewPage.content}"
-         class="review-card mb-3">
+         class="pm-list-card mb-3">
 
       <div class="review-top">
         <div>
@@ -118,15 +114,15 @@
     </div>
 
     <!-- 페이징 -->
-    <div class="pagination-wrap" th:if="${reviewPage.totalPages > 1}">
+    <div class="pm-pagination" th:if="${reviewPage.totalPages > 1}">
 
-      <a class="page-btn"
+      <a class="pm-page-btn"
          th:classappend="${reviewPage.first} ? ' disabled' : ''"
          th:href="${reviewPage.first} ? '#' : @{/review/myReview(page=${currentPage - 1})}">
         이전
       </a>
 
-      <a class="page-btn"
+      <a class="pm-page-btn"
          th:each="pageNum : ${#numbers.sequence(0, reviewPage.totalPages - 1)}"
          th:href="@{/review/myReview(page=${pageNum})}"
          th:classappend="${pageNum == currentPage} ? ' active' : ''"
@@ -134,7 +130,7 @@
         1
       </a>
 
-      <a class="page-btn"
+      <a class="pm-page-btn"
          th:classappend="${reviewPage.last} ? ' disabled' : ''"
          th:href="${reviewPage.last} ? '#' : @{/review/myReview(page=${currentPage + 1})}">
         다음

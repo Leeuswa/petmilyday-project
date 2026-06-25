@@ -37,10 +37,16 @@ public class HospitalAdminReservationServiceImpl implements HospitalAdminReserva
     private final ModelMapper modelMapper;
     private final NotificationService notificationService;
 
-    // 병원 관리자 예약 목록 조회
+    // 병원 관리자 예약 목록 상태/날짜 필터 + 페이징 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<ReservationResponseDTO> reservationList(String username, int page) {
+    public Page<ReservationResponseDTO> reservationList(
+            String username,
+            ReservationStatus status,
+            LocalDate dateFrom,
+            LocalDate dateTo,
+            int page
+    ) {
 
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("회원이 없습니다."));
@@ -53,7 +59,7 @@ public class HospitalAdminReservationServiceImpl implements HospitalAdminReserva
 
         Pageable pageable = PageRequest.of(page, 10);
 
-        return reservationRepository.findHospitalReservationsPage(hospitalId, pageable)
+        return reservationRepository.searchHospitalReservationsPage(hospitalId, status, dateFrom, dateTo, pageable)
                 .map(reservation -> {
                     ReservationResponseDTO dto =
                             modelMapper.map(reservation, ReservationResponseDTO.class);

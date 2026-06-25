@@ -1,5 +1,7 @@
 package com.petmilyday.entity.reservation;
 
+import com.petmilyday.entity.hospital.HospitalReview;
+import com.petmilyday.entity.medical.MedicalRecord;
 import com.petmilyday.entity.member.Member;
 import com.petmilyday.entity.member.PetProfile;
 import com.petmilyday.entity.hospital.Hospital;
@@ -13,6 +15,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -59,6 +63,16 @@ public class Reservation {
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // 예약 삭제(병원 삭제로 인한 cascade 포함) 시 진료기록도 함께 삭제되도록 cascade 설정
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private MedicalRecord medicalRecord;
+
+    // 예약 삭제(병원 삭제로 인한 cascade 포함) 시 이 예약에 달린 리뷰도 함께 삭제되도록 cascade 설정
+    // (hospital_review.reservation_id가 not null FK라 Hospital -> Reservation 삭제 순서를 Hibernate가 올바르게 계산하려면 이 매핑이 필요함)
+    @Builder.Default
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HospitalReview> reviews = new ArrayList<>();
 
     public void cancel(String cancelReason){
         this.status = ReservationStatus.CANCEL;

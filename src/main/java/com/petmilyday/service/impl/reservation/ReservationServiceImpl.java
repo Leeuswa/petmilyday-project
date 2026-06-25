@@ -64,8 +64,25 @@ public class ReservationServiceImpl implements ReservationService {
         Member member = memberRepository.findByUsername(loginId)
                 .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없습니다."));
 
-        PetProfile pet = petProfileRepository.findById(dto.getPetId())
+        PetProfile pet = petProfileRepository.findByIdAndMember(dto.getPetId(), member)
                 .orElseThrow(() -> new RuntimeException("반려 동물을 찾을 수 없습니다."));
+
+        // 과거 날짜/시간 예약 차단 (오늘 또는 미래만 허용)
+        if (dto.getReserveDate() == null) {
+            throw new RuntimeException("예약 날짜를 선택해주세요.");
+        }
+
+        LocalDate today = LocalDate.now();
+
+        if (dto.getReserveDate().isBefore(today)) {
+            throw new RuntimeException("지난 날짜로는 예약할 수 없습니다.");
+        }
+
+        if (dto.getReserveDate().isEqual(today)
+                && dto.getReserveTime() != null
+                && dto.getReserveTime().isBefore(LocalTime.now())) {
+            throw new RuntimeException("이미 지난 시간으로는 예약할 수 없습니다.");
+        }
 
         // 현재 시간대의 예약 수 조회
         long currentCount = reservationRepository.countAvailableSlot(
@@ -221,12 +238,17 @@ public class ReservationServiceImpl implements ReservationService {
     // 예약 취소
     @Override
     @Transactional
-    public void reservationCancel(Long reservationId, String cancelReason) {
+    public void reservationCancel(Long reservationId, String cancelReason, String username) {
 
         log.info("실시간 대기열 적용된 reservationCancel 실행됨 - reservationId: {}", reservationId);
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+
+        // 본인 예약만 취소할 수 있도록 검증 (다른 회원 예약을 ID만 바꿔서 취소하는 것을 방지)
+        if (!reservation.getMember().getUsername().equals(username)) {
+            throw new RuntimeException("본인 예약만 취소할 수 있습니다.");
+        }
 
         if (reservation.getStatus() == ReservationStatus.CANCEL) {
             throw new RuntimeException("이미 취소된 예약입니다.");
@@ -280,6 +302,10 @@ public class ReservationServiceImpl implements ReservationService {
         LocalTime openTime = hospitalHours.getOpenTime();
         LocalTime closeTime = hospitalHours.getCloseTime();
 
+        // 조회 날짜가 오늘이면, 이미 지난 시간대는 예약 불가 처리한다.
+        boolean isToday = date.isEqual(LocalDate.now());
+        LocalTime now = LocalTime.now();
+
         List<ReservationSlotDto> slots = new ArrayList<>();
 
         LocalTime currentTime = openTime;
@@ -294,7 +320,8 @@ public class ReservationServiceImpl implements ReservationService {
                             ReservationStatus.CANCEL
                     );
 
-            boolean available = currentCount < hospital.getMaxPerSlot();
+            boolean isPast = isToday && currentTime.isBefore(now);
+            boolean available = !isPast && currentCount < hospital.getMaxPerSlot();
 
             ReservationSlotDto slot = ReservationSlotDto.builder()
                     .time(currentTime)

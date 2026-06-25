@@ -21,17 +21,17 @@
 <div class="container py-5">
     <div class="reservation-wrap">
 
-        <div class="page-header-box">
+        <div class="pm-list-page-header">
             <div>
-                <h4>
+                <h3>
                     <i class="bi bi-calendar2-check"></i>
                     내 예약 목록
-                </h4>
+                </h3>
                 <p>신청한 동물병원 예약 상태와 대기번호를 확인할 수 있습니다.</p>
             </div>
 
             <div class="header-actions">
-                <div class="summary-card">
+                <div class="pm-list-summary pm-list-summary--pink">
                     <span>전체 예약</span>
                     <strong>
                         <span th:text="${reservationPage.totalElements}">0</span>건
@@ -47,10 +47,10 @@
         </div>
 
         <!-- 예약 없을 때 -->
-        <div class="empty-card"
+        <div class="pm-list-empty"
              th:if="${#lists.isEmpty(reservationPage.content)}">
 
-            <i class="bi bi-calendar-x"></i>
+            <i class="bi bi-calendar-x pm-list-empty-icon"></i>
 
             <p>
                 예약 내역이 없습니다.
@@ -69,9 +69,7 @@
             <div class="col-12"
                  th:each="reservation : ${reservationPage.content}">
 
-                <div class="reservation-card">
-
-                    <div class="reservation-main">
+                <div class="pm-list-card">
 
                         <div class="row align-items-center">
 
@@ -210,8 +208,6 @@
 
                         </div>
 
-                    </div>
-
                 </div>
 
             </div>
@@ -219,15 +215,15 @@
         </div>
 
         <!-- 페이징 -->
-        <div class="pagination-wrap" th:if="${reservationPage.totalPages > 1}">
+        <div class="pm-pagination" th:if="${reservationPage.totalPages > 1}">
 
-            <a class="page-btn"
+            <a class="pm-page-btn"
                th:classappend="${reservationPage.first} ? ' disabled' : ''"
                th:href="${reservationPage.first} ? '#' : @{/reservation/list(page=${currentPage - 1})}">
                 이전
             </a>
 
-            <a class="page-btn"
+            <a class="pm-page-btn"
                th:each="pageNum : ${#numbers.sequence(0, reservationPage.totalPages - 1)}"
                th:href="@{/reservation/list(page=${pageNum})}"
                th:classappend="${pageNum == currentPage} ? ' active' : ''"
@@ -235,7 +231,7 @@
                 1
             </a>
 
-            <a class="page-btn"
+            <a class="pm-page-btn"
                th:classappend="${reservationPage.last} ? ' disabled' : ''"
                th:href="${reservationPage.last} ? '#' : @{/reservation/list(page=${currentPage + 1})}">
                 다음

@@ -54,7 +54,7 @@ public interface HospitalReviewRepository extends JpaRepository<HospitalReview, 
             Pageable pageable
     );
 
-    // 메인 어드민 - 신고된 병원 리뷰 목록 조회
+    // 메인 어드민 - 신고된 병원 리뷰 목록 + 키워드(병원명·작성자·리뷰내용) 검색 + 페이징
     @Query(
             value = """
             SELECT r
@@ -62,15 +62,28 @@ public interface HospitalReviewRepository extends JpaRepository<HospitalReview, 
             JOIN FETCH r.hospital h
             JOIN FETCH r.member m
             WHERE r.isReported = true
+              AND (:keyword IS NULL OR :keyword = ''
+                   OR h.name LIKE CONCAT('%', :keyword, '%')
+                   OR m.nickname LIKE CONCAT('%', :keyword, '%')
+                   OR r.content LIKE CONCAT('%', :keyword, '%'))
             ORDER BY r.createdAt DESC
         """,
             countQuery = """
             SELECT count(r)
             FROM HospitalReview r
+            JOIN r.hospital h
+            JOIN r.member m
             WHERE r.isReported = true
+              AND (:keyword IS NULL OR :keyword = ''
+                   OR h.name LIKE CONCAT('%', :keyword, '%')
+                   OR m.nickname LIKE CONCAT('%', :keyword, '%')
+                   OR r.content LIKE CONCAT('%', :keyword, '%'))
         """
     )
-    Page<HospitalReview> findReportedReviewsForAdmin(Pageable pageable);
+    Page<HospitalReview> searchReportedReviewsForAdmin(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 
     // 메인 어드민 - 전체 병원 리뷰 목록
     @Query("""

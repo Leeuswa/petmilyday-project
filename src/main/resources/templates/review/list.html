@@ -370,11 +370,13 @@
                 </span>
 
                 <div>
-                    <form th:if="${review.isReported != true}"
+                    <form th:if="${review.isReported != true and (#authentication == null or !#authentication.name.equals(review.memberUsername))}"
                           th:action="@{/review/report/{reviewId}(reviewId=${review.id})}"
                           method="post"
                           sec:authorize="isAuthenticated()"
                           style="display:inline;">
+
+                        <input type="hidden" name="hospitalId" th:value="${hospitalId}">
 
                         <button type="submit"
                                 class="btn btn-outline-danger btn-sm report-btn"

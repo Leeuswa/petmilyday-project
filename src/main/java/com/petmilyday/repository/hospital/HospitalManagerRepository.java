@@ -29,24 +29,32 @@ public interface HospitalManagerRepository extends JpaRepository<HospitalManager
             @Param("status") HospitalManagerStatus status
     );
 
-    // 메인 관리자가 신청 목록 볼 때 - member, hospital까지 같이 조회 + 페이징
+    // 메인 관리자가 신청 목록 볼 때 - member, hospital까지 같이 조회 + 병원명/담당자명 검색 + 페이징
     @Query(
             value = """
                     select hm
                     from HospitalManager hm
                     join fetch hm.member
-                    join fetch hm.hospital
+                    join fetch hm.hospital h
                     where hm.status = :status
+                      and (:keyword is null or :keyword = ''
+                           or h.name like concat('%', :keyword, '%')
+                           or hm.managerName like concat('%', :keyword, '%'))
                     order by hm.id desc
                     """,
             countQuery = """
                     select count(hm)
                     from HospitalManager hm
+                    join hm.hospital h
                     where hm.status = :status
+                      and (:keyword is null or :keyword = ''
+                           or h.name like concat('%', :keyword, '%')
+                           or hm.managerName like concat('%', :keyword, '%'))
                     """
     )
     Page<HospitalManager> findByStatusWithMemberAndHospitalPage(
             @Param("status") HospitalManagerStatus status,
+            @Param("keyword") String keyword,
             Pageable pageable
     );
 

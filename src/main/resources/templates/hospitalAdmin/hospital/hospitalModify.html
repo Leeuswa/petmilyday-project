@@ -9,28 +9,7 @@
 <body>
 
 <div class="admin-layout">
-  <aside class="sidebar">
-    <div class="logo">Hospital Admin</div>
-
-    <div class="notification-wrap">
-      <button type="button" class="notification-btn">
-        🔔 알림
-        <span id="notification-count" class="notification-count" style="display:none;">0</span>
-      </button>
-
-      <div class="notification-dropdown">
-        <div class="notification-title">알림</div>
-        <div id="notification-list" class="notification-list">
-          <div class="notification-empty">새 알림이 없습니다.</div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="menu">
-      <a href="/hospitalAdmin/hospital" class="active">병원 정보 관리</a>
-      <a href="/hospitalAdmin/reservations">예약 관리</a>
-    </nav>
-  </aside>
+  <aside th:replace="~{fragments/hospitalAdminSidebar :: hospitalAdminSidebar('hospital')}"></aside>
 
   <main class="content">
     <div class="topbar">

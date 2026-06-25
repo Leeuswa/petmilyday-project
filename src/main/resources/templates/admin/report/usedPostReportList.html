@@ -288,6 +288,26 @@
                 <p th:text="${message}"></p>
             </div>
 
+            <form th:action="@{/admin/reports/used-posts}"
+                  method="get"
+                  style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:18px;">
+
+                <select name="hidden" class="page-link" style="font-weight:400;">
+                    <option value="" th:selected="${hidden == null}">전체 상태</option>
+                    <option value="false" th:selected="${hidden != null and hidden == false}">노출중</option>
+                    <option value="true" th:selected="${hidden != null and hidden == true}">숨김</option>
+                </select>
+
+                <input type="text"
+                       name="keyword"
+                       placeholder="게시글 제목/신고자/사유 검색"
+                       th:value="${keyword}"
+                       style="min-width:240px; padding:0 12px; height:38px; border:1px solid #d1d5db; border-radius:9px; font-size:14px;">
+
+                <button type="submit" class="btn-sm btn-primary">검색</button>
+                <a th:href="@{/admin/reports/used-posts}" class="page-link">초기화</a>
+            </form>
+
             <div class="table-wrap">
                 <table class="table">
                     <thead>
@@ -383,7 +403,7 @@
 
                 <a th:if="${currentPage > 0}"
                    class="page-link"
-                   th:href="@{/admin/reports/used-posts(page=${currentPage - 1})}">
+                   th:href="@{/admin/reports/used-posts(page=${currentPage - 1}, hidden=${hidden}, keyword=${keyword})}">
                     이전
                 </a>
 
@@ -394,7 +414,7 @@
 
                 <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
                    th:if="${pageNum >= currentPage - 2 and pageNum <= currentPage + 2}"
-                   th:href="@{/admin/reports/used-posts(page=${pageNum})}"
+                   th:href="@{/admin/reports/used-posts(page=${pageNum}, hidden=${hidden}, keyword=${keyword})}"
                    th:text="${pageNum + 1}"
                    th:class="${pageNum == currentPage ? 'page-link active' : 'page-link'}">
                     1
@@ -402,7 +422,7 @@
 
                 <a th:if="${currentPage < totalPages - 1}"
                    class="page-link"
-                   th:href="@{/admin/reports/used-posts(page=${currentPage + 1})}">
+                   th:href="@{/admin/reports/used-posts(page=${currentPage + 1}, hidden=${hidden}, keyword=${keyword})}">
                     다음
                 </a>
 

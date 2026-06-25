@@ -20,35 +20,31 @@
     <div class="page-wrap">
 
         <!-- 상단 제목 -->
-        <div class="title-card">
-            <div class="d-flex justify-content-between align-items-center gap-3">
-                <div>
-                    <h3>
-                        <i class="bi bi-shield-plus"></i>
-                        내 동물 예방접종
-                    </h3>
+        <div class="pm-list-page-header">
+            <div>
+                <h3>
+                    <i class="bi bi-shield-plus"></i>
+                    내 동물 예방접종
+                </h3>
 
-                    <p>
-                        등록된 반려동물의 예방접종 기록과 다음 접종 예정일을 확인할 수 있습니다.
-                    </p>
-                </div>
+                <p>
+                    등록된 반려동물의 예방접종 기록과 다음 접종 예정일을 확인할 수 있습니다.
+                </p>
+            </div>
 
-                <div class="summary-card">
-                    <span>전체 접종 기록</span>
-                    <strong>
-                        <span th:text="${vaccinationPage.totalElements}">0</span>건
-                    </strong>
-                </div>
+            <div class="pm-list-summary pm-list-summary--sky">
+                <span>전체 접종 기록</span>
+                <strong>
+                    <span th:text="${vaccinationPage.totalElements}">0</span>건
+                </strong>
             </div>
         </div>
 
         <!-- 예방접종 기록이 없을 때 -->
         <div th:if="${#lists.isEmpty(vaccinationPage.content)}"
-             class="empty-card">
+             class="pm-list-empty">
 
-            <div class="empty-icon">
-                <i class="bi bi-shield-x"></i>
-            </div>
+            <i class="bi bi-shield-x pm-list-empty-icon"></i>
 
             <h5 class="fw-bold mb-2">
                 예방접종 기록이 없습니다.
@@ -66,7 +62,7 @@
 
         <!-- 예방접종 목록 -->
         <div th:each="vaccination : ${vaccinationPage.content}"
-             class="vaccination-card mb-3">
+             class="pm-list-card mb-3">
 
             <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                 <div>
@@ -139,15 +135,15 @@
         </div>
 
         <!-- 페이징 -->
-        <div class="pagination-wrap" th:if="${vaccinationPage.totalPages > 1}">
+        <div class="pm-pagination" th:if="${vaccinationPage.totalPages > 1}">
 
-            <a class="page-btn"
+            <a class="pm-page-btn"
                th:classappend="${vaccinationPage.first} ? ' disabled' : ''"
                th:href="${vaccinationPage.first} ? '#' : @{/vaccination/myVaccination(page=${currentPage - 1})}">
                 이전
             </a>
 
-            <a class="page-btn"
+            <a class="pm-page-btn"
                th:each="pageNum : ${#numbers.sequence(0, vaccinationPage.totalPages - 1)}"
                th:href="@{/vaccination/myVaccination(page=${pageNum})}"
                th:classappend="${pageNum == currentPage} ? ' active' : ''"
@@ -155,7 +151,7 @@
                 1
             </a>
 
-            <a class="page-btn"
+            <a class="pm-page-btn"
                th:classappend="${vaccinationPage.last} ? ' disabled' : ''"
                th:href="${vaccinationPage.last} ? '#' : @{/vaccination/myVaccination(page=${currentPage + 1})}">
                 다음

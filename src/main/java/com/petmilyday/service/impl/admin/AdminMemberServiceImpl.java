@@ -1,6 +1,7 @@
 package com.petmilyday.service.impl.admin;
 
 import com.petmilyday.dto.admin.AdminMemberDTO;
+import com.petmilyday.dto.admin.MemberSearchDTO;
 import com.petmilyday.entity.member.AccountStatus;
 import com.petmilyday.entity.member.Member;
 import com.petmilyday.entity.member.Role;
@@ -23,13 +24,13 @@ public class AdminMemberServiceImpl implements AdminMemberService {
     private final MemberRepository memberRepository;
     private final ModelMapper modelMapper;
 
-    // 메인 관리자가 회원 목록을 최신 가입순으로 페이징 조회
+    // 메인 관리자가 회원 목록을 검색/필터 + 최신 가입순으로 페이징 조회
     @Override
-    public Page<AdminMemberDTO> memberList(int page) {
+    public Page<AdminMemberDTO> memberList(MemberSearchDTO searchDTO, int page) {
 
         Pageable pageable = PageRequest.of(page, 10);
 
-        return memberRepository.findAllByOrderByCreatedAtDesc(pageable)
+        return memberRepository.searchMembersPage(searchDTO, pageable)
                 .map(member -> modelMapper.map(member, AdminMemberDTO.class));
     }
 

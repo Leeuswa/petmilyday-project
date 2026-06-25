@@ -14,8 +14,8 @@ public interface HospitalManagerService {
     //병원 관리자 신청한 일반 회원 리스트
     List<HospitalManager> waitingList();
 
-    //병원 관리자 신청한 일반 회원 리스트 + 페이징
-    Page<HospitalManager> waitingListPage(int page);
+    //병원 관리자 신청한 일반 회원 리스트 + 병원명/담당자명 검색 + 페이징
+    Page<HospitalManager> waitingListPage(String keyword, int page);
 
     //병원 관리자 승인
     void approveManager(Long hospitalManagerId);

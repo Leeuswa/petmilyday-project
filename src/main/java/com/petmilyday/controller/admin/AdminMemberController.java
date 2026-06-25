@@ -1,5 +1,6 @@
 package com.petmilyday.controller.admin;
 
+import com.petmilyday.dto.admin.MemberSearchDTO;
 import com.petmilyday.entity.member.Role;
 import com.petmilyday.service.admin.AdminMemberService;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +19,15 @@ public class AdminMemberController {
     private final AdminMemberService adminMemberService;
 
 
-    // 관리자 회원 목록 페이징 조회
+    // 관리자 회원 목록 검색/필터 + 페이징 조회
     @GetMapping("/admin/members")
-    public String memberList(@RequestParam(defaultValue = "0") int page,
+    public String memberList(MemberSearchDTO searchDTO,
+                             @RequestParam(defaultValue = "0") int page,
                              Model model) {
 
-        model.addAttribute("memberPage", adminMemberService.memberList(page));
+        model.addAttribute("memberPage", adminMemberService.memberList(searchDTO, page));
         model.addAttribute("currentPage", page);
+        model.addAttribute("searchDTO", searchDTO);
 
         return "admin/member/memberList";
     }
