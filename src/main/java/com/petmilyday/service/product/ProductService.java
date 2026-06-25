@@ -34,33 +34,28 @@ public class ProductService {
     private final S3UploadService s3UploadService;
     private final NotificationService notificationService;
 
-    // 전체 상품 조회 (삭제 제외)
     public List<ProductResponseDto> getAllProducts() {
         return productRepository.findByIsDeletedFalse().stream()
                 .map(ProductResponseDto::new)
                 .collect(Collectors.toList());
     }
 
-    // 카테고리별 상품 조회 (삭제 제외)
     public List<ProductResponseDto> getProductsByCategory(String category) {
         return productRepository.findByCategoryAndIsDeletedFalse(category).stream()
                 .map(ProductResponseDto::new)
                 .collect(Collectors.toList());
     }
 
-    // 상품 상세 조회
     public ProductResponseDto getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("상품 없음: " + id));
         return new ProductResponseDto(product);
     }
 
-    // 관리자용 전체 상품 목록 조회 (삭제 제외)
     public List<Product> findAll() {
         return productRepository.findByIsDeletedFalse();
     }
 
-    // 상품 논리 삭제 및 구독 자동 취소
     @Transactional
     public void softDelete(Long id) {
         Product product = productRepository.findById(id)
@@ -68,17 +63,14 @@ public class ProductService {
 
         product.setDeleted(true);
 
-        // 해당 상품을 구독 중인 활성 구독자 조회
         List<Subscription> activeSubscriptions = subscriptionRepository.findByProductAndStatus(product, SubscriptionStatus.ACTIVE);
 
-        // 구독 취소 및 구독자 알림
         for (Subscription sub : activeSubscriptions) {
             sub.setStatus(SubscriptionStatus.CANCELLED);
             notifySubscriptionCancelled(sub, product);
         }
     }
 
-    // 판매종료로 구독이 취소된 사용자에게 알림 전송
     private void notifySubscriptionCancelled(Subscription subscription, Product product) {
         try {
             notificationService.sendToUser(
@@ -96,20 +88,17 @@ public class ProductService {
         }
     }
 
-    // 상품 등록 처리
     @Transactional
     public void registerProduct(ProductRequestDto dto) {
-        // 1. S3에 이미지 업로드하고 URL 받기
         String imgUrl = s3UploadService.uploadFile(dto.getImageFile());
 
-        // 2. 엔티티 생성
         Product product = Product.builder()
                 .name(dto.getName())
                 .price(dto.getPrice())
                 .stock(dto.getStock())
                 .category(dto.getCategory())
                 .description(dto.getDescription())
-                .imgUrl(imgUrl) // S3에서 받은 URL 저장!
+                .imgUrl(imgUrl)
                 .petSpecies(dto.getPetSpecies())
                 .material(dto.getMaterial())
                 .sizeInfo(dto.getSizeInfo())
@@ -118,22 +107,18 @@ public class ProductService {
                 .isDeleted(false)
                 .build();
 
-        // 3. DB 저장
         productRepository.save(product);
     }
 
-    // 관리자 상품 수정용 단건 엔티티 조회
     public Product findById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("상품 없음: " + id));
     }
 
-    // 상품 정보 수정 처리 (더티 체킹 및 S3 이미지 파일 처리 보정)
     @Transactional
-    public void updateProduct(Long id, ProductRequestDto dto, MultipartFile file) {
+    public void updateProduct(Long id, ProductRequestDto dto, MultipartFile file, MultipartFile descFile) {
         Product product = findById(id);
 
-        // [디버깅 프린트 1] 컨트롤러에서 파일이 넘어왔는지 검사
         System.out.println("=========================================");
         System.out.println("현재 수정할 상품 ID: " + id);
         if (file == null) {
@@ -150,7 +135,6 @@ public class ProductService {
 
             String newImgUrl = s3UploadService.uploadFile(file);
 
-            //  [디버깅 프린트 2] S3가 준 결과값 확인
             System.out.println("S3에서 새로 발급해준 이미지 URL: " + newImgUrl);
 
             product.setImgUrl(newImgUrl);
@@ -159,7 +143,11 @@ public class ProductService {
         }
         System.out.println("=========================================");
 
-        // 나머지 일반 정보 변경 반영
+        if (descFile != null && !descFile.isEmpty()) {
+            String newDescImgUrl = s3UploadService.uploadFile(descFile);
+            product.setDescImgUrl(newDescImgUrl);
+        }
+
         product.setName(dto.getName());
         product.setPrice(dto.getPrice());
         product.setStock(dto.getStock());
@@ -171,11 +159,9 @@ public class ProductService {
         product.setOrigin(dto.getOrigin());
     }
 
-    // 관리자용 상품 정렬 및 페이징 조회 로직 구현
     public Page<Product> getAdminProductPage(int page, int size, String sortType) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "id"); // 기본 정렬: 최신 등록순
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
 
-        // 컨트롤러에서 넘어온 문자열 분기에 따라 정렬 조건 조립
         if ("priceAsc".equals(sortType)) {
             sort = Sort.by(Sort.Direction.ASC, "price");
         } else if ("priceDesc".equals(sortType)) {
@@ -187,5 +173,4 @@ public class ProductService {
         Pageable pageable = PageRequest.of(page, size, sort);
         return productRepository.findByIsDeletedFalse(pageable);
     }
-
 }

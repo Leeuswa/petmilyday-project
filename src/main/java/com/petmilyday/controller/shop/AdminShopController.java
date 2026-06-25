@@ -67,9 +67,10 @@ public class AdminShopController {
     @PostMapping("/edit/{id}")
     public String updateProduct(@PathVariable("id") Long id,
                                 @ModelAttribute ProductRequestDto dto,
-                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                                @RequestParam(value = "descImgFile", required = false) MultipartFile descFile) throws IOException {
 
-        productService.updateProduct(id, dto, imageFile);
+        productService.updateProduct(id, dto, imageFile, descFile);
 
         return "redirect:/admin/shop/list";
     }
