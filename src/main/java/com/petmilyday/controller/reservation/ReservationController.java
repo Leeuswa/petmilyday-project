@@ -43,6 +43,7 @@ public class ReservationController {
 
         model.addAttribute("hospitalId", hospitalId);
         model.addAttribute("dto", new ReservationRequestDTO());
+        model.addAttribute("today", LocalDate.now());
 
         List<PetProFileDTO> petList = petProfileService.petList(authentication.getName());
         model.addAttribute("petList", petList);
@@ -90,11 +91,17 @@ public class ReservationController {
     // 예약 취소
     @PostMapping("/{reservationId}/cancel")
     public String reservationCancel(@PathVariable Long reservationId,
-                                    @RequestParam String cancelReason) {
+                                    @RequestParam String cancelReason,
+                                    Authentication authentication,
+                                    RedirectAttributes redirectAttributes) {
 
         log.info("예약 취소 요청 - reservationId: {}, 사유: {}", reservationId, cancelReason);
 
-        reservationService.reservationCancel(reservationId, cancelReason);
+        try {
+            reservationService.reservationCancel(reservationId, cancelReason, authentication.getName());
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("globalError", e.getMessage());
+        }
 
         return "redirect:/reservation/list";
     }

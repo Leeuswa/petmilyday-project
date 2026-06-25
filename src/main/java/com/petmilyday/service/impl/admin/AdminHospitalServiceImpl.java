@@ -2,6 +2,7 @@ package com.petmilyday.service.impl.admin;
 
 import com.petmilyday.dto.admin.AdminHospitalDTO;
 import com.petmilyday.dto.geocoding.GeoPointDTO;
+import com.petmilyday.dto.hospital.HospitalRequestDTO;
 import com.petmilyday.entity.hospital.Hospital;
 import com.petmilyday.repository.hospital.HospitalRepository;
 import com.petmilyday.service.admin.AdminHospitalService;
@@ -64,10 +65,10 @@ public class AdminHospitalServiceImpl implements AdminHospitalService {
                 .toList();
     }
 
-    // 병원 리스트 목록 조회 + 페이징
+    // 병원 리스트 목록 조회 + 페이징 (검색/필터 포함)
     @Override
     @Transactional(readOnly = true)
-    public Page<AdminHospitalDTO> findAllPage(int page) {
+    public Page<AdminHospitalDTO> findAllPage(HospitalRequestDTO searchDTO, int page) {
 
         Pageable pageable = PageRequest.of(
                 page,
@@ -75,7 +76,7 @@ public class AdminHospitalServiceImpl implements AdminHospitalService {
                 Sort.by(Sort.Direction.DESC, "id")
         );
 
-        return hospitalRepository.findAll(pageable)
+        return hospitalRepository.searchHospitalsPage(searchDTO, pageable)
                 .map(hospital -> modelMapper.map(hospital, AdminHospitalDTO.class));
     }
 

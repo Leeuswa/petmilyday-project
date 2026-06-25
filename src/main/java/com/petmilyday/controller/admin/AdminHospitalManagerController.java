@@ -14,13 +14,15 @@ public class AdminHospitalManagerController {
 
     private final HospitalManagerService hospitalManagerService;
 
-    // 병원 관리자 신청 목록
+    // 병원 관리자 신청 목록 (병원명/담당자명 검색)
     @GetMapping
-    public String waitingList(@RequestParam(defaultValue = "0") int page,
+    public String waitingList(@RequestParam(required = false) String keyword,
+                              @RequestParam(defaultValue = "0") int page,
                               Model model) {
 
-        model.addAttribute("managerPage", hospitalManagerService.waitingListPage(page));
+        model.addAttribute("managerPage", hospitalManagerService.waitingListPage(keyword, page));
         model.addAttribute("currentPage", page);
+        model.addAttribute("keyword", keyword);
 
         return "admin/hospitalManager/hospitalManagerList";
     }

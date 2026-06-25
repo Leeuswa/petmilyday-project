@@ -8,11 +8,11 @@ import com.petmilyday.repository.community.*;
 import com.petmilyday.repository.member.MemberRepository;
 import com.petmilyday.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,38 +42,41 @@ public class ReportServiceImpl {
         return reportRepository.save(report).getId();
     }
 
-    // 전체 신고 목록 조회 (관리자)
-    public List<ReportDTO.Response> getReportList() {
-        return reportRepository.findAllByOrderByStatusAscIdDesc().stream()
-                .map(report -> {
-                    ReportDTO.Response dto = ReportDTO.Response.builder()
-                            .id(report.getId())
-                            .reporterUsername(report.getReporter().getUsername())
-                            .targetType(report.getTargetType())
-                            .targetId(report.getTargetId())
-                            .reason(report.getReason())
-                            .status(report.getStatus())
-                            .createdAt(report.getCreatedAt())
-                            .build();
+    // 전체 신고 목록 조회 (관리자) + 상태/구분/키워드 검색 + 페이징
+    public Page<ReportDTO.Response> getReportPage(String status, String targetType, String keyword, int page) {
+        Pageable pageable = PageRequest.of(page, 10);
 
-                    // 처리 분기
-                    if ("POST".equals(report.getTargetType())) {
-                        communityPostRepository.findById(report.getTargetId())
-                                .ifPresent(post -> dto.setTargetContentSummary("[일반글] " + post.getTitle()));
-                    } else if ("COMMENT".equals(report.getTargetType())) {
-                        commentRepository.findById(report.getTargetId())
-                                .ifPresent(comment -> dto.setTargetContentSummary("[일반댓글] " + comment.getContent()));
-                    } else if ("MEETUP_POST".equals(report.getTargetType())) {
-                        meetupPostRepository.findById(report.getTargetId())
-                                .ifPresent(meetupPost -> dto.setTargetContentSummary("[모임글] " + meetupPost.getTitle()));
-                    } else if ("MEETUP_COMMENT".equals(report.getTargetType())) {
-                        meetupCommentRepository.findById(report.getTargetId())
-                                .ifPresent(meetupComment -> dto.setTargetContentSummary("[모임댓글] " + meetupComment.getContent()));
-                    }
+        return reportRepository.searchForAdmin(status, targetType, keyword, pageable)
+                .map(this::toResponseDto);
+    }
 
-                    return dto;
-                })
-                .collect(Collectors.toList());
+    private ReportDTO.Response toResponseDto(Report report) {
+        ReportDTO.Response dto = ReportDTO.Response.builder()
+                .id(report.getId())
+                .reporterUsername(report.getReporter().getUsername())
+                .targetType(report.getTargetType())
+                .targetId(report.getTargetId())
+                .reason(report.getReason())
+                .status(report.getStatus())
+                .createdAt(report.getCreatedAt())
+                .build();
+
+        // 처리 분기
+        if ("POST".equals(report.getTargetType())) {
+            communityPostRepository.findById(report.getTargetId())
+                    .ifPresent(post -> dto.setTargetContentSummary("[일반글] " + post.getTitle()));
+        } else if ("COMMENT".equals(report.getTargetType())) {
+            commentRepository.findById(report.getTargetId())
+                    .ifPresent(comment -> dto.setTargetContentSummary("[일반댓글] " + comment.getContent()));
+        } else if ("MEETUP_POST".equals(report.getTargetType())) {
+            meetupPostRepository.findById(report.getTargetId())
+                    .ifPresent(meetupPost -> dto.setTargetContentSummary("[모임글] " + meetupPost.getTitle()));
+        } else if ("MEETUP_COMMENT".equals(report.getTargetType())) {
+            meetupCommentRepository.findById(report.getTargetId())
+                    .ifPresent(meetupComment -> dto.setTargetContentSummary("[모임댓글] " + meetupComment.getContent()));
+        }
+
+        return dto;
     }
 
     // 신고 글 삭제 처리 및 알림 발송

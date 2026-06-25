@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>병원 예약 관리</title>
   <link th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
 
   <style>
     body {
@@ -292,7 +293,10 @@
 </head>
 <body>
 
-<div th:replace="~{fragments/header :: header}"></div>
+<div class="admin-layout">
+  <aside th:replace="~{fragments/hospitalAdminSidebar :: hospitalAdminSidebar('reservations')}"></aside>
+
+  <main class="content">
 
 <div class="container py-5">
   <div class="reservation-wrap">
@@ -319,6 +323,27 @@
           <span>최근 예약일 기준으로 정렬됩니다.</span>
         </div>
       </div>
+
+      <form th:action="@{/hospitalAdmin/reservations}"
+            method="get"
+            class="d-flex gap-2 flex-wrap align-items-center"
+            style="padding: 0 24px 18px;">
+
+        <select class="form-select" style="max-width:160px;" name="status">
+          <option value="" th:selected="${status == null}">전체 상태</option>
+          <option value="WAITING" th:selected="${status != null and status.name() == 'WAITING'}">승인대기</option>
+          <option value="APPROVED" th:selected="${status != null and status.name() == 'APPROVED'}">승인완료</option>
+          <option value="DONE" th:selected="${status != null and status.name() == 'DONE'}">진료완료</option>
+          <option value="CANCEL" th:selected="${status != null and status.name() == 'CANCEL'}">취소</option>
+        </select>
+
+        <input type="date" class="form-control" style="max-width:160px;" name="dateFrom" th:value="${dateFrom}">
+        <span>~</span>
+        <input type="date" class="form-control" style="max-width:160px;" name="dateTo" th:value="${dateTo}">
+
+        <button type="submit" class="btn btn-primary btn-sm">검색</button>
+        <a th:href="@{/hospitalAdmin/reservations}" class="btn btn-outline-secondary btn-sm">초기화</a>
+      </form>
 
       <div class="table-responsive">
         <table class="table table-hover align-middle">
@@ -452,13 +477,13 @@
 
         <a class="page-btn"
            th:classappend="${reservationPage.first} ? ' disabled' : ''"
-           th:href="${reservationPage.first} ? '#' : @{/hospitalAdmin/reservations(page=${currentPage - 1})}">
+           th:href="${reservationPage.first} ? '#' : @{/hospitalAdmin/reservations(page=${currentPage - 1}, status=${status}, dateFrom=${dateFrom}, dateTo=${dateTo})}">
           이전
         </a>
 
         <a class="page-btn"
            th:each="pageNum : ${#numbers.sequence(0, reservationPage.totalPages - 1)}"
-           th:href="@{/hospitalAdmin/reservations(page=${pageNum})}"
+           th:href="@{/hospitalAdmin/reservations(page=${pageNum}, status=${status}, dateFrom=${dateFrom}, dateTo=${dateTo})}"
            th:classappend="${pageNum == currentPage} ? ' active' : ''"
            th:text="${pageNum + 1}">
           1
@@ -466,7 +491,7 @@
 
         <a class="page-btn"
            th:classappend="${reservationPage.last} ? ' disabled' : ''"
-           th:href="${reservationPage.last} ? '#' : @{/hospitalAdmin/reservations(page=${currentPage + 1})}">
+           th:href="${reservationPage.last} ? '#' : @{/hospitalAdmin/reservations(page=${currentPage + 1}, status=${status}, dateFrom=${dateFrom}, dateTo=${dateTo})}">
           다음
         </a>
 
@@ -474,6 +499,9 @@
 
     </div>
   </div>
+</div>
+
+  </main>
 </div>
 
 <div class="modal fade" id="messageModal" tabindex="-1"
@@ -506,6 +534,8 @@
   const messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
   messageModal.show();
 </script>
+
+<div th:replace="~{fragments/sseNotification :: sseNotification}"></div>
 
 </body>
 </html>

@@ -1,5 +1,6 @@
 package com.petmilyday.entity.hospital;
 
+import com.petmilyday.entity.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -72,6 +73,19 @@ public class Hospital {
     @Builder.Default
     @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL)
     private List<HospitalImg> images = new ArrayList<>();
+
+    // 병원 삭제 시 해당 병원의 예약/리뷰/병원관리자 기록도 함께 삭제되도록 cascade 설정
+    @Builder.Default
+    @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reservation> reservations = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HospitalReview> reviews = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "hospital", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HospitalManager> managers = new ArrayList<>();
 
     // 메인 관리자: 병원 기본정보 수정
     public void updateBasicInfo(String name,

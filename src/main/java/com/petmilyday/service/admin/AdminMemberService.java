@@ -1,6 +1,7 @@
 package com.petmilyday.service.admin;
 
 import com.petmilyday.dto.admin.AdminMemberDTO;
+import com.petmilyday.dto.admin.MemberSearchDTO;
 import com.petmilyday.entity.member.Role;
 import org.springframework.data.domain.Page;
 
@@ -8,8 +9,8 @@ import java.util.List;
 
 public interface AdminMemberService {
 
-    // 관리자 회원 목록 페이징 조회
-    Page<AdminMemberDTO> memberList(int page);
+    // 관리자 회원 목록 검색/필터 + 페이징 조회
+    Page<AdminMemberDTO> memberList(MemberSearchDTO searchDTO, int page);
 
     // 회원 정지
     void banMember(Long memberId, String currentUsername);

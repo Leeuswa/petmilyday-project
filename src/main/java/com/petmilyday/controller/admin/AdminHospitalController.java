@@ -1,6 +1,7 @@
 package com.petmilyday.controller.admin;
 
 import com.petmilyday.dto.admin.AdminHospitalDTO;
+import com.petmilyday.dto.hospital.HospitalRequestDTO;
 import com.petmilyday.service.admin.AdminHospitalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +18,15 @@ public class AdminHospitalController {
 
     private final AdminHospitalService adminHospitalService;
 
-    // 병원 목록 조회
+    // 병원 목록 조회 (검색/필터 포함)
     @GetMapping("/")
-    public String hospitalList(@RequestParam(defaultValue = "0") int page,
+    public String hospitalList(HospitalRequestDTO searchDTO,
+                               @RequestParam(defaultValue = "0") int page,
                                Model model) {
 
-        model.addAttribute("hospitalPage", adminHospitalService.findAllPage(page));
+        model.addAttribute("hospitalPage", adminHospitalService.findAllPage(searchDTO, page));
         model.addAttribute("currentPage", page);
+        model.addAttribute("searchDTO", searchDTO);
 
         return "admin/hospitals/hospitalList";
     }
@@ -109,9 +112,12 @@ public class AdminHospitalController {
     public String remove(@PathVariable Long hospitalId,
                          RedirectAttributes redirectAttributes) {
 
-        adminHospitalService.remove(hospitalId);
-
-        redirectAttributes.addFlashAttribute("message", "병원이 삭제되었습니다.");
+        try {
+            adminHospitalService.remove(hospitalId);
+            redirectAttributes.addFlashAttribute("message", "병원이 삭제되었습니다.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("message", "병원 삭제에 실패했습니다: " + e.getMessage());
+        }
 
         return "redirect:/admin/hospitals/";
     }

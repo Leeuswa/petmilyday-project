@@ -103,12 +103,13 @@ public class HospitalManagerServiceImpl implements HospitalManagerService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<HospitalManager> waitingListPage(int page) {
+    public Page<HospitalManager> waitingListPage(String keyword, int page) {
 
         Pageable pageable = PageRequest.of(page, 10);
 
         return hospitalManagerRepository.findByStatusWithMemberAndHospitalPage(
                 HospitalManagerStatus.WAITING,
+                keyword,
                 pageable
         );
     }

@@ -18,7 +18,7 @@
 <div class="container py-5">
     <div class="medical-wrap">
 
-        <div class="page-header-box">
+        <div class="pm-list-page-header">
             <div>
                 <h3>
                     <i class="bi bi-clipboard2-pulse"></i>
@@ -27,7 +27,7 @@
                 <p>진료가 완료된 동물병원 예약 기록을 확인할 수 있습니다.</p>
             </div>
 
-            <div class="summary-card">
+            <div class="pm-list-summary pm-list-summary--mint">
                 <span>진료 완료 기록</span>
                 <strong>
                     <span th:text="${medicalRecordPage.totalElements}">0</span>건
@@ -36,10 +36,10 @@
         </div>
 
         <!-- 기록 없음 -->
-        <div class="empty-card"
+        <div class="pm-list-empty"
              th:if="${#lists.isEmpty(medicalRecordPage.content)}">
 
-            <i class="bi bi-clipboard-x"></i>
+            <i class="bi bi-clipboard-x pm-list-empty-icon"></i>
 
             <h5 class="fw-bold mb-2">
                 진료기록이 없습니다.
@@ -62,8 +62,7 @@
             <div class="col-12"
                  th:each="record : ${medicalRecordPage.content}">
 
-                <div class="record-card">
-                    <div class="record-main">
+                <div class="pm-list-card">
 
                         <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                             <h5 class="hospital-name"
@@ -126,22 +125,21 @@
                             </a>
                         </div>
 
-                    </div>
                 </div>
 
             </div>
         </div>
 
         <!-- 페이징 -->
-        <div class="pagination-wrap" th:if="${medicalRecordPage.totalPages > 1}">
+        <div class="pm-pagination" th:if="${medicalRecordPage.totalPages > 1}">
 
-            <a class="page-btn"
+            <a class="pm-page-btn"
                th:classappend="${medicalRecordPage.first} ? ' disabled' : ''"
                th:href="${medicalRecordPage.first} ? '#' : @{/reservation/medical-records(page=${currentPage - 1})}">
                 이전
             </a>
 
-            <a class="page-btn"
+            <a class="pm-page-btn"
                th:each="pageNum : ${#numbers.sequence(0, medicalRecordPage.totalPages - 1)}"
                th:href="@{/reservation/medical-records(page=${pageNum})}"
                th:classappend="${pageNum == currentPage} ? ' active' : ''"
@@ -149,7 +147,7 @@
                 1
             </a>
 
-            <a class="page-btn"
+            <a class="pm-page-btn"
                th:classappend="${medicalRecordPage.last} ? ' disabled' : ''"
                th:href="${medicalRecordPage.last} ? '#' : @{/reservation/medical-records(page=${currentPage + 1})}">
                 다음

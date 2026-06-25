@@ -1,6 +1,7 @@
 package com.petmilyday.service.impl.admin;
 
 import com.petmilyday.dto.admin.AdminReservationDTO;
+import com.petmilyday.dto.admin.ReservationSearchDTO;
 import com.petmilyday.entity.reservation.Reservation;
 import com.petmilyday.repository.reservation.ReservationRepository;
 import com.petmilyday.service.admin.AdminReservationService;
@@ -18,14 +19,14 @@ public class AdminReservationServiceImpl implements AdminReservationService {
 
     private final ReservationRepository reservationRepository;
 
-    // 예약 리스트 페이징
+    // 예약 리스트 검색/필터 + 페이징
     @Override
     @Transactional(readOnly = true)
-    public Page<AdminReservationDTO> reservationList(int page) {
+    public Page<AdminReservationDTO> reservationList(ReservationSearchDTO searchDTO, int page) {
 
         Pageable pageable = PageRequest.of(page, 10);
 
-        return reservationRepository.findAllForAdmin(pageable)
+        return reservationRepository.searchAdminReservationsPage(searchDTO, pageable)
                 .map(this::toDTO);
     }
 

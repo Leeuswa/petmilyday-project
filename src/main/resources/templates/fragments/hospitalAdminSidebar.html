@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<body>
+
+<aside class="sidebar" th:fragment="hospitalAdminSidebar(activeMenu)">
+
+  <a th:href="@{/}"
+     class="logo"
+     style="text-decoration: none; color: inherit; display: block;">
+    펫밀리데이
+  </a>
+
+  <div class="notification-wrap">
+    <button type="button" class="notification-btn">
+      🔔 알림
+      <span id="notification-count" class="notification-count" style="display:none;">0</span>
+    </button>
+
+    <div class="notification-dropdown">
+      <div class="notification-title">알림</div>
+      <div id="notification-list" class="notification-list">
+        <div class="notification-empty">새 알림이 없습니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="menu">
+    <a th:href="@{/hospitalAdmin/hospital}"
+       th:classappend="${activeMenu == 'hospital'} ? ' active' : ''">
+      병원 정보 관리
+    </a>
+    <a th:href="@{/hospitalAdmin/reservations}"
+       th:classappend="${activeMenu == 'reservations'} ? ' active' : ''">
+      예약 관리
+    </a>
+  </nav>
+
+</aside>
+
+</body>
+</html>

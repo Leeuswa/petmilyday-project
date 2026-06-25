@@ -101,24 +101,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
             Pageable pageable
     );
 
-    // 메인 관리자용 전체 예약 목록 조회
-    // 전체 병원의 예약을 날짜/시간 최신순으로 조회
-    @Query(
-            value = """
-                    SELECT r
-                    FROM Reservation r
-                    JOIN FETCH r.hospital h
-                    JOIN FETCH r.member m
-                    LEFT JOIN FETCH r.pet p
-                    ORDER BY r.reserveDate DESC, r.reserveTime DESC, r.createdAt DESC
-                    """,
-            countQuery = """
-                    SELECT count(r)
-                    FROM Reservation r
-                    """
-    )
-    Page<Reservation> findAllForAdmin(Pageable pageable);
-
     // 병원 관리자용 예약 목록 조회
     // 담당 병원의 전체 예약을 날짜/시간 최신순으로 조회
     @Query("""
@@ -133,27 +115,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
 
     // 병원 관리자용 예약 목록 페이징 조회
     // 담당 병원의 전체 예약을 페이지 단위로 조회
-    @Query(
-            value = """
-                    SELECT r
-                    FROM Reservation r
-                    JOIN FETCH r.hospital h
-                    JOIN FETCH r.member m
-                    LEFT JOIN FETCH r.pet p
-                    WHERE r.hospital.id = :hospitalId
-                    ORDER BY r.reserveDate DESC, r.reserveTime DESC, r.createdAt DESC
-                    """,
-            countQuery = """
-                    SELECT count(r)
-                    FROM Reservation r
-                    WHERE r.hospital.id = :hospitalId
-                    """
-    )
-    Page<Reservation> findHospitalReservationsPage(
-            @Param("hospitalId") Long hospitalId,
-            Pageable pageable
-    );
-
     // 실시간 대기열 재정렬용 예약 목록 조회
     // 같은 병원 + 같은 날짜 + 같은 시간대 예약 중 취소 상태가 아닌 예약들을 생성순으로 가져옴
     // 생성순으로 1번, 2번, 3번 대기번호를 다시 부여하기 위해 사용

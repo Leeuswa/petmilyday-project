@@ -27,20 +27,24 @@ public class AdminContentManageController {
     private final UsedPostRepository usedPostRepository;
     private final HospitalReviewRepository hospitalReviewRepository;
     private final ProductQnaRepository productQnaRepository;
-    // 중고마켓 게시글 신고 목록
+    // 중고마켓 게시글 신고 목록 (처리상태/키워드 검색)
     @GetMapping("/reports/used-posts")
-    public String usedPostReportList(@RequestParam(defaultValue = "0") int page,
+    public String usedPostReportList(@RequestParam(required = false) Boolean hidden,
+                                     @RequestParam(required = false) String keyword,
+                                     @RequestParam(defaultValue = "0") int page,
                                      Model model) {
 
         Pageable pageable = PageRequest.of(page, 10);
 
         Page<UsedPostReport> reportPage =
-                usedPostReportRepository.findAllForAdmin(pageable);
+                usedPostReportRepository.searchForAdmin(hidden, keyword, pageable);
 
         model.addAttribute("reportPage", reportPage);
         model.addAttribute("reportList", reportPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", reportPage.getTotalPages());
+        model.addAttribute("hidden", hidden);
+        model.addAttribute("keyword", keyword);
 
         return "admin/report/usedPostReportList";
     }
@@ -75,20 +79,22 @@ public class AdminContentManageController {
         return "redirect:/admin/reports/used-posts";
     }
 
-    // 병원 리뷰 신고 목록
+    // 병원 리뷰 신고 목록 (키워드 검색)
     @GetMapping("/reviews/hospital")
-    public String hospitalReviewReportList(@RequestParam(defaultValue = "0") int page,
+    public String hospitalReviewReportList(@RequestParam(required = false) String keyword,
+                                           @RequestParam(defaultValue = "0") int page,
                                            Model model) {
 
         Pageable pageable = PageRequest.of(page, 10);
 
         Page<HospitalReview> reviewPage =
-                hospitalReviewRepository.findReportedReviewsForAdmin(pageable);
+                hospitalReviewRepository.searchReportedReviewsForAdmin(keyword, pageable);
 
         model.addAttribute("reviewPage", reviewPage);
         model.addAttribute("reviewList", reviewPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", reviewPage.getTotalPages());
+        model.addAttribute("keyword", keyword);
 
         return "admin/review/hospitalReviewReportList";
     }
@@ -120,20 +126,24 @@ public class AdminContentManageController {
         return "redirect:/admin/reviews/hospital";
     }
 
-    // QnA 관리 목록
+    // QnA 관리 목록 (상태/키워드 검색)
     @GetMapping("/qna")
-    public String qnaList(@RequestParam(defaultValue = "0") int page,
+    public String qnaList(@RequestParam(required = false) String status,
+                          @RequestParam(required = false) String keyword,
+                          @RequestParam(defaultValue = "0") int page,
                           Model model) {
 
         Pageable pageable = PageRequest.of(page, 10);
 
         Page<ProductQna> qnaPage =
-                productQnaRepository.findAllForAdmin(pageable);
+                productQnaRepository.searchForAdmin(status, keyword, pageable);
 
         model.addAttribute("qnaPage", qnaPage);
         model.addAttribute("qnaList", qnaPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", qnaPage.getTotalPages());
+        model.addAttribute("status", status);
+        model.addAttribute("keyword", keyword);
 
         return "admin/qna/qnaList";
     }

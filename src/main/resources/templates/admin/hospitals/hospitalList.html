@@ -313,6 +313,35 @@
           </div>
         </div>
 
+        <form th:action="@{/admin/hospitals/}"
+              method="get"
+              style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding:0 24px 18px;">
+
+          <input type="text"
+                 class="form-control"
+                 style="max-width:220px;"
+                 name="keyword"
+                 placeholder="병원명 검색"
+                 th:value="${searchDTO.keyword}">
+
+          <select class="form-control" style="max-width:160px;" name="department">
+            <option value="" th:selected="${searchDTO.department == null or searchDTO.department == ''}">전체 진료과</option>
+            <option value="내과" th:selected="${searchDTO.department == '내과'}">내과</option>
+            <option value="외과" th:selected="${searchDTO.department == '외과'}">외과</option>
+            <option value="피부과" th:selected="${searchDTO.department == '피부과'}">피부과</option>
+            <option value="치과" th:selected="${searchDTO.department == '치과'}">치과</option>
+            <option value="안과" th:selected="${searchDTO.department == '안과'}">안과</option>
+          </select>
+
+          <label style="display:flex; align-items:center; gap:6px; font-size:14px; font-weight:600; color:#374151;">
+            <input type="checkbox" name="isEmergency" value="true" th:checked="${searchDTO.isEmergency == true}">
+            응급진료만
+          </label>
+
+          <button type="submit" class="btn btn-primary btn-sm">검색</button>
+          <a th:href="@{/admin/hospitals/}" class="btn btn-outline btn-sm">초기화</a>
+        </form>
+
         <div class="table-wrap">
           <table class="hospital-table">
             <thead>
@@ -397,13 +426,13 @@
 
           <a class="page-btn"
              th:classappend="${hospitalPage.first} ? ' disabled' : ''"
-             th:href="${hospitalPage.first} ? '#' : @{/admin/hospitals/(page=${currentPage - 1})}">
+             th:href="${hospitalPage.first} ? '#' : @{/admin/hospitals/(page=${currentPage - 1}, keyword=${searchDTO.keyword}, department=${searchDTO.department}, isEmergency=${searchDTO.isEmergency})}">
             이전
           </a>
 
           <a class="page-btn"
              th:each="pageNum : ${#numbers.sequence(0, hospitalPage.totalPages - 1)}"
-             th:href="@{/admin/hospitals/(page=${pageNum})}"
+             th:href="@{/admin/hospitals/(page=${pageNum}, keyword=${searchDTO.keyword}, department=${searchDTO.department}, isEmergency=${searchDTO.isEmergency})}"
              th:classappend="${pageNum == currentPage} ? ' active' : ''"
              th:text="${pageNum + 1}">
             1
@@ -411,7 +440,7 @@
 
           <a class="page-btn"
              th:classappend="${hospitalPage.last} ? ' disabled' : ''"
-             th:href="${hospitalPage.last} ? '#' : @{/admin/hospitals/(page=${currentPage + 1})}">
+             th:href="${hospitalPage.last} ? '#' : @{/admin/hospitals/(page=${currentPage + 1}, keyword=${searchDTO.keyword}, department=${searchDTO.department}, isEmergency=${searchDTO.isEmergency})}">
             다음
           </a>
 

@@ -14,6 +14,7 @@ public class HospitalReviewResponseDTO {
     private Long hospitalId;
     private String hospitalName;
     private Long memberId;
+    private String memberUsername;
     private String memberNickname;
     private Integer rating;
     private String content;

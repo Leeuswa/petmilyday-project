@@ -189,6 +189,7 @@ public class HospitalReviewServiceImpl implements HospitalReviewService {
 
         dto.setMemberNickname(review.getMember().getNickname());
         dto.setMemberId(review.getMember().getId());
+        dto.setMemberUsername(review.getMember().getUsername());
         dto.setHospitalId(review.getHospital().getId());
         dto.setHospitalName(review.getHospital().getName());
 
