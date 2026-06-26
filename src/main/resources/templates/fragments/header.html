@@ -40,18 +40,6 @@
         <span class="nav-link dropbtn">동물병원 예약</span>
         <div class="dropdown-content">
 
-          <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
-             th:href="@{/hospitalAdmin/hospital}">
-            병원 정보 관리
-          </a>
-
-          <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
-             th:href="@{/hospitalAdmin/reservations}">
-            병원 예약 관리
-          </a>
-
-          <hr sec:authorize="hasRole('HOSPITAL_ADMIN')">
-
           <a th:href="@{/hospital/list}">
             병원 검색/예약
           </a>
@@ -143,6 +131,18 @@
               </a>
 
               <hr sec:authorize="hasRole('ADMIN')">
+
+              <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
+                 th:href="@{/hospitalAdmin/hospital}">
+                🏥 병원 정보 관리
+              </a>
+
+              <a sec:authorize="hasRole('HOSPITAL_ADMIN')"
+                 th:href="@{/hospitalAdmin/reservations}">
+                🏥 병원 예약 관리
+              </a>
+
+              <hr sec:authorize="hasRole('HOSPITAL_ADMIN')">
 
               <a th:href="@{/member/mypage}">👤 회원정보 수정</a>
               <a th:href="@{/member/mypage/myPosts}">📝 내가 쓴 게시글</a>

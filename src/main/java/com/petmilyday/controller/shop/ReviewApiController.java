@@ -44,6 +44,7 @@ public class ReviewApiController {
 
             map.put("nickname", writer != null ? writer.getNickname() : "탈퇴한 회원");
             map.put("memberId", review.getMemberId());
+            map.put("isReported", Boolean.TRUE.equals(review.getIsReported()));
 
             return map;
         }).toList();
@@ -102,6 +103,27 @@ public class ReviewApiController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 삭제 중 알 수 없는 오류 발생");
+        }
+    }
+
+    // 리뷰 신고
+    @PostMapping("/{reviewId}/report")
+    public ResponseEntity<?> reportReview(@PathVariable Long reviewId, Principal principal) {
+        try {
+            if (principal == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요한 서비스입니다.");
+            }
+
+            String username = principal.getName();
+            Member member = memberRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+            reviewService.reportReview(reviewId, member.getId());
+
+            return ResponseEntity.ok().body(Map.of("success", true, "message", "리뷰가 신고되었습니다."));
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

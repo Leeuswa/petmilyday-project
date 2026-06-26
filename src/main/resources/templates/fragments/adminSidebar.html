@@ -72,6 +72,21 @@
       </a>
     </div>
 
+    <!-- 동물용품샵 -->
+    <div class="menu-section">
+      <div class="menu-title">동물용품샵</div>
+
+      <a th:href="@{/admin/qna}"
+         th:classappend="${activeMenu == 'qna'} ? ' active' : ''">
+        QnA 관리
+      </a>
+
+      <a th:href="@{/admin/reviews/product}"
+         th:classappend="${activeMenu == 'productReviews'} ? ' active' : ''">
+        리뷰 조회
+      </a>
+    </div>
+
     <!-- 중고거래 -->
     <div class="menu-section">
       <div class="menu-title">중고거래</div>
@@ -79,11 +94,6 @@
       <a th:href="@{/admin/reports/used-posts}"
          th:classappend="${activeMenu == 'usedReports'} ? ' active' : ''">
         중고거래 신고 관리
-      </a>
-
-      <a th:href="@{/admin/qna}"
-         th:classappend="${activeMenu == 'qna'} ? ' active' : ''">
-        QnA 관리
       </a>
     </div>
 

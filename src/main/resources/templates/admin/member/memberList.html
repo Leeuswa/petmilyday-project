@@ -447,7 +447,9 @@
                       USER
                     </option>
 
+                    <!-- HOSPITAL_ADMIN은 신청-승인 절차로만 부여하므로, 이미 HOSPITAL_ADMIN인 회원만 옵션으로 표시 -->
                     <option value="HOSPITAL_ADMIN"
+                            th:if="${member.role.name() == 'HOSPITAL_ADMIN'}"
                             th:selected="${member.role.name() == 'HOSPITAL_ADMIN'}">
                       HOSPITAL_ADMIN
                     </option>
