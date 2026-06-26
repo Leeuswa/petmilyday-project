@@ -16,7 +16,7 @@ public class MemberDTO {
     public static class RegisterRequest {
 
         @NotBlank(message = "아이디는 필수 입력 사항입니다.")
-        @Size(max = 20, message = "아이디는 20자 이내여야 합니다.")
+        @Size(min = 4, max = 20, message = "아이디는 20자 이내여야 합니다.")
         @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "아이디는 영문 및 숫자만 허용됩니다.")
         private String username;
 

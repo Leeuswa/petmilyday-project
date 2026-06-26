@@ -113,6 +113,18 @@
       return;
     }
 
+    if (username.length < 4 || username.length > 20) {
+      alert("아이디는 4자 이상 20자 이하로 입력해 주세요.");
+      usernameInput.focus();
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9]+$/.test(username)) {
+      alert("아이디는 영문과 숫자만 사용할 수 있습니다.");
+      usernameInput.focus();
+      return;
+    }
+
     const tokenElement = document.querySelector("meta[name='_csrf']");
     const headerElement = document.querySelector("meta[name='_csrf_header']");
     const token = tokenElement ? tokenElement.getAttribute("content") : "";
