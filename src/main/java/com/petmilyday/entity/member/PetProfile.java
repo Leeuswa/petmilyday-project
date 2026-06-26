@@ -1,10 +1,14 @@
 package com.petmilyday.entity.member;
 
+import com.petmilyday.entity.reservation.Reservation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,4 +43,7 @@ public class PetProfile {
 
     @Column(length = 500)
     private String photoUrl;
+
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Reservation> reservations = new ArrayList<>();
 }
