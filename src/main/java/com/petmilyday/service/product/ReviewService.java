@@ -61,4 +61,21 @@ public class ReviewService {
 
         reviewRepository.delete(review);
     }
+
+    // 리뷰 신고
+    @Transactional
+    public void reportReview(Long reviewId, Long currentMemberId) {
+        ProductReview review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 리뷰입니다."));
+
+        if (review.getMemberId().equals(currentMemberId)) {
+            throw new IllegalArgumentException("본인이 작성한 리뷰는 신고할 수 없습니다.");
+        }
+
+        if (Boolean.TRUE.equals(review.getIsReported())) {
+            throw new IllegalStateException("이미 신고된 리뷰입니다.");
+        }
+
+        review.report();
+    }
 }

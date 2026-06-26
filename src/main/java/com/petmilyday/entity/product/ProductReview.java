@@ -37,8 +37,21 @@ public class ProductReview {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "is_reported", nullable = false)
+    private Boolean isReported = false;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    // 신고 처리
+    public void report() {
+        this.isReported = true;
+    }
+
+    // 신고 해제
+    public void restoreReport() {
+        this.isReported = false;
     }
 }

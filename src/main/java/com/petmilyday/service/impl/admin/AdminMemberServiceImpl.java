@@ -99,6 +99,11 @@ public class AdminMemberServiceImpl implements AdminMemberService {
             throw new RuntimeException("탈퇴한 회원은 변경할 수 없습니다.");
         }
 
+        // USER/ADMIN을 HOSPITAL_ADMIN으로 직접 바꾸는 것은 금지 (병원관리자 신청-승인 절차로만 부여)
+        if (role == Role.HOSPITAL_ADMIN && member.getRole() != Role.HOSPITAL_ADMIN) {
+            throw new RuntimeException("병원 관리자 권한은 '병원 관리자 신청' 승인 절차로만 부여할 수 있습니다.");
+        }
+
         // 회원 권한 변경
         member.changeRole(role);
     }

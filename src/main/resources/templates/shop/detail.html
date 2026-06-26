@@ -343,12 +343,19 @@
                         deleteBtn = `<button class="btn btn-outline-danger btn-sm p-1 px-2 border-0" style="font-size:11px;" onclick="deleteMyReview(${r.id})"><i class="bi bi-trash"></i> 삭제</button>`;
                     }
 
+                    let reportBtn = '';
+                    const isOwnReview = currentMemberIdVal && String(currentMemberIdVal) === String(r.memberId);
+                    if (currentMemberIdVal && !isOwnReview && !r.isReported) {
+                        reportBtn = `<button class="btn btn-outline-secondary btn-sm p-1 px-2 border-0" style="font-size:11px;" onclick="reportProductReview(${r.id})"><i class="bi bi-flag"></i> 신고</button>`;
+                    }
+
                     reviewContainer.innerHTML += `
             <div class="pb-3 border-bottom small">
                 <div class="d-flex justify-content-between align-items-center">
                     <strong>${writerName}</strong>
                     <div class="d-flex align-items-center gap-2">
                         <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+                        ${reportBtn}
                         ${deleteBtn}
                     </div>
                 </div>
@@ -373,6 +380,15 @@
                 if (res.ok) { alert('리뷰가 삭제되었습니다. 🧹'); loadRealReviews(); }
                 else { res.text().then(msg => alert('삭제 실패: ' + msg)); }
             }).catch(err => console.error("리뷰 삭제 에러:", err));
+    }
+
+    function reportProductReview(reviewId) {
+        if (!confirm('이 리뷰를 신고하시겠습니까?')) return;
+        fetch('/api/reviews/' + reviewId + '/report', { method: 'POST' })
+            .then(res => {
+                if (res.ok) { alert('리뷰가 신고되었습니다.'); loadRealReviews(); }
+                else { res.text().then(msg => alert('신고 실패: ' + msg)); }
+            }).catch(err => console.error("리뷰 신고 에러:", err));
     }
 
     function openImageModal(imgSrc) {

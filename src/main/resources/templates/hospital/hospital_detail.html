@@ -216,6 +216,12 @@
                                             신고
                                         </button>
                                     </form>
+
+                                    <span th:if="${review.isReported == true and #authentication != null and #authentication.name == review.memberUsername}"
+                                          class="badge bg-secondary">
+                                        <i class="bi bi-flag-fill"></i>
+                                        신고 접수됨
+                                    </span>
                                 </div>
                             </div>
 

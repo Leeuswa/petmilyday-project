@@ -386,7 +386,7 @@
                         </button>
                     </form>
 
-                    <span th:if="${review.isReported == true}"
+                    <span th:if="${review.isReported == true and #authentication != null and #authentication.name == review.memberUsername}"
                           class="reported-badge">
                         <i class="bi bi-flag-fill"></i>
                         신고됨

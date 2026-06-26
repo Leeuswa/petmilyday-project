@@ -1,10 +1,17 @@
 package com.petmilyday.controller.admin;
 
+import com.petmilyday.dto.product.ProductReviewAdminDto;
 import com.petmilyday.entity.hospital.HospitalReview;
+import com.petmilyday.entity.member.Member;
+import com.petmilyday.entity.product.Product;
 import com.petmilyday.entity.product.ProductQna;
+import com.petmilyday.entity.product.ProductReview;
 import com.petmilyday.entity.used.UsedPost;
 import com.petmilyday.entity.used.UsedPostReport;
 import com.petmilyday.repository.hospital.HospitalReviewRepository;
+import com.petmilyday.repository.member.MemberRepository;
+import com.petmilyday.repository.product.ProductRepository;
+import com.petmilyday.repository.product.ProductReviewRepository;
 import com.petmilyday.repository.shop.ProductQnaRepository;
 import com.petmilyday.repository.used.UsedPostReportRepository;
 import com.petmilyday.repository.used.UsedPostRepository;
@@ -27,6 +34,9 @@ public class AdminContentManageController {
     private final UsedPostRepository usedPostRepository;
     private final HospitalReviewRepository hospitalReviewRepository;
     private final ProductQnaRepository productQnaRepository;
+    private final ProductReviewRepository productReviewRepository;
+    private final ProductRepository productRepository;
+    private final MemberRepository memberRepository;
     // 중고마켓 게시글 신고 목록 (처리상태/키워드 검색)
     @GetMapping("/reports/used-posts")
     public String usedPostReportList(@RequestParam(required = false) Boolean hidden,
@@ -175,5 +185,81 @@ public class AdminContentManageController {
 
         redirectAttributes.addFlashAttribute("message", "QnA를 삭제했습니다.");
         return "redirect:/admin/qna";
+    }
+
+    // 상품 리뷰 전체 조회 (키워드 검색, 신고 여부 무관)
+    @GetMapping("/reviews/product")
+    public String productReviewList(@RequestParam(required = false) String keyword,
+                                    @RequestParam(defaultValue = "0") int page,
+                                    Model model) {
+
+        Pageable pageable = PageRequest.of(page, 10);
+
+        Page<ProductReviewAdminDto> reviewPage = productReviewRepository
+                .searchReviewsForAdmin(keyword, pageable)
+                .map(review -> {
+                    Product product = productRepository.findById(review.getProductId()).orElse(null);
+                    Member member = memberRepository.findById(review.getMemberId()).orElse(null);
+
+                    return ProductReviewAdminDto.builder()
+                            .id(review.getId())
+                            .productName(product != null ? product.getName() : "삭제된 상품")
+                            .memberDisplayName(member != null ? member.getDisplayName() : "알 수 없음")
+                            .rating(review.getRating())
+                            .content(review.getContent())
+                            .imgUrl(review.getImgUrl())
+                            .createdAt(review.getCreatedAt())
+                            .isReported(Boolean.TRUE.equals(review.getIsReported()))
+                            .build();
+                });
+
+        model.addAttribute("reviewPage", reviewPage);
+        model.addAttribute("reviewList", reviewPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", reviewPage.getTotalPages());
+        model.addAttribute("keyword", keyword);
+
+        return "admin/review/productReviewReportList";
+    }
+
+    // 상품 리뷰 신고 해제
+    @PostMapping("/reviews/product/{reviewId}/restore")
+    @Transactional
+    public String restoreProductReview(@PathVariable Long reviewId,
+                                       RedirectAttributes redirectAttributes) {
+
+        try {
+            ProductReview review = productReviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new RuntimeException("리뷰를 찾을 수 없습니다."));
+
+            review.restoreReport();
+
+            redirectAttributes.addFlashAttribute("message", "리뷰 신고를 해제했습니다.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin/reviews/product";
+    }
+
+    // 상품 리뷰 삭제
+    @PostMapping("/reviews/product/{reviewId}/delete")
+    @Transactional
+    public String deleteProductReview(@PathVariable Long reviewId,
+                                      RedirectAttributes redirectAttributes) {
+
+        try {
+            if (!productReviewRepository.existsById(reviewId)) {
+                throw new RuntimeException("리뷰를 찾을 수 없습니다.");
+            }
+
+            productReviewRepository.deleteById(reviewId);
+
+            redirectAttributes.addFlashAttribute("message", "리뷰를 삭제했습니다.");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin/reviews/product";
     }
 }
