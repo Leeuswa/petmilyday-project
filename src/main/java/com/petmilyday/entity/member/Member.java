@@ -94,7 +94,8 @@ public class Member {
     }
 
     // 회원 정보 수정
-    public void updateProfile(String nickname, String email, String phoneNumber, String address, String detailAddress, String bio) {
+    public void updateProfile(String name, String nickname, String email, String phoneNumber, String address, String detailAddress, String bio) {
+        this.name = name;
         this.nickname = nickname;
         this.email = email;
         this.phoneNumber = phoneNumber;

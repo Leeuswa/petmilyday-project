@@ -16,6 +16,12 @@
   <form th:action="@{/member/modify-profile}" method="post" th:object="${updateRequest}" onsubmit="return validateModifyForm()">
 
     <div class="form-group">
+      <label for="name">이름</label>
+      <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="이름을 입력하세요">
+      <span class="error-msg" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+    </div>
+
+    <div class="form-group">
       <label for="nickname">닉네임</label>
       <input type="text" id="nickname" th:field="*{nickname}" class="form-control" placeholder="사용하실 닉네임을 입력하세요">
       <span class="error-msg" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
@@ -58,6 +64,55 @@
 
 <script>
   function validateModifyForm() {
+    const nickname = document.getElementById("nickname").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phoneNumber = document.getElementById("phoneNumber").value.trim();
+    const bio = document.getElementById("bio").value.trim();
+
+    const name = document.getElementById("name").value.trim();
+
+    if (!name) {
+      alert("이름은 필수 입력 사항입니다.");
+      document.getElementById("name").focus();
+      return false;
+    }
+    if (name.length > 30) {
+      alert("이름은 30자 이내여야 합니다.");
+      document.getElementById("name").focus();
+      return false;
+    }
+
+    if (nickname.length > 30) {
+      alert("닉네임은 30자 이내여야 합니다.");
+      document.getElementById("nickname").focus();
+      return false;
+    }
+
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!email) {
+      alert("이메일은 필수 입력 사항입니다.");
+      document.getElementById("email").focus();
+      return false;
+    }
+    if (!emailRegex.test(email)) {
+      alert("올바른 이메일 형식이 아닙니다.");
+      document.getElementById("email").focus();
+      return false;
+    }
+
+    const phoneRegex = /^\d{3}-\d{4}-\d{4}$/;
+    if (phoneNumber && !phoneRegex.test(phoneNumber)) {
+      alert("전화번호는 000-0000-0000 형식이어야 합니다.");
+      document.getElementById("phoneNumber").focus();
+      return false;
+    }
+
+    if (bio.length > 30) {
+      alert("한 줄 소개는 30자 이내여야 합니다.");
+      document.getElementById("bio").focus();
+      return false;
+    }
+
     return true;
   }
 </script>

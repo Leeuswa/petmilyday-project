@@ -144,6 +144,7 @@ public class MemberController {
         MemberDTO.MyPageResponse info = memberService.getMyPageInfo(username);
 
         MemberDTO.UpdateRequest updateRequest = MemberDTO.UpdateRequest.builder()
+                .name(info.getName())
                 .nickname(info.getNickname())
                 .email(info.getEmail())
                 .phoneNumber(info.getPhoneNumber())
@@ -218,6 +219,38 @@ public class MemberController {
         model.addAttribute("newPet", new PetProFileDTO());
 
         return "member/pet-profile";
+    }
+
+    // 회원 탈퇴
+    @PostMapping("/withdraw")
+    public String withdraw(Authentication authentication,
+                           jakarta.servlet.http.HttpServletResponse response,
+                           RedirectAttributes redirectAttributes) {
+
+        if (authentication == null) {
+            return "redirect:/member/login";
+        }
+
+        String username = authentication.getName();
+
+        try {
+            // 1. 서비스단의 회원탈퇴 로직 호출 (파라미터로 username만 넘기도록 서비스 메서드 활용)
+            memberService.withdraw(username);
+
+            // 2. 즉시 로그아웃 처리 (JWT가 저장된 Authorization 쿠키 삭제)
+            jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("Authorization", "");
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(0); // 쿠키 수명을 0으로 만들어 브라우저에서 삭제
+            response.addCookie(cookie);
+
+            redirectAttributes.addFlashAttribute("successMsg", "회원탈퇴가 정상적으로 완료되었습니다. 그동안 이용해 주셔서 감사합니다.");
+            return "redirect:/"; // 메인 페이지로 리다이렉트
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", "회원탈퇴 처리 중 오류가 발생했습니다.");
+            return "redirect:/member/mypage";
+        }
     }
 
     // 반려동물 등록 처리
