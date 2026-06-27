@@ -68,6 +68,7 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         member.updateProfile(
+                request.getName(),
                 request.getNickname(),
                 request.getEmail(),
                 request.getPhoneNumber(),
@@ -87,20 +88,24 @@ public class MemberServiceImpl implements MemberService {
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
         }
 
+        if (passwordEncoder.matches(request.getNewPassword(), member.getPassword())) {
+            throw new IllegalArgumentException("새 비밀번호는 현재 비밀번호와 다르게 설정해야 합니다.");
+        }
+
         member.updatePassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
     @Override
     @Transactional
-    public void withdraw(String username, String password) {
+    public void withdraw(String username) {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
+        // 상태값 변경 방식 (Soft Delete)인 경우
+        member.withdraw();
 
-        memberRepository.delete(member);
+        // 만약 진짜 DB에서 데이터를 아예 지우는 물리 삭제(Hard Delete)를 원하시면 아래 주석을 해제하세요.
+        // memberRepository.delete(member);
     }
 
     @Override

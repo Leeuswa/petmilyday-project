@@ -16,7 +16,7 @@ public interface MemberService {
     void updatePassword(String username, MemberDTO.UpdatePasswordRequest request);
 
     // 회원 탈퇴
-    void withdraw(String username, String password);
+    void withdraw(String username);
 
     // 로그인 비즈니스 로직
     MemberDTO.LoginResponse login(MemberDTO.LoginRequest request);

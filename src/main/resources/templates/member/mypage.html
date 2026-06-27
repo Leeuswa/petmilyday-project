@@ -52,12 +52,23 @@
       <a th:href="@{/member/pet-profile}" class="btn btn-primary">반려동물 관리</a>
       <a th:href="@{/member/modify-profile}" class="btn btn-secondary">회원정보 수정</a>
       <a th:href="@{/member/modify-password}" class="btn btn-secondary">비밀번호 변경</a>
-      <form th:action="@{/member/delete}" method="post" onsubmit="return confirm('정말 탈퇴하시겠습니까? 데이터는 복구되지 않습니다.');">
-        <button type="submit" class="btn btn-secondary">회원 탈퇴</button>
-      </form>
+      <button type="button" onclick="confirmWithdraw()" class="btn-withdraw" style="background: none; border: none; color: #ff4d4d; cursor: pointer;">회원탈퇴</button>
     </div>
+
+    <form id="withdrawForm" th:action="@{/member/withdraw}" method="post" style="display: none;"></form>
   </div>
 </div>
+</div>
+
+<script>
+  function confirmWithdraw() {
+    // 정말 탈퇴할 것인지 알림창(Confirm) 띄우기
+    if (confirm("정말 탈퇴하시겠습니까?\n탈퇴 시 모든 정보가 삭제되며 되돌릴 수 없습니다.")) {
+      // '네(확인)' 선택 시 폼 제출
+      document.getElementById("withdrawForm").submit();
+    }
+  }
+</script>
 
 </body>
 </html>

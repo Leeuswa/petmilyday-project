@@ -45,7 +45,7 @@ public class MemberDTO {
 
         private String detailAddress;
 
-        @Size(max = 100, message = "한 줄 소개는 100자 이내여야 합니다.")
+        @Size(max = 30, message = "한 줄 소개는 30자 이내여야 합니다.")
         private String bio;
     }
 
@@ -55,6 +55,10 @@ public class MemberDTO {
     @AllArgsConstructor
     @Builder
     public static class UpdateRequest {
+        @NotBlank(message = "이름은 필수 입력 사항입니다.")
+        @Size(max = 30, message = "이름은 30자 이내여야 합니다.")
+        private String name;
+
         @Size(max = 30, message = "닉네임은 30자 이내여야 합니다.")
         private String nickname;
 
@@ -69,7 +73,7 @@ public class MemberDTO {
 
         private String detailAddress;
 
-        @Size(max = 100, message = "한 줄 소개는 100자 이내여야 합니다.")
+        @Size(max = 30, message = "한 줄 소개는 30자 이내여야 합니다.")
         private String bio;
     }
 
