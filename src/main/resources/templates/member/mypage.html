@@ -47,6 +47,10 @@
       <div class="info-label">주소</div>
       <div class="info-value" th:text="${member.address}"></div>
     </div>
+    <div class="info-row">
+      <div class="info-label">한 줄 소개</div>
+      <div class="info-value" th:text="${member.bio}"></div>
+    </div>
 
     <div class="btn-wrap">
       <a th:href="@{/member/pet-profile}" class="btn btn-primary">반려동물 관리</a>
