@@ -413,7 +413,6 @@
         const content = document.getElementById('reviewContentInput').value.trim();
         const fileInput = document.getElementById('reviewImageInput');
         const file = fileInput ? fileInput.files[0] : null;
-        const mockOrderId = Math.floor(Math.random() * 100000) + 1;
 
         if (!currentProductId) return alert('상품 정보 오류');
         const submitBtn = document.getElementById('reviewSubmitBtn');
@@ -435,7 +434,6 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     productId: currentProductId,
-                    orderId: mockOrderId,
                     rating: rating,
                     content: content,
                     imgUrl: finalImageUrl
