@@ -89,8 +89,16 @@ public class ProductService {
     }
 
     @Transactional
-    public void registerProduct(ProductRequestDto dto) {
-        String imgUrl = s3UploadService.uploadFile(dto.getImageFile());
+    public void registerProduct(ProductRequestDto dto, MultipartFile imageFile, MultipartFile descFile) {
+        String imgUrl = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imgUrl = s3UploadService.uploadFile(imageFile);
+        }
+
+        String descImgUrl = null;
+        if (descFile != null && !descFile.isEmpty()) {
+            descImgUrl = s3UploadService.uploadFile(descFile);
+        }
 
         Product product = Product.builder()
                 .name(dto.getName())
@@ -99,6 +107,7 @@ public class ProductService {
                 .category(dto.getCategory())
                 .description(dto.getDescription())
                 .imgUrl(imgUrl)
+                .descImgUrl(descImgUrl)
                 .petSpecies(dto.getPetSpecies())
                 .material(dto.getMaterial())
                 .sizeInfo(dto.getSizeInfo())
