@@ -62,7 +62,18 @@
 
                     <div class="form-group mb-3">
                         <label class="info-label">상품 이미지</label>
-                        <input type="file" name="imageFile" accept="image/*" class="form-control" required>
+                        <input type="file" name="imageFile" accept="image/*" class="form-control" onchange="previewCreateImage(this)" required>
+                        <div id="imagePreviewArea" class="mt-3 text-center d-none">
+                            <img id="createImagePreview" class="rounded border shadow-sm" style="max-width: 140px; max-height: 140px; object-fit: cover;" alt="미리보기">
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="info-label">상세 설명 이미지</label>
+                        <input type="file" name="descImgFile" accept="image/*" class="form-control" onchange="previewDescImage(this)">
+                        <div id="descImagePreviewArea" class="mt-3 text-center d-none">
+                            <img id="createDescPreview" class="rounded border shadow-sm" style="max-width: 140px; max-height: 140px; object-fit: cover;" alt="미리보기">
+                        </div>
                     </div>
 
                     <div class="row g-3 mb-4">
@@ -97,5 +108,36 @@
     </div>
 </div>
 
+<script th:inline="javascript">
+    function previewCreateImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('createImagePreview');
+                const previewArea = document.getElementById('imagePreviewArea');
+                if (previewImg && previewArea) {
+                    previewImg.src = e.target.result;
+                    previewArea.classList.remove('d-none');
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function previewDescImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('createDescPreview');
+                const previewArea = document.getElementById('descImagePreviewArea');
+                if (previewImg && previewArea) {
+                    previewImg.src = e.target.result;
+                    previewArea.classList.remove('d-none');
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 </body>
 </html>
