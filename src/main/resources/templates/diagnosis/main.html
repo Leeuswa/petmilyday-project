@@ -128,53 +128,6 @@
 
     </div>
 
-    <div class="stats-grid">
-
-        <div class="stat-card">
-
-            <div class="stat-icon">
-                🩺
-            </div>
-
-            <div>
-                <div class="stat-title">
-                    총 진단 횟수
-                </div>
-
-                <div class="stat-value"
-                     th:text="${totalDiagnosisCount ?: 0}">
-                    0
-                </div>
-            </div>
-
-        </div>
-
-        <div class="stat-card">
-
-            <div class="stat-icon">
-                📅
-            </div>
-
-            <div>
-                <div class="stat-title">
-                    최근 진단일
-                </div>
-
-                <div class="stat-value date-value"
-                     th:if="${lastDiagnosisDate != null}"
-                     th:text="${#temporals.format(lastDiagnosisDate,'yyyy-MM-dd')}">
-                </div>
-
-                <div class="stat-value date-value"
-                     th:if="${lastDiagnosisDate == null}">
-                    없음
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
     <div class="content-layout">
 
         <main class="content-main">
