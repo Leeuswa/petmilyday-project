@@ -3,18 +3,12 @@ package com.petmilyday.repository.product;
 import com.petmilyday.entity.product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+    // JpaRepository를 상속받았기에 기본 CRUD가 자동 생성
 
-
-    List<Product> findByIsDeletedFalse();
-
-    List<Product> findByCategoryAndIsDeletedFalse(String category);
-
-    Page<Product> findByIsDeletedFalse(Pageable pageable);
+    List<Product> findByCategory(String category);
 }
