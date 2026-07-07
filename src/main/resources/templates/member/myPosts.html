@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>펫밀리데이 - 내가 쓴 게시글</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/member/myPosts.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="mypage-container">
+    <h2 class="page-title">내가 쓴 커뮤니티 게시글</h2>
+
+    <div th:if="${#lists.isEmpty(postList)}" class="empty-msg">
+        아직 작성하신 게시글이 없습니다. 첫 글을 남겨보세요!
+    </div>
+
+    <ul class="post-list" th:unless="${#lists.isEmpty(postList)}">
+        <li class="post-item" th:each="post : ${postList}">
+            <div class="post-title-wrap">
+                <span th:if="${post.anonymous}" class="type-badge type-anonymous">익명</span>
+                <span th:unless="${post.anonymous}" class="type-badge type-nickname">닉네임</span>
+                <a th:href="@{/community/read(id=${post.id})}" th:text="${post.title}">게시글 제목</a>
+            </div>
+
+            <div class="post-meta">
+                <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">작성일</span>
+                <span>조회수 <span th:text="${post.viewCount}">0</span></span>
+            </div>
+        </li>
+    </ul>
+
+    <a th:href="@{/member/mypage}" class="btn-back">마이페이지로 돌아가기</a>
+</div>
+
+</body>
+</html>

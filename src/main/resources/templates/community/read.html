@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>펫밀리데이 - 게시글 상세</title>
+    <meta name="_csrf" th:content="${_csrf?.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/community/read.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+    <input type="hidden" id="currentUser" th:value="${#authentication.name != 'anonymousUser' ? #authentication.name : 'anonymousUser'}">
+    <input type="hidden" id="currentPostId" th:value="${postDTO.id}">
+
+    <div class="post-header">
+        <h1 class="post-title" th:text="${postDTO.title}">제목</h1>
+        <div class="post-info">
+            <span th:text="'작성자: ' + ${postDTO.writerName}"></span>
+            <div class="post-info-right">
+                <span th:text="${#temporals.format(postDTO.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+                <span th:text="'조회수: ' + ${postDTO.viewCount}"></span>
+                <button type="button" th:onclick="sendReport('POST', [[${postDTO.id}]])"
+                        style="padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; border: 1px solid #FFCDD2; color: #E53935; background-color: #FFEBEE; outline: none;">
+                    🚨 신고
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-content" th:text="${postDTO.content}">본문</div>
+
+    <div class="post-actions">
+        <a th:href="@{/community/list}" class="btn btn-list">목록</a>
+        <th:block th:if="${#authentication.name == postDTO.writerUsername}">
+            <a th:href="@{/community/modify(id=${postDTO.id})}" class="btn btn-modify">수정</a>
+            <form th:action="@{/community/remove}" method="post" style="display: inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                <input type="hidden" name="id" th:value="${postDTO.id}">
+                <button type="submit" class="btn btn-modify" style="background-color:#fff; color:var(--pink); border:2px solid var(--pink-light);">삭제</button>
+            </form>
+        </th:block>
+    </div>
+
+    <div class="comment-section">
+        <h3>댓글</h3>
+        <div id="comment-list-container" class="comment-list"></div>
+
+        <div class="comment-form">
+            <textarea id="new-comment-text" placeholder="우리 아이들을 위한 따뜻한 댓글을 남겨주세요."></textarea>
+            <button type="button" id="btn-comment-submit" class="comment-submit-btn" onclick="submitMainComment()">댓글 등록</button>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const postId = document.getElementById("currentPostId").value;
+
+    function getAuthHeaders() {
+        const requestHeaders = {
+            "Content-Type": "application/json"
+        };
+        const csrfMeta = document.querySelector("meta[name='_csrf']");
+        const csrfHeaderMeta = document.querySelector("meta[name='_csrf_header']");
+        if (csrfMeta && csrfHeaderMeta && csrfHeaderMeta.content) {
+            requestHeaders[csrfHeaderMeta.content] = csrfMeta.content;
+        }
+        return requestHeaders;
+    }
+
+    // 댓글 목록
+    function loadComments() {
+        const currentUser = document.getElementById("currentUser") ? document.getElementById("currentUser").value : 'anonymousUser';
+
+        fetch("/comments/list/" + postId)
+            .then(response => response.json())
+            .then(pageResponse => {
+                const container = document.getElementById("comment-list-container");
+                container.innerHTML = "";
+
+                if (!pageResponse.dtoList || pageResponse.dtoList.length === 0) {
+                    container.innerHTML = "<div style='padding:20px; text-align:center; color:var(--muted); font-weight:600;'>등록된 댓글이 없습니다. 첫 댓글을 남겨보세요.</div>";
+                    return;
+                }
+
+                pageResponse.dtoList.forEach(comment => {
+                    const isChild = comment.parentId != null;
+
+                    const isLiked = comment.likedByCurrentUser;
+                    const heartIcon = isLiked ? '♥' : '♡';
+                    const likeBtnStyle = isLiked
+                        ? "border: 1px solid #FF4B4B; color: #FF4B4B; background-color: #FFF0F0;"
+                        : "border: 1px solid var(--pink-light); color: var(--muted); background-color: #ffffff;";
+
+                    const commentHtml = `
+    <div class="comment-item ${isChild ? 'child' : ''}" style="margin-bottom:15px; padding:15px; border-bottom:1px solid var(--pink-light); ${isChild ? 'margin-left:40px; background:var(--pink-pale); border-radius: 0 16px 16px 0; border-left: 4px solid var(--pink-light);' : ''}">
+        <div class="comment-writer" style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:700;">
+            <span>${comment.writerName}</span>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <span style="color:var(--muted); font-size:12px;">${comment.createdAt}</span>
+
+                <button type="button" onclick="toggleCommentLike(${comment.id})"
+                        style="padding: 4px 10px; border-radius: 12px; font-size: 13px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: 0.2s; outline: none; ${likeBtnStyle}">
+                    <span>${heartIcon}</span> <span>${comment.likeCount}</span>
+                </button>
+
+                ${!isChild && currentUser !== 'anonymousUser' ? `
+                    <button type="button" class="comment-reply-btn" onclick="showReCommentForm(${comment.id})" style="font-size:13px; color:var(--pink); background:none; border:none; cursor:pointer; font-weight:800; padding:0;">답글</button>
+                ` : ''}
+
+                ${currentUser === comment.writerUsername ? `
+                    <button type="button" onclick="deleteComment(${comment.id})" style="font-size:13px; color:var(--muted); background:none; border:none; cursor:pointer; font-weight:800; padding:0;">삭제</button>
+                ` : ''}
+
+                ${currentUser !== 'anonymousUser' && currentUser !== comment.writerUsername ? `
+                    <button type="button" onclick="sendReport('COMMENT', ${comment.id})" style="font-size:13px; color:#E53935; background:none; border:none; cursor:pointer; font-weight:800; padding:0;">신고</button>
+                ` : ''}
+
+            </div>
+        </div>
+        <div class="comment-body" style="color:var(--dark); font-size:15px; line-height:1.5;">${comment.content}</div>
+
+        <div id="recomment-form-container-${comment.id}"></div>
+    </div>
+`;
+                    container.innerHTML += commentHtml;
+                });
+            })
+            .catch(error => console.error("댓글 로딩 실패:", error));
+    }
+
+    // 메인 댓글 전송
+    function submitMainComment() {
+        const contentInput = document.getElementById("new-comment-text");
+        const content = contentInput.value.trim();
+
+        if (!content) {
+            alert("댓글 내용을 입력해주세요.");
+            return;
+        }
+
+        const data = {
+            postId: parseInt(postId, 10),
+            content: content
+        };
+
+        fetch("/comments/", {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        })
+            .then(async response => {
+                if (response.ok) {
+                    contentInput.value = "";
+                    loadComments();
+                } else {
+                    const errorText = await response.text();
+                    alert(`댓글 등록 실패 (상태코드: ${response.status})\n서버 에러 원인: ${errorText}`);
+                }
+            })
+            .catch(error => console.error("통신 에러 :", error));
+    }
+
+    // 대댓글 폼 열기
+    function showReCommentForm(parentId) {
+        const container = document.getElementById(`recomment-form-container-${parentId}`);
+        if(container.innerHTML.trim() !== "") {
+            container.innerHTML = "";
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="recomment-form" style="margin-top:15px; display:flex; flex-direction:column; gap:8px;">
+                <textarea id="recomment-text-${parentId}" style="width:100%; height:70px; padding:12px; border:2px solid var(--pink-light); border-radius:12px; outline:none; resize:none; font-family:inherit; font-size:14px;" placeholder="답글 내용을 입력해주세요."></textarea>
+                <div style="display:flex; justify-content:flex-end; gap:8px;">
+                    <button type="button" onclick="document.getElementById('recomment-form-container-${parentId}').innerHTML=''" style="background:#ffffff; color:var(--muted); border:2px solid var(--pink-light); padding:8px 16px; border-radius:12px; font-weight:700; cursor:pointer;">취소</button>
+                    <button type="button" onclick="submitReComment(${parentId})" style="background:var(--pink); color:#ffffff; border:none; padding:8px 16px; border-radius:12px; font-weight:700; cursor:pointer;">등록</button>
+                </div>
+            </div>
+        `;
+    }
+
+    // 대댓글 전송
+    function submitReComment(parentId) {
+        const contentInput = document.getElementById(`recomment-text-${parentId}`);
+        const content = contentInput.value.trim();
+        if(!content) {
+            alert("답글 내용을 입력해주세요.");
+            return;
+        }
+
+        const data = {
+            postId: parseInt(postId, 10),
+            content: content,
+            parentId: parseInt(parentId, 10)
+        };
+
+        fetch("/comments/", {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(data)
+        })
+            .then(async response => {
+                if(response.ok) {
+                    document.getElementById(`recomment-form-container-${parentId}`).innerHTML = "";
+                    loadComments();
+                } else {
+                    const errorText = await response.text();
+                    alert(`대댓글 등록 실패 (상태코드: ${response.status})\n서버 에러 원인: ${errorText}`);
+                }
+            })
+            .catch(error => console.error("통신 장애:", error));
+    }
+
+    function deleteComment(commentId) {
+        if (!confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
+
+        const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+
+        fetch("/comments/" + commentId, {
+            method: "DELETE",
+            headers: {
+                [header]: token
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    loadComments(); // 댓글 목록 새로고침
+                } else {
+                    alert("댓글 삭제 권한이 없거나 실패했습니다.");
+                }
+            })
+            .catch(error => console.error("댓글 삭제 통신 에러:", error));
+    }
+
+    // 좋아요 토글
+    function toggleCommentLike(commentId) {
+        fetch(`/comments/${commentId}/like`, {
+            method: "POST",
+            headers: getAuthHeaders()
+        })
+            .then(async response => {
+                if (response.ok) {
+                    loadComments();
+                } else {
+                    const errorText = await response.text();
+                    alert(`좋아요 실패 (상태코드: ${response.status})\n서버 에러 원인: ${errorText}`);
+                }
+            })
+            .catch(error => console.error("좋아요 처리 실패:", error));
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        loadComments();
+    });
+
+    function sendReport(type, id) {
+        const reason = prompt("신고 사유를 입력해 주세요 (예: 욕설, 도배, 비방 등):");
+        if (!reason || !reason.trim()) {
+            return; // 취소 처리
+        }
+
+        const token = document.querySelector("meta[name='_csrf']").getAttribute("content");
+        const header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+
+        fetch("/api/reports", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json",
+                [header]: token
+        },
+        body: JSON.stringify({
+            targetType: type,
+            targetId: id,
+            reason: reason
+        })
+    })
+    .then(response => {
+        if(response.ok) {
+            alert("신고가 완료되었습니다. 관리자 검토 후 조치됩니다.");
+        } else {
+            alert("신고에 실패했습니다. 로그인 상태를 확인해 주세요.");
+        }
+    })
+        .catch(error => console.error("통신 에러:", error));
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+:root {
+    --pink: #ff7bac;
+    --pink-deep: #f0558a;
+    --pink-light: #ffe4ef;
+    --pink-pale: #fff5f9;
+    --mint: #06d6a0;
+    --mint-light: #dffbf4;
+    --purple: #9b72cf;
+    --purple-light: #f0e8ff;
+    --yellow-light: #fff7df;
+    --dark: #2d1b2e;
+    --mid: #6b4c6e;
+    --muted: #a08aa3;
+    --bg: #fff8fb;
+    --white: #ffffff;
+    --radius-xl: 28px;
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --pill: 999px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Sora', sans-serif;
+}
+
+body {
+    background: var(--bg);
+    color: var(--dark);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.diagnosis-main-page {
+    width: 100%;
+    padding: 32px 34px 60px;
+}
+
+.main-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 150px;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, #ffd1e2 0%, #ffe8f1 45%, #f0e8ff 100%);
+    box-shadow: 0 14px 36px rgba(255, 123, 172, 0.20);
+    padding: 32px 40px;
+    margin: 0 auto 24px;
+    max-width: 1100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.main-hero::before {
+    content: "🐾";
+    position: absolute;
+    font-size: 110px;
+    color: rgba(255, 123, 172, 0.16);
+    left: 28%;
+    top: 0;
+    transform: rotate(-18deg);
+}
+
+.hero-center {
+    position: relative;
+    z-index: 2;
+}
+
+.main-hero h2 {
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--dark);
+    margin-bottom: 8px;
+}
+
+.main-hero p {
+    color: var(--mid);
+    font-weight: 700;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.hero-icon-left,
+.hero-icon-right {
+    position: absolute;
+    font-size: 58px;
+    z-index: 2;
+}
+
+.hero-icon-left {
+    left: 34px;
+    bottom: 28px;
+}
+
+.hero-icon-right {
+    right: 44px;
+    bottom: 8px;
+    opacity: 0.55;
+    z-index: 1;
+}
+
+.card-grid {
+    max-width: 1100px;
+    margin: 0 auto 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.menu-card {
+    display: block;
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 26px;
+    text-decoration: none;
+    color: var(--dark);
+    border: 1px solid rgba(255, 123, 172, 0.08);
+    min-height: 210px;
+    transition: 0.22s;
+    box-shadow: 0 6px 24px rgba(45, 27, 46, 0.07);
+}
+
+.menu-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(45, 27, 46, 0.12);
+    color: var(--dark);
+}
+
+.menu-card.pink {
+    background: linear-gradient(135deg, #fff5f9, #ffffff);
+}
+
+.menu-card.yellow {
+    background: linear-gradient(135deg, #fffaf0, #ffffff);
+}
+
+.menu-card.mint {
+    background: linear-gradient(135deg, #f0fffb, #ffffff);
+}
+
+.menu-card.purple {
+    background: linear-gradient(135deg, #f7f2ff, #ffffff);
+}
+
+.icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: var(--pink-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    margin-bottom: 18px;
+}
+
+.menu-card.yellow .icon {
+    background: var(--yellow-light);
+}
+
+.menu-card.mint .icon {
+    background: var(--mint-light);
+}
+
+.menu-card.purple .icon {
+    background: var(--purple-light);
+}
+
+.card-title {
+    font-size: 19px;
+    font-weight: 900;
+    margin-bottom: 10px;
+    color: var(--dark);
+}
+
+.card-desc {
+    color: var(--mid);
+    font-weight: 700;
+    line-height: 1.7;
+    min-height: 48px;
+}
+
+.card-arrow {
+    margin-top: 18px;
+    color: var(--pink-deep);
+    font-weight: 900;
+}
+
+.content-layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 22px;
+    align-items: start;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 900;
+    margin-bottom: 15px;
+    color: var(--dark);
+}
+
+.history-box,
+.guide-box {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    box-shadow: 0 6px 24px rgba(45, 27, 46, 0.07);
+    border: 1px solid rgba(255, 123, 172, 0.08);
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 123, 172, 0.12);
+}
+
+.history-item:last-of-type {
+    border-bottom: none;
+}
+
+.history-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.history-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 15px;
+    background: var(--pink-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.history-pet {
+    font-weight: 900;
+    color: var(--dark);
+    margin-bottom: 3px;
+}
+
+.history-disease {
+    color: var(--pink-deep);
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 3px;
+}
+
+.history-date {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.history-more {
+    margin-top: 15px;
+}
+
+.history-link {
+    display: inline-flex;
+    text-decoration: none;
+    color: var(--pink-deep);
+    font-weight: 900;
+}
+
+.history-link:hover {
+    color: var(--pink-deep);
+    text-decoration: underline;
+}
+
+.empty-box {
+    text-align: center;
+    padding: 38px 16px;
+}
+
+.empty-icon {
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+.empty-title {
+    font-weight: 900;
+    color: var(--dark);
+    margin-bottom: 6px;
+}
+
+.empty-desc {
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.guide-box {
+    background: linear-gradient(135deg, #fffaf0, #ffffff);
+}
+
+.guide-box ul {
+    margin: 0;
+    padding-left: 18px;
+    line-height: 1.9;
+    color: var(--mid);
+    font-weight: 700;
+    font-size: 13px;
+}
+
+@media (max-width: 1000px) {
+    .card-grid,
+    .content-layout {
+        max-width: 720px;
+        grid-template-columns: 1fr;
+    }
+
+    .main-hero {
+        flex-direction: column;
+        max-width: 720px;
+    }
+
+    .hero-icon-left,
+    .hero-icon-right {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .diagnosis-main-page {
+        padding: 20px 14px 40px;
+    }
+
+    .main-hero {
+        padding: 28px 18px;
+    }
+
+    .main-hero h2 {
+        font-size: 30px;
+    }
+
+    .menu-card {
+        min-height: auto;
+    }
+
+    .history-left {
+        align-items: flex-start;
+    }
+}

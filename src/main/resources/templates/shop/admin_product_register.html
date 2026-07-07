@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 - 상품 등록</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/shop/shop-product-form.css}" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shop-card form-container p-5 bg-white shadow-sm" style="border-radius: 24px;">
+                <h2 class="fw-bold text-dark text-center mb-4"><i class="bi bi-plus-circle-fill text-warning"></i> 새 상품 등록</h2>
+
+                <form th:action="@{/admin/shop/new}" th:object="${productRequestDto}" method="post" enctype="multipart/form-data">
+
+                    <div class="form-group mb-3">
+                        <label class="info-label">상품명</label>
+                        <input type="text" th:field="*{name}" class="form-control" placeholder="상품 이름을 입력하세요" required>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="info-label">가격</label>
+                                <input type="number" th:field="*{price}" class="form-control" placeholder="0원" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="info-label">재고</label>
+                                <input type="number" th:field="*{stock}" class="form-control" placeholder="0개" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="info-label">카테고리</label>
+                                <input type="text" th:field="*{category}" class="form-control" placeholder="예: 사료, 간식">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label class="info-label">반려동물 종</label>
+                                <input type="text" th:field="*{petSpecies}" class="form-control" placeholder="예: 강아지, 고양이">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="info-label">상세 설명</label>
+                        <textarea th:field="*{description}" class="form-control" placeholder="상품에 대한 상세한 설명을 적어주세요"></textarea>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="info-label">상품 이미지</label>
+                        <input type="file" name="imageFile" accept="image/*" class="form-control" onchange="previewCreateImage(this)" required>
+                        <div id="imagePreviewArea" class="mt-3 text-center d-none">
+                            <img id="createImagePreview" class="rounded border shadow-sm" style="max-width: 140px; max-height: 140px; object-fit: cover;" alt="미리보기">
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="info-label">상세 설명 이미지</label>
+                        <input type="file" name="descImgFile" accept="image/*" class="form-control" onchange="previewDescImage(this)">
+                        <div id="descImagePreviewArea" class="mt-3 text-center d-none">
+                            <img id="createDescPreview" class="rounded border shadow-sm" style="max-width: 140px; max-height: 140px; object-fit: cover;" alt="미리보기">
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="info-label">소재</label>
+                                <input type="text" th:field="*{material}" class="form-control" placeholder="소재">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="info-label">사이즈</label>
+                                <input type="text" th:field="*{sizeInfo}" class="form-control" placeholder="사이즈 정보">
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label class="info-label">원산지</label>
+                                <input type="text" th:field="*{origin}" class="form-control" placeholder="원산지">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2.5 fw-bold primary-cart-action mb-2" style="border-radius: 999px;">상품 등록하기</button>
+                    <div class="text-center mt-3">
+                        <a href="/admin/shop/list" class="cancel-link fw-bold text-decoration-none">취소</a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    function previewCreateImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('createImagePreview');
+                const previewArea = document.getElementById('imagePreviewArea');
+                if (previewImg && previewArea) {
+                    previewImg.src = e.target.result;
+                    previewArea.classList.remove('d-none');
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function previewDescImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('createDescPreview');
+                const previewArea = document.getElementById('descImagePreviewArea');
+                if (previewImg && previewArea) {
+                    previewImg.src = e.target.result;
+                    previewArea.classList.remove('d-none');
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+</body>
+</html>

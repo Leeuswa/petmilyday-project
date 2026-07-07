@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>펫밀리데이 - 모임 개설</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/community/community-form.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+    <h2 class="page-title">새 모임 개설</h2>
+
+    <form th:action="@{/community/meetup/register}" method="post" th:object="${meetupPostDTO}">
+        <div class="form-group">
+            <label for="title">제목</label>
+            <input type="text" id="title" th:field="*{title}" class="form-control" placeholder="모임 제목을 입력하세요">
+            <span class="error-msg" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="location">모임 장소</label>
+            <input type="text" id="location" th:field="*{location}" class="form-control" placeholder="예: 여의도 한강공원 배달존 앞">
+            <span class="error-msg" th:if="${#fields.hasErrors('location')}" th:errors="*{location}"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="meetupDate">모임 일시</label>
+            <input type="datetime-local" id="meetupDate" th:field="*{meetupDate}" class="form-control">
+            <span class="error-msg" th:if="${#fields.hasErrors('meetupDate')}" th:errors="*{meetupDate}"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="maxParticipants">최대 참여 인원</label>
+            <input type="number" id="maxParticipants" th:field="*{maxParticipants}" class="form-control" min="2" placeholder="최소 2명 이상 설정 가능">
+            <span class="error-msg" th:if="${#fields.hasErrors('maxParticipants')}" th:errors="*{maxParticipants}"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="content">내용</label>
+            <textarea id="content" th:field="*{content}" class="form-control" placeholder="준비물이나 아이들을 위한 안내 사항을 적어주세요."></textarea>
+            <span class="error-msg" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></span>
+        </div>
+
+        <div class="btn-wrap">
+            <a th:href="@{/community/meetup/list}" class="btn btn-secondary">취소</a>
+            <button type="submit" class="btn btn-primary">모임 생성</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

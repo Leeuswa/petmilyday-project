@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>병원 등록</title>
+  <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/hospitalForms.css}">
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <aside th:replace="~{fragments/adminSidebar :: adminSidebar('hospitals')}"></aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div>
+        <h2>병원 등록</h2>
+        <p>관리자가 병원의 기본정보를 입력합니다. 세부정보와 운영시간은 병원관리자가 수정합니다.</p>
+      </div>
+      <a th:href="@{/admin/hospitals/}" class="btn btn-outline">목록</a>
+    </div>
+
+    <div class="hf-card">
+      <div class="hf-card-head">
+        <span class="icon">🏥</span>
+        <div>
+          <strong>병원 기본정보</strong>
+          <span>병원명, 연락처, 위치 정보를 입력하세요.</span>
+        </div>
+      </div>
+
+      <form th:action="@{/admin/hospitals/register}"
+            th:object="${hospitalDTO}"
+            method="post"
+            class="hf-card-body">
+
+        <div class="error" th:if="${error}" th:text="${error}" style="margin-bottom:16px;"></div>
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label class="form-label">병원명</label>
+            <input type="text"
+                   class="form-control"
+                   th:field="*{name}"
+                   placeholder="예: 펫밀리 동물병원">
+            <div class="error"
+                 th:if="${#fields.hasErrors('name')}"
+                 th:errors="*{name}"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">전화번호</label>
+            <input type="text"
+                   class="form-control"
+                   th:field="*{phone}"
+                   placeholder="예: 02-1234-5678">
+            <div class="error"
+                 th:if="${#fields.hasErrors('phone')}"
+                 th:errors="*{phone}"></div>
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label">주소</label>
+            <div class="address-search-row">
+              <input type="text"
+                     class="form-control"
+                     id="address"
+                     th:field="*{address}"
+                     placeholder="주소 검색 버튼을 클릭하세요"
+                     readonly>
+              <button type="button" class="btn btn-outline" onclick="execDaumPostcode()">주소 검색</button>
+            </div>
+            <div class="error"
+                 th:if="${#fields.hasErrors('address')}"
+                 th:errors="*{address}"></div>
+          </div>
+
+        </div>
+
+        <div class="actions">
+          <a th:href="@{/admin/hospitals/}" class="btn btn-gray">취소</a>
+          <button type="submit" class="btn btn-primary">병원 등록</button>
+        </div>
+
+      </form>
+    </div>
+  </main>
+</div>
+
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+    function execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function (data) {
+                document.getElementById('address').value = data.roadAddress || data.jibunAddress;
+            }
+        }).open();
+    }
+</script>
+
+</body>
+</html>
