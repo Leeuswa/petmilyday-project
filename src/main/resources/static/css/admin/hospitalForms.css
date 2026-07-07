@@ -1,0 +1,149 @@
+.hf-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.hf-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+  overflow: hidden;
+}
+
+.hf-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.hf-card-head .icon {
+  font-size: 20px;
+}
+
+.hf-card-head strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.hf-card-head span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12.5px;
+  color: #6b7280;
+}
+
+.hf-card-body {
+  padding: 24px;
+}
+
+.hf-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.hf-info-item {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f9fafb;
+  border: 1px solid #f1f5f9;
+}
+
+.hf-info-item.full {
+  grid-column: 1 / -1;
+}
+
+.hf-info-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #6b7280;
+}
+
+.hf-info-value {
+  font-size: 15px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.hf-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 800;
+}
+
+.hf-pill-on {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.hf-pill-off {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.hf-hours-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.hf-hours-table th {
+  padding: 10px 12px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  font-weight: 800;
+  text-align: center;
+}
+
+.hf-hours-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: center;
+  color: #111827;
+}
+
+.hf-day-closed {
+  color: #9ca3af;
+  font-weight: 800;
+}
+
+.hf-day-open {
+  color: #15803d;
+  font-weight: 800;
+}
+
+.hf-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.address-search-row {
+  display: flex;
+  gap: 8px;
+}
+
+.address-search-row .form-control {
+  flex: 1;
+  background: #f9fafb;
+}
+
+.address-search-row .btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}

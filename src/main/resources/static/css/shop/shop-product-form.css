@@ -1,0 +1,89 @@
+@charset "UTF-8";
+
+body {
+    background-color: #FFF8FB !important;
+    background-image:
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.06'%3E🐾%3C/text%3E%3C/svg%3E"),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ctext y='50' x='15' font-size='32' opacity='0.06'%3E🐾%3C/text%3E%3C/svg%3E") !important;
+    background-position: 0px 0px, 150px 150px !important;
+    background-size: 300px 300px !important;
+    background-repeat: repeat !important;
+    font-family: 'Nunito', 'Sora', sans-serif;
+    color: #2D1B2E;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 40px 20px;
+}
+
+.shop-card {
+    border: 1px solid rgba(255,123,172,.12) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 12px 32px rgba(45,27,46,.04) !important;
+    background-color: #ffffff !important;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 650px;
+    padding: 40px !important;
+}
+
+.info-label {
+    color: #6B4C6E;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 6px !important;
+    display: block;
+}
+
+.form-control {
+    border-radius: 12px !important;
+    border: 1px solid #FFE4EF !important;
+    color: #2D1B2E !important;
+    padding: 12px 16px !important;
+    font-size: 1rem !important;
+    background-color: #ffffff !important;
+}
+
+.form-control:focus {
+    border-color: #FF7BAC !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 123, 172, 0.15) !important;
+    background-color: #ffffff !important;
+}
+
+textarea.form-control {
+    height: 120px;
+    resize: vertical;
+}
+
+.primary-cart-action {
+    background: linear-gradient(135deg, #FF7BAC, #F0558A) !important;
+    border: none !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    border-radius: 999px !important;
+    font-size: 1.1rem !important;
+    box-shadow: 0 4px 16px rgba(255,85,138,.25) !important;
+    transition: transform .2s, box-shadow .2s !important;
+}
+
+.primary-cart-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255,85,138,.35) !important;
+    background: linear-gradient(135deg, #FF7BAC, #F0558A) !important;
+}
+
+.cancel-link {
+    color: #A08AA3 !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: color 0.15s ease;
+}
+
+.cancel-link:hover {
+    color: #F0558A !important;
+}

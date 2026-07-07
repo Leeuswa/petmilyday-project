@@ -2,8 +2,10 @@ package com.petmilyday.dto.product;
 
 import com.petmilyday.entity.product.Product;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class ProductResponseDto {
     private Long id;
     private String name;
@@ -17,7 +19,11 @@ public class ProductResponseDto {
     private String material;
     private String sizeInfo;
     private String origin;
+    private String descImgUrl;
 
+    private boolean isDeleted;
+
+    // 상품 엔티티 데이터를 정보 조회 및 상세 화면용 DTO로 변환
     public ProductResponseDto(Product entity) {
         this.id = entity.getId();
         this.name = entity.getName();
@@ -31,5 +37,7 @@ public class ProductResponseDto {
         this.material = entity.getMaterial();
         this.sizeInfo = entity.getSizeInfo();
         this.origin = entity.getOrigin();
+        this.isDeleted = entity.isDeleted();
+        this.descImgUrl = entity.getDescImgUrl();
     }
 }

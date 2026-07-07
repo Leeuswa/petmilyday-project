@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>상품 리뷰 조회</title>
+  <link rel="stylesheet" th:href="@{/css/admin/adminHospital.css}">
+
+  <style>
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .page-title-box h2 {
+      margin: 0 0 8px;
+      font-size: 26px;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    .page-title-box p {
+      margin: 0;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .summary-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .summary-item {
+      min-width: 150px;
+      padding: 16px 18px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+
+    .summary-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .summary-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .review-card {
+      padding: 22px;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .table thead th {
+      padding: 14px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #f9fafb;
+      color: #374151;
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .table tbody td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #f1f5f9;
+      color: #374151;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .table tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .product-name {
+      max-width: 170px;
+      font-weight: 700;
+      color: #111827;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .review-content {
+      max-width: 300px;
+      color: #4b5563;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .rating-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 46px;
+      height: 30px;
+      border-radius: 999px;
+      background: #fef3c7;
+      color: #92400e;
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .action-area {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn-sm {
+      padding: 7px 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .alert {
+      margin-bottom: 16px;
+      padding: 13px 16px;
+      border-radius: 10px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    .alert p {
+      margin: 0;
+    }
+
+    .alert-error {
+      border-color: #fecaca;
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .empty-row {
+      padding: 50px 0 !important;
+      color: #6b7280;
+      font-weight: 700;
+      background: #ffffff;
+    }
+
+    .pagination-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-top: 24px;
+    }
+
+    .page-link {
+      min-width: 38px;
+      height: 38px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      background: #ffffff;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .page-link:hover {
+      background: #f3f4f6;
+    }
+
+    .page-link.active {
+      border-color: #2563eb;
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .page-link.disabled {
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: default;
+    }
+
+    .page-info {
+      margin-top: 12px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+  <aside th:replace="~{fragments/adminSidebar :: adminSidebar('productReviews')}"></aside>
+
+  <main class="content">
+
+    <div class="page-header">
+      <div class="page-title-box">
+        <h2>상품 리뷰 조회</h2>
+        <p>동물용품샵 상품 리뷰 전체를 조회하고, 신고 해제 또는 삭제 처리할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-item">
+        <span class="summary-label">전체 리뷰</span>
+        <strong class="summary-value"
+                th:text="${reviewPage != null ? reviewPage.totalElements : 0}">
+          0
+        </strong>
+      </div>
+
+      <div class="summary-item">
+        <span class="summary-label">현재 페이지</span>
+        <strong class="summary-value"
+                th:text="${totalPages == 0 ? 0 : currentPage + 1}">
+          1
+        </strong>
+      </div>
+
+      <div class="summary-item">
+        <span class="summary-label">전체 페이지</span>
+        <strong class="summary-value"
+                th:text="${totalPages}">
+          1
+        </strong>
+      </div>
+    </div>
+
+    <div class="review-card">
+
+      <div th:if="${message}" class="alert">
+        <p th:text="${message}"></p>
+      </div>
+
+      <div th:if="${error}" class="alert alert-error">
+        <p th:text="${error}"></p>
+      </div>
+
+      <form th:action="@{/admin/reviews/product}"
+            method="get"
+            style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:18px;">
+
+        <input type="text"
+               name="keyword"
+               placeholder="상품명/작성자/리뷰내용 검색"
+               th:value="${keyword}"
+               style="min-width:240px; padding:0 12px; height:38px; border:1px solid #d1d5db; border-radius:9px; font-size:14px;">
+
+        <button type="submit" class="btn-sm btn-primary">검색</button>
+        <a th:href="@{/admin/reviews/product}" class="page-link">초기화</a>
+      </form>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>리뷰번호</th>
+            <th>상품명</th>
+            <th>작성자</th>
+            <th>평점</th>
+            <th>리뷰 내용</th>
+            <th>작성일</th>
+            <th>상태</th>
+            <th>관리</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr th:if="${reviewList == null or reviewList.isEmpty()}">
+            <td colspan="8" class="empty-row">
+              등록된 리뷰가 없습니다.
+            </td>
+          </tr>
+
+          <tr th:each="review : ${reviewList}">
+            <td th:text="${review.id}">1</td>
+
+            <td class="product-name"
+                th:text="${review.productName}">
+              상품명
+            </td>
+
+            <td th:text="${review.memberDisplayName}">
+              작성자
+            </td>
+
+            <td>
+              <span class="rating-badge"
+                    th:text="'★ ' + ${review.rating}">
+                ★ 5
+              </span>
+            </td>
+
+            <td class="review-content"
+                th:text="${review.content}">
+              리뷰 내용
+            </td>
+
+            <td th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}">
+              2026-06-16 12:00
+            </td>
+
+            <td>
+              <span th:if="${review.isReported}" class="badge badge-danger">
+                신고됨
+              </span>
+              <span th:unless="${review.isReported}" class="badge" style="background:#eef2f7; color:#475569;">
+                정상
+              </span>
+            </td>
+
+            <td>
+              <div class="action-area">
+                <form th:if="${review.isReported}"
+                      th:action="@{/admin/reviews/product/{reviewId}/restore(reviewId=${review.id})}"
+                      method="post"
+                      style="display:inline;">
+                  <button type="submit" class="btn-sm btn-primary">
+                    신고 해제
+                  </button>
+                </form>
+
+                <form th:action="@{/admin/reviews/product/{reviewId}/delete(reviewId=${review.id})}"
+                      method="post"
+                      style="display:inline;"
+                      onsubmit="return confirm('정말 이 리뷰를 삭제하시겠습니까?');">
+                  <button type="submit" class="btn-sm btn-danger">
+                    삭제
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination-area" th:if="${totalPages > 1}">
+
+        <a th:if="${currentPage > 0}"
+           class="page-link"
+           th:href="@{/admin/reviews/product(page=${currentPage - 1}, keyword=${keyword})}">
+          이전
+        </a>
+
+        <span th:if="${currentPage == 0}"
+              class="page-link disabled">
+          이전
+        </span>
+
+        <a th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+           th:if="${pageNum >= currentPage - 2 and pageNum <= currentPage + 2}"
+           th:href="@{/admin/reviews/product(page=${pageNum}, keyword=${keyword})}"
+           th:text="${pageNum + 1}"
+           th:class="${pageNum == currentPage ? 'page-link active' : 'page-link'}">
+          1
+        </a>
+
+        <a th:if="${currentPage < totalPages - 1}"
+           class="page-link"
+           th:href="@{/admin/reviews/product(page=${currentPage + 1}, keyword=${keyword})}">
+          다음
+        </a>
+
+        <span th:if="${currentPage >= totalPages - 1}"
+              class="page-link disabled">
+          다음
+        </span>
+
+      </div>
+
+      <div class="page-info" th:if="${reviewPage != null}">
+        <span th:text="${reviewPage.totalElements}">0</span>건 중
+        <span th:text="${reviewPage.numberOfElements}">0</span>건 표시
+      </div>
+
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

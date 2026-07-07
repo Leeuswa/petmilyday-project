@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>펫밀리데이 - 회원정보 수정</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/member/modify-profile.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+  <h2 class="page-title">회원정보 수정</h2>
+
+  <form th:action="@{/member/modify-profile}" method="post" th:object="${updateRequest}" onsubmit="return validateModifyForm()">
+
+    <div class="form-group">
+      <label for="name">이름</label>
+      <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="이름을 입력하세요">
+      <span class="error-msg" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+    </div>
+
+    <div class="form-group">
+      <label for="nickname">닉네임</label>
+      <input type="text" id="nickname" th:field="*{nickname}" class="form-control" placeholder="사용하실 닉네임을 입력하세요">
+      <span class="error-msg" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
+    </div>
+
+    <div class="form-group">
+      <label for="email">이메일</label>
+      <input type="text" id="email" th:field="*{email}" class="form-control" placeholder="이메일을 입력하세요">
+      <span class="error-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+    </div>
+
+    <div class="form-group">
+      <label for="phoneNumber">전화번호</label>
+      <input type="text" id="phoneNumber" th:field="*{phoneNumber}" class="form-control">
+      <span class="error-msg" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></span>
+    </div>
+
+    <div class="form-group">
+      <label for="address">주소</label>
+      <input type="text" id="address" th:field="*{address}" class="form-control">
+      <span class="error-msg" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+    </div>
+
+    <div class="form-group">
+      <label for="detailAddress">상세 주소</label>
+      <input type="text" id="detailAddress" th:field="*{detailAddress}" class="form-control">
+    </div>
+
+    <div class="form-group">
+      <label for="bio">한 줄 소개</label>
+      <input type="text" id="bio" th:field="*{bio}" class="form-control" placeholder="자신을 한 줄로 표현해 보세요">
+    </div>
+
+    <div class="btn-wrap">
+      <a th:href="@{/member/mypage}" class="btn-cancel">취소</a>
+      <button type="submit" class="btn-save">수정 완료</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function validateModifyForm() {
+    const nickname = document.getElementById("nickname").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phoneNumber = document.getElementById("phoneNumber").value.trim();
+    const bio = document.getElementById("bio").value.trim();
+
+    const name = document.getElementById("name").value.trim();
+
+    if (!name) {
+      alert("이름은 필수 입력 사항입니다.");
+      document.getElementById("name").focus();
+      return false;
+    }
+    if (name.length > 30) {
+      alert("이름은 30자 이내여야 합니다.");
+      document.getElementById("name").focus();
+      return false;
+    }
+
+    if (nickname.length > 30) {
+      alert("닉네임은 30자 이내여야 합니다.");
+      document.getElementById("nickname").focus();
+      return false;
+    }
+
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!email) {
+      alert("이메일은 필수 입력 사항입니다.");
+      document.getElementById("email").focus();
+      return false;
+    }
+    if (!emailRegex.test(email)) {
+      alert("올바른 이메일 형식이 아닙니다.");
+      document.getElementById("email").focus();
+      return false;
+    }
+
+    const phoneRegex = /^\d{3}-\d{4}-\d{4}$/;
+    if (phoneNumber && !phoneRegex.test(phoneNumber)) {
+      alert("전화번호는 000-0000-0000 형식이어야 합니다.");
+      document.getElementById("phoneNumber").focus();
+      return false;
+    }
+
+    if (bio.length > 30) {
+      alert("한 줄 소개는 30자 이내여야 합니다.");
+      document.getElementById("bio").focus();
+      return false;
+    }
+
+    return true;
+  }
+</script>
+</body>
+</html>

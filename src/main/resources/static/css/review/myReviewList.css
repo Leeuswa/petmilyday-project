@@ -1,0 +1,104 @@
+.page-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.pm-list-page-header h3 i {
+    color: var(--pm-purple);
+}
+
+.review-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.hospital-name {
+    font-weight: 900;
+    color: var(--pm-dark);
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+.hospital-name i {
+    color: var(--pm-pink);
+}
+
+.review-writer-small {
+    color: var(--pm-muted);
+    font-size: 13px;
+    margin-top: 5px;
+    font-weight: 700;
+}
+
+.review-date {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: var(--pm-r-pill);
+    background: var(--pm-pink-pale);
+    color: var(--pm-pink-deep);
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.star-rating {
+    color: var(--pm-yellow);
+    font-size: 18px;
+    margin: 12px 0 14px;
+}
+
+.score-text {
+    color: var(--pm-muted);
+    font-size: 13px;
+    font-weight: 800;
+    margin-left: 8px;
+}
+
+.review-content {
+    color: var(--pm-mid);
+    line-height: 1.7;
+    margin-bottom: 18px;
+    white-space: pre-line;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.pm-list-empty .btn-primary {
+    background: linear-gradient(135deg, var(--pm-pink), var(--pm-pink-deep));
+    border: none;
+}
+
+.review-meta {
+    color: var(--pm-muted);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.btn-detail {
+    border-radius: var(--pm-r-pill);
+    font-weight: 800;
+}
+
+.btn-detail.btn-outline-primary {
+    border-color: var(--pm-pink-light);
+    color: var(--pm-pink-deep);
+}
+
+.btn-detail.btn-outline-primary:hover {
+    background: var(--pm-pink-light);
+    border-color: var(--pm-pink);
+    color: var(--pm-pink-deep);
+}
+
+@media (max-width: 768px) {
+    .review-top {
+        flex-direction: column;
+    }
+
+    .review-date {
+        width: fit-content;
+    }
+}

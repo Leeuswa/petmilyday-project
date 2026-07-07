@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>펫밀리데이 - 모임 커뮤니티</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/community/list.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+    <h2 class="page-title">모임 게시판</h2>
+
+    <div class="post-list" th:unless="${#lists.isEmpty(responseDTO.dtoList)}">
+        <div class="post-item" th:each="post : ${responseDTO.dtoList}">
+            <div class="post-title-wrap">
+                <span th:classappend="${post.status == 'RECRUITING'} ? 'status-badge status-recruiting' : 'status-badge status-closed'"
+                      th:text="${post.status == 'RECRUITING'} ? '모집중' : '마감'"></span>
+                <a th:href="@{/community/meetup/read(id=${post.id})}" th:text="${post.title}"></a>
+            </div>
+
+            <div class="meetup-meta-info" style="display:flex; gap:15px; font-size:13px; color:var(--mid); margin-top:8px; font-weight:600;">
+                <span>📍 장소: <span th:text="${post.location}"></span></span>
+                <span>⏰ 일시: <span th:text="${#temporals.format(post.meetupDate, 'yyyy-MM-dd HH:mm')}"></span></span>
+                <span>👥 정원: <span th:text="${post.currentParticipants} + ' / ' + ${post.maxParticipants} + '명'"></span></span>
+            </div>
+
+            <div style="font-size: 12px; color: var(--muted); margin-top: 8px; font-weight:600;">
+                주최자: <span th:text="${post.hostName}"></span> | 조회수: <span th:text="${post.viewCount}"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="board-footer">
+        <div class="pagination">
+            <a th:if="${responseDTO.prev}" th:href="@{/community/meetup/list(page=${responseDTO.start - 1})}">이전</a>
+            <a th:each="num : ${#numbers.sequence(responseDTO.start, responseDTO.end)}"
+               th:href="@{/community/meetup/list(page=${num})}"
+               th:classappend="${num == responseDTO.page} ? 'active' : ''" th:text="${num}"></a>
+            <a th:if="${responseDTO.next}" th:href="@{/community/meetup/list(page=${responseDTO.end + 1})}">다음</a>
+        </div>
+        <a th:href="@{/community/meetup/register}" class="write-btn">모임 개설</a>
+    </div>
+</div>
+
+</body>
+</html>

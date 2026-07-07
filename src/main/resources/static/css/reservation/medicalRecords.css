@@ -1,0 +1,104 @@
+.medical-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.pm-list-page-header h3 i {
+    color: var(--pm-mint);
+}
+
+.hospital-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--pm-dark);
+}
+
+.done-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: var(--pm-r-pill);
+    background: var(--pm-mint-light);
+    color: #0a8f6c;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.done-badge::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 18px;
+    margin-top: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--pm-mid);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.info-item i {
+    color: var(--pm-pink);
+    font-size: 15px;
+}
+
+.record-footer {
+    margin-top: 20px;
+    padding: 15px 16px;
+    border-radius: var(--pm-r-lg);
+    background: var(--pm-pink-pale);
+    border: 1px solid var(--pm-pink-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.record-number {
+    color: var(--pm-muted);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.btn-detail {
+    border-radius: var(--pm-r-pill);
+    font-weight: 800;
+    padding: 8px 13px;
+}
+
+.record-footer .btn-outline-primary {
+    border-color: var(--pm-pink-light);
+    color: var(--pm-pink-deep);
+}
+
+.record-footer .btn-outline-primary:hover {
+    background: var(--pm-pink-light);
+    border-color: var(--pm-pink);
+    color: var(--pm-pink-deep);
+}
+
+.pm-list-empty .btn-primary {
+    background: linear-gradient(135deg, var(--pm-pink), var(--pm-pink-deep));
+    border: none;
+    border-radius: var(--pm-r-pill);
+}
+
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}

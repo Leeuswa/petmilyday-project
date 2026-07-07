@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+  <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>펫밀리데이 - 회원가입</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+<div class="auth-wrapper register-wrapper">
+  <div class="auth-header">
+    <div class="logo">
+      <span class="logo-text">petmilyday</span>
+    </div>
+    <h1 style="font-size: 24px; font-weight: 800; margin-top: 15px; margin-bottom: 5px;">시작해볼까요</h1>
+    <p style="font-size: 14px; margin: 0; color: #6B4C6E;">반려동물의 모든 일상을 기록하세요</p>
+  </div>
+
+  <div class="auth-card">
+    <h2 class="auth-title">만나서 반가워요</h2>
+
+    <div class="social-login">
+      <a th:href="@{/oauth2/authorization/kakao}" class="social-btn kakao-btn">
+        <span class="icon" style="margin-right: 8px;">💬</span> 카카오로 시작하기
+      </a>
+      <a th:href="@{/oauth2/authorization/google}" class="social-btn google-btn">
+        <span class="icon" style="margin-right: 8px;">G</span> Google로 시작하기
+      </a>
+    </div>
+
+    <div class="divider">
+      <span>또는</span>
+    </div>
+
+    <form th:action="@{/member/register}" th:object="${registerRequest}" method="post" onsubmit="return validateForm()">
+      <div class="form-group">
+        <label for="username">아이디<span style="color: red;"> *</span></label>
+
+        <div style="display: flex; gap: 8px; align-items: stretch;">
+          <input type="text" id="username" th:field="*{username}" class="form-control" placeholder="영문, 숫자 조합 4~20자" required style="margin-bottom: 0;">
+          <button type="button" class="auth-btn" style="width: auto; min-width: 100px; padding: 0 15px; font-size: 14px; white-space: nowrap; margin: 0; border-radius: 16px;" onclick="checkUsernameDuplicate()">중복 확인</button>
+        </div>
+        <input type="hidden" id="isUsernameChecked" value="false">
+        <span class="error-msg" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="password">비밀번호<span style="color: red;"> *</span></label>
+        <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="8자에서 20자 이내 대소문자 특수문자 조합" required>
+        <span class="error-msg" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="passwordConfirm">비밀번호 확인<span style="color: red;"> *</span></label>
+        <input type="password" id="passwordConfirm" class="form-control" placeholder="비밀번호를 한 번 더 적어주세요" required>
+      </div>
+
+      <div class="form-group">
+        <label for="name">이름<span style="color: red;"> *</span></label>
+        <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="성명을 입력하세요" required>
+        <span class="error-msg" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="nickname">닉네임<span style="color: red;"> *</span></label>
+        <input type="text" id="nickname" th:field="*{nickname}" class="form-control" placeholder="사용하실 닉네임을 적어주세요" required>
+        <span class="error-msg" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">이메일<span style="color: red;"> *</span></label>
+        <input type="email" id="email" th:field="*{email}" class="form-control" placeholder="example@petmily.com" required>
+        <span class="error-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="detailAddress">전화번호</label>
+        <input type="text" id="phoneNumber" th:field="*{phoneNumber}" class="form-control" placeholder="000-0000-0000 형식으로 입력하세요">
+      </div>
+
+      <div class="form-group">
+        <label for="address">주소</label>
+        <input type="text" id="address" th:field="*{address}" class="form-control" placeholder="시/군/구 주소를 입력하세요">
+      </div>
+
+      <div class="form-group">
+        <label for="detailAddress">상세 주소</label>
+        <input type="text" id="detailAddress" th:field="*{detailAddress}" class="form-control" placeholder="나머지 상세 주소를 입력하세요">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 25px;">
+        <label for="bio">한 줄 소개</label>
+        <textarea id="bio" th:field="*{bio}" class="form-control" style="resize: none; height: 90px;" placeholder="나와 나의 반려동물을 소개해 주세요! (최대 30자)"></textarea>
+      </div>
+
+      <button type="submit" class="auth-btn">반려인 회원가입 완료</button>
+    </form>
+  </div>
+
+  <div class="auth-footer">
+    이미 계정이 있으신가요? <a th:href="@{/member/login}">로그인하러 가기</a>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  function checkUsernameDuplicate() {
+    const usernameInput = document.getElementById("username");
+    const username = usernameInput.value.trim();
+
+    if (!username) {
+      alert("아이디를 입력해 주세요.");
+      usernameInput.focus();
+      return;
+    }
+
+    if (username.length < 4 || username.length > 20) {
+      alert("아이디는 4자 이상 20자 이하로 입력해 주세요.");
+      usernameInput.focus();
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9]+$/.test(username)) {
+      alert("아이디는 영문과 숫자만 사용할 수 있습니다.");
+      usernameInput.focus();
+      return;
+    }
+
+    const tokenElement = document.querySelector("meta[name='_csrf']");
+    const headerElement = document.querySelector("meta[name='_csrf_header']");
+    const token = tokenElement ? tokenElement.getAttribute("content") : "";
+    const header = headerElement ? headerElement.getAttribute("content") : "";
+
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    if (header && token) {
+      headers[header] = token;
+    }
+
+    fetch(`/member/check-username?username=${encodeURIComponent(username)}`, {
+      method: "GET",
+      headers: headers
+    })
+            .then(response => response.json())
+            .then(isDuplicated => {
+              if (isDuplicated) {
+                alert("이미 사용 중인 아이디입니다. 다른 아이디를 입력해 주세요.");
+                document.getElementById("isUsernameChecked").value = "false";
+              } else {
+                alert("사용 가능한 아이디입니다!");
+                document.getElementById("isUsernameChecked").value = "true";
+                usernameInput.readOnly = true;
+                usernameInput.style.backgroundColor = "var(--pink-pale)";
+              }
+            })
+            .catch(error => {
+              console.error("중복 확인 통신 에러:", error);
+              alert("중복 확인 통신 중 에러가 발생했습니다.");
+            });
+  }
+
+  document.getElementById("registerForm").addEventListener("submit", function(e) {
+    const isUsernameChecked = document.getElementById("isUsernameChecked").value;
+    if (isUsernameChecked !== "true") {
+      e.preventDefault();
+      alert("아이디 중복 확인을 먼저 완료해 주세요.");
+    }
+  });
+
+  function validateForm() {
+    const pw = document.getElementById("password").value;
+    const pwConfirm = document.getElementById("passwordConfirm").value;
+
+    if (pw !== pwConfirm) {
+      alert("비밀번호와 비밀번호 확인 칸의 입력값이 서로 다릅니다.");
+      document.getElementById("passwordConfirm").focus();
+      return false;
+    }
+
+    const phoneInput = document.getElementById("phoneNumber");
+
+    // 전화번호 입력칸이 존재하고, 빈 값이 아닐 때만 검사
+    if (phoneInput && phoneInput.value.trim() !== "") {
+      const phoneRegex = /^\d{2,3}-\d{3,4}-\d{4}$/;
+
+      if (!phoneRegex.test(phoneInput.value)) {
+        alert("전화번호는 하이픈(-)을 포함하여 000-0000-0000 형식으로 입력해 주세요.");
+        phoneInput.focus();
+        return false;
+      }
+    }
+    return true;
+  }
+</script>
+</body>
+</html>
